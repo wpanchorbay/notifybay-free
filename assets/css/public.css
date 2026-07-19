@@ -1,0 +1,217 @@
+/**
+ * NotifyBay Public Styles
+ */
+
+.notifybay-frontend-root {
+    margin: 15px 0;
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-left: 10px !important;
+}
+
+.notifybay-frontend-root.form-open {
+    margin-top: 20px !important;
+    margin-left: 0 !important;
+    display: block !important;
+}
+
+.notifybay-waitlist-wrapper, 
+.notifybay-wishlist-wrapper {
+    display: inline-block;
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    vertical-align: middle;
+}
+
+.notifybay-waitlist-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.notifybay-guest-form-wrapper {
+    display: block;
+    width: 100%;
+    box-shadow: none;
+}
+
+.notifybay-waitlist-desc {
+    font-size: 13px;
+    color: #4b5563;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.notifybay-form-fields {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.notifybay-form-fields input[type="email"] {
+    flex: 1;
+    padding: 11px 12px;
+    font-size: 14px;
+}
+
+.notifybay-form-fields select {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #fff;
+}
+
+.notifybay-fomo {
+    display: inline-flex;
+    align-items: center;
+    background: #fef2f2;
+    color: #991b1b;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    border: 1px solid #fee2e2;
+}
+
+.notifybay-fomo::before {
+    content: "🔥";
+    margin-right: 6px;
+}
+
+/* Functional states for JS */
+.notifybay-wishlist-btn.active,
+.notifybay-wishlist-btn:disabled,
+.notifybay-waitlist-form button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed !important;
+    pointer-events: none;
+    text-wrap: nowrap;
+}
+
+/* Toast Notification */
+.notifybay-toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #111827;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.notifybay-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.notifybay-toast .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: #059669;
+    border-radius: 50%;
+    font-size: 12px;
+}
+
+.notifybay-toast.error .icon {
+    background: #dc2626;
+}
+
+.notifybay-toast.error {
+    border-left: 4px solid #dc2626;
+}
+
+/* My Account Tabs Styling */
+.notifybay-thumbnail-wrapper {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+}
+
+.notifybay-product-thumb {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+}
+
+.notifybay-account-table .product-status mark.instock {
+    background: #d1fae5;
+    color: #065f46;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+}
+
+.notifybay-account-table .product-actions {
+    text-align: right;
+}
+
+.notifybay-account-table .button.secondary {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.notifybay-account-table .button.secondary:hover {
+    background-color: #e5e7eb;
+}
+
+/* My Account Menu Icons */
+.woocommerce-MyAccount-navigation-link--waitlist a,
+.woocommerce-MyAccount-navigation-link--wishlist a {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100%;
+}
+
+.woocommerce-MyAccount-navigation-link--waitlist a::before,
+.woocommerce-MyAccount-navigation-link--wishlist a::before {
+    display: none !important; /* Hide any theme-default icons on the left */
+}
+
+.woocommerce-MyAccount-navigation-link--waitlist a::after {
+    content: "\f160";
+    font-family: dashicons;
+    font-size: 18px;
+    opacity: 0.5;
+    margin-left: 10px;
+}
+
+.woocommerce-MyAccount-navigation-link--wishlist a::after {
+    content: "\f487";
+    font-family: dashicons;
+    font-size: 18px;
+    opacity: 0.5;
+    margin-left: 10px;
+}

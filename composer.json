@@ -1,0 +1,22 @@
+{
+    "name": "sankarsan/notifybay",
+    "description": "A comprehensive WordPress plugin boilerplate with React/TypeScript frontend.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "WPAnchorBay",
+            "email": "sankarsan@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "rakit/validation": "^1.4",
+        "woocommerce/action-scheduler": "^3.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "NotifyBay\\": "app/"
+        }
+    }
+}
