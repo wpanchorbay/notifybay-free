@@ -181,7 +181,7 @@ class FrontendController extends ApiController {
 			$user_email      = wp_get_current_user()->user_email;
 			$check_variation = $variation_id ? $variation_id : 0;
 
-			$is_subscribed_waitlist = (bool) $wpdb->get_var(
+			$is_subscribed_waitlist = (bool) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 				$wpdb->prepare(
 					"SELECT id FROM {$wpdb->prefix}notifybay_leads WHERE product_id = %d AND variation_id = %d AND user_email = %s AND type = 'waitlist' AND status IN ('active', 'pending_verification')", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 					$product_id,
@@ -353,7 +353,7 @@ class FrontendController extends ApiController {
 			}
 
 			// Calculate fresh wishlist count for the response
-			$wishlist_count = (int) $wpdb->get_var(
+			$wishlist_count = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 				$wpdb->prepare(
 					"SELECT COUNT(*) FROM {$wpdb->prefix}notifybay_leads WHERE user_email = %s AND type = 'wishlist' AND status = 'active'", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 					$validated['email']
@@ -398,7 +398,7 @@ class FrontendController extends ApiController {
 		$table      = $lead_model->get_table();
 
 		// Ensure the lead belongs to the user before unsubscribing
-		$result = $wpdb->update(
+		$result = $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$table,
 			array(
 				'status'     => 'unsubscribed',
@@ -412,7 +412,7 @@ class FrontendController extends ApiController {
 
 		if ( $result ) {
 			// Calculate fresh wishlist count for the response
-			$wishlist_count = (int) $wpdb->get_var(
+			$wishlist_count = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 				$wpdb->prepare(
 					"SELECT COUNT(*) FROM {$wpdb->prefix}notifybay_leads WHERE user_email = %s AND type = 'wishlist' AND status = 'active'", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 					$user_email
@@ -432,10 +432,30 @@ class FrontendController extends ApiController {
 	/**
 	 * Simple rate limiting using transients.
 	 *
+	 * Caps repeated signups from the same email address to curb spam and
+	 * email-bombing of the public subscribe endpoint. Returns false once the
+	 * threshold is exceeded within the window, so the caller can respond 429.
+	 *
 	 * @param string $email The user email.
-	 * @return bool
+	 * @return bool True if the request is within the allowed rate, false otherwise.
 	 */
 	private function check_rate_limit( $email ) {
+		$key   = 'notifybay_rl_' . md5( strtolower( (string) $email ) );
+		$count = (int) get_transient( $key );
+
+		/**
+		 * Filters the maximum number of signups allowed per email within the window.
+		 *
+		 * @since 1.0.0
+		 * @param int $max_attempts Default 5.
+		 */
+		$max_attempts = (int) apply_filters( 'notifybay_rate_limit_max_attempts', 5 );
+
+		if ( $count >= $max_attempts ) {
+			return false;
+		}
+
+		set_transient( $key, $count + 1, 10 * MINUTE_IN_SECONDS );
 		return true;
 	}
 }

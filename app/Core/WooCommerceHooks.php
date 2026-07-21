@@ -116,7 +116,7 @@ class WooCommerceHooks {
 		$lead_model = new Lead();
 		$table      = $lead_model->get_table();
 
-		$wpdb->delete( $table, array( 'product_id' => $post_id ) );
+		$wpdb->delete( $table, array( 'product_id' => $post_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 	}
 
 	/**
@@ -129,7 +129,7 @@ class WooCommerceHooks {
 		$lead_model = new Lead();
 		$table      = $lead_model->get_table();
 
-		$wpdb->delete( $table, array( 'variation_id' => $variation_id ) );
+		$wpdb->delete( $table, array( 'variation_id' => $variation_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 	}
 
 	/**
@@ -149,7 +149,7 @@ class WooCommerceHooks {
 			$lead_model = new Lead();
 			$table      = $lead_model->get_table();
 
-			$wpdb->update(
+			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 				$table,
 				array(
 					'status'     => 'expired',
@@ -175,7 +175,7 @@ class WooCommerceHooks {
 			$lead_model = new Lead();
 			$table      = $lead_model->get_table();
 
-			$wpdb->update(
+			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 				$table,
 				array(
 					'status'     => 'expired',
@@ -204,7 +204,7 @@ class WooCommerceHooks {
 		$lead_model = new Lead();
 		$table      = $lead_model->get_table();
 
-		$wpdb->update(
+		$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$table,
 			array(
 				'user_id'    => $customer_id,

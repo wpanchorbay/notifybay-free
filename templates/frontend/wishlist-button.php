@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <?php
 $notifybay_is_logged_in = is_user_logged_in();
-$is_variable            = isset( $is_variable ) ? $is_variable : false;
+$is_variable            = isset( $is_variable ) ? $is_variable : false; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- $is_variable is a template variable passed in by TemplateRenderer, not a plugin global.
 ?>
 <div class="notifybay-wishlist-wrapper" data-notifybay-type="wishlist">
 	<form class="notifybay-wishlist-form" onsubmit="return false;">

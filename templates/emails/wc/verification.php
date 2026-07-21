@@ -14,6 +14,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- WooCommerce email template: local vars ($product_name, $verify_url, $additional_content) are supplied by WC_Email and the woocommerce_email_header/footer hooks are core WooCommerce hooks. Standard WC template conventions, not plugin globals.
+
 $product_name = isset( $context['product_name'] ) ? $context['product_name'] : '';
 $verify_url   = isset( $context['verify_url'] ) ? $context['verify_url'] : '';
 
@@ -62,3 +64,5 @@ if ( $additional_content ) {
  * @hooked WC_Emails::email_footer() Output the email footer
  */
 do_action( 'woocommerce_email_footer', $email );
+
+// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals

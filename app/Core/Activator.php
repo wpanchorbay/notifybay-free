@@ -45,8 +45,8 @@ class Activator {
 		self::create_custom_tables();
 
 		// Register WooCommerce endpoints manually so they are included in the flush
-		add_rewrite_endpoint( 'waitlist', EP_PAGES );
-		add_rewrite_endpoint( 'wishlist', EP_PAGES );
+		add_rewrite_endpoint( 'notifybay-waitlist', EP_PAGES );
+		add_rewrite_endpoint( 'notifybay-wishlist', EP_PAGES );
 
 		// Flush rewrite rules.
 		flush_rewrite_rules();
@@ -82,9 +82,14 @@ class Activator {
 	private static function add_plugin_roles_and_capabilities() {
 		$custom_capability = 'manage_notifybay';
 
-		$admin_role = get_role( 'administrator' );
-		if ( $admin_role && ! $admin_role->has_cap( $custom_capability ) ) {
-			$admin_role->add_cap( $custom_capability );
+		// Grant to administrators and WooCommerce shop managers so store staff can
+		// manage waitlists/leads without full administrator access. Removal on
+		// deactivation is handled across all roles by Deactivator.
+		foreach ( array( 'administrator', 'shop_manager' ) as $role_name ) {
+			$role = get_role( $role_name );
+			if ( $role && ! $role->has_cap( $custom_capability ) ) {
+				$role->add_cap( $custom_capability );
+			}
 		}
 	}
 }

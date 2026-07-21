@@ -67,8 +67,8 @@ class Endpoints {
 			return;
 		}
 
-		$action = sanitize_text_field( $_GET['notifybay_action'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$token  = isset( $_GET['token'] ) ? sanitize_text_field( $_GET['token'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$action = sanitize_text_field( wp_unslash( $_GET['notifybay_action'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$token  = isset( $_GET['token'] ) ? sanitize_text_field( wp_unslash( $_GET['token'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		if ( 'verify' === $action ) {
 			$this->verify_lead( $token );
@@ -91,7 +91,7 @@ class Endpoints {
 		$lead_model = new Lead();
 		$table      = $lead_model->get_table();
 
-		$lead = $wpdb->get_row(
+		$lead = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
 				"SELECT * FROM {$wpdb->prefix}notifybay_leads WHERE verification_token = %s AND status = 'pending_verification'", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$token
@@ -102,7 +102,7 @@ class Endpoints {
 			wp_die( esc_html__( 'Invalid or expired verification link.', 'notifybay-waitlist-and-stock-alert-woo' ) );
 		}
 
-		$wpdb->update(
+		$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$table,
 			array(
 				'status'     => 'active',
@@ -132,7 +132,7 @@ class Endpoints {
 		$lead_model = new Lead();
 		$table      = $lead_model->get_table();
 
-		$lead = $wpdb->get_row(
+		$lead = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
 				"SELECT * FROM {$wpdb->prefix}notifybay_leads WHERE verification_token = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$token
@@ -143,7 +143,7 @@ class Endpoints {
 			wp_die( esc_html__( 'Unsubscribe failed. Lead not found.', 'notifybay-waitlist-and-stock-alert-woo' ) );
 		}
 
-		$wpdb->update(
+		$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$table,
 			array(
 				'status'     => 'unsubscribed',
@@ -241,7 +241,7 @@ class Endpoints {
 		$lead_model = new Lead();
 		$table      = $lead_model->get_table();
 
-		$count = $wpdb->delete( $table, array( 'user_email' => $email_address ) );
+		$count = $wpdb->delete( $table, array( 'user_email' => $email_address ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 
 		return array(
 			'items_removed'  => $count > 0,

@@ -14,6 +14,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- WooCommerce email template: local vars ($product_name, $buy_link, $additional_content) are supplied by WC_Email and the woocommerce_email_header/footer hooks are core WooCommerce hooks. Standard WC template conventions, not plugin globals.
+
 $product_name = isset( $context['product_name'] ) ? $context['product_name'] : '';
 $buy_link     = isset( $context['buy_link'] ) ? $context['buy_link'] : '';
 
@@ -69,3 +71,5 @@ echo wp_kses_post( $email->get_unsubscribe_html() );
  * @hooked WC_Emails::email_footer() Output the email footer
  */
 do_action( 'woocommerce_email_footer', $email );
+
+// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals

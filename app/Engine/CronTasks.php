@@ -99,7 +99,7 @@ class CronTasks {
 		$cutoff       = time() - ( 15 * MINUTE_IN_SECONDS );
 		$cutoff_mysql = gmdate( 'Y-m-d H:i:s', $cutoff );
 
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
 				"UPDATE {$table} SET status = 'active', updated_at = %s WHERE status = 'processing' AND updated_at <= %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				current_time( 'mysql' ),
@@ -119,7 +119,7 @@ class CronTasks {
 		$cutoff       = time() - DAY_IN_SECONDS;
 		$cutoff_mysql = gmdate( 'Y-m-d H:i:s', $cutoff );
 
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
 				"UPDATE {$table} SET status = 'expired', updated_at = %s WHERE status = 'pending_verification' AND created_at <= %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				current_time( 'mysql' ),
@@ -136,7 +136,7 @@ class CronTasks {
 		$table     = $wpdb->prefix . 'notifybay_leads';
 		$now_mysql = current_time( 'mysql' );
 
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
 				"UPDATE {$table} SET status = 'expired', updated_at = %s WHERE status = 'active' AND expires_at IS NOT NULL AND expires_at <= %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$now_mysql,

@@ -12,6 +12,9 @@
  * @author     WPAnchorBay <sankarsan@gmail.com>
  */
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 // Note: Gutenberg blocks (Waitlist/Wishlist) are a premium packaging feature and
 // are registered by NotifyBay Pro (its own Blocks class), not here.
 return array(

@@ -25,7 +25,7 @@ if ( $notifybay_deep_uninstall ) {
 
 	// Drop leads table. This also removes any rows NotifyBay Pro wrote
 	// (wishlist/price-drop leads) — Pro owns no tables of its own.
-	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}notifybay_leads" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}notifybay_leads" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 	// Delete options. This also removes Pro's license_key/license_status,
 	// which live inside this same shared option — Pro's own uninstall.php
@@ -34,6 +34,6 @@ if ( $notifybay_deep_uninstall ) {
 	delete_option( 'notifybay_version' );
 
 	// Delete transients (covers both notifybay_* and notifybaypro_* prefixes).
-	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_notifybay%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_notifybay%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_notifybay%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_notifybay%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 }

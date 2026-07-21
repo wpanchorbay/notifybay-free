@@ -37,7 +37,11 @@ if ( ! function_exists( 'notifybay_log' ) ) {
 			$logger  = wc_get_logger();
 			$context = array( 'source' => 'notifybay' );
 			$logger->log( $level_lower, $formatted_message, $context );
-		} else {
+		} elseif ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			// Last-resort sink used only when WC_Logger isn't available (WooCommerce is a
+			// hard dependency, so this branch is effectively unreachable in production) and
+			// only while debugging.
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_print_r -- documented debug-only fallback sink.
 			error_log( "[NotifyBay] [{$level_lower}]: " . print_r( $formatted_message, true ) );
 		}
 	}

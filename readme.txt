@@ -1,170 +1,68 @@
 === NotifyBay ===
 Contributors: wpanchorbay, sankarsan
-Tags: boilerplate, react, typescript, admin, rest-api
+Tags: woocommerce, waitlist, back-in-stock, wishlist, price-drop-alert
 Requires at least: 5.6
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.0
-Stable tag: 1.2.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-NotifyBay is a modern, production‑ready WordPress plugin boilerplate that bridges classic WordPress development with a full‑featured React/TypeScript admin UI.
+Capture high-intent leads on out-of-stock and price-watched WooCommerce products, then automatically notify customers when it matters.
 
 == Description ==
 
-NotifyBay is a modern, production‑ready WordPress plugin boilerplate that bridges classic WordPress development with a full‑featured React/TypeScript admin UI. It provides:
+NotifyBay bridges the gap between customer demand and inventory availability. It lets WooCommerce store owners capture high-intent leads when a product is out of stock (Waitlists) or when a customer wants to keep an eye on a product's price (Wishlists), then handles the follow-up automatically — recovering sales that would otherwise be lost.
 
-* A robust PHP backend built with OOP, PSR‑4 autoloading, and a singleton base class.
-* REST API infrastructure with permission‑checked base controllers.
-* Dynamic cron job manager for background tasks.
-* A resource generator CLI to scaffold models, migrations, and API controllers.
-* Full Settings API abstraction.
-* Database manager for custom tables plus a logger.
-* White‑labeling capabilities (plugin name, slug, icons, URLs).
-* Dual React component libraries:
-  * `common` – Modern Tailwind‑styled UI components.
-  * `classics` – Components that mimic native WordPress/WooCommerce styling.
-* Tailwind CSS integration with a custom prefix (`notifybay-`) and a pre‑flight guard to preserve native styles.
-* Production build system powered by `@wordpress/scripts` (Webpack) supporting modern and legacy builds.
+By leveraging background processing and intelligent notification logic, NotifyBay does this without slowing down your store or your customers' checkout experience.
 
-== Key Features ==
+= Key Features =
 
-=== Backend (PHP) ===
+* **Waitlists & Back-in-Stock Alerts** — Customers can join a waitlist on any out-of-stock product and are automatically emailed the moment it's restocked.
+* **Wishlists** — Customers can add products to a personal wishlist to keep track of items they're interested in and monitor for price changes.
+* **Fair-Play Dispatch Engine** — Intelligent dispatch logic calculates how much restocked inventory is actually available to notify waitlisted customers about, respecting a configurable reservation window so alerts are distributed fairly and nobody is notified about stock that's already been claimed.
+* **Asynchronous Processing** — Notification emails are queued and sent in the background via Action Scheduler, so high-volume dispatch never impacts your customers' checkout experience or your site's performance.
+* **Conversion Tracking** — Deep integration with WooCommerce order data attributes recovered sales back to NotifyBay alerts, so you can see the impact on your bottom line.
+* **Guest-to-Account Merging** — Guest waitlist and wishlist subscriptions are automatically merged into a customer's account the moment they register, so nothing gets lost.
+* **My Account Integration** — Customers get dedicated Waitlist and Wishlist tabs in their WooCommerce "My Account" area to review and manage their own subscriptions.
 
-* Namespace‑based autoloader – PSR‑4 compliant.
-* Base Singleton (`Base.php`) – Automatic hook registration.
-* REST API (`ApiController.php`) – Secure, extendable base controller.
-* Cron Manager (`Cron.php`) – Schedule, manage, and run WP‑Cron jobs.
-* Resource Generator (`bin/make-resource`) – Scaffold models, migrations, controllers.
-* Settings API (`Settings.php`) – Easy settings handling with schema validation.
-* Database Manager (`DbManager.php`) – Custom table creation via `dbDelta()`.
-* Logger (`Logger.php`) – DB‑based logging with JSON context and levels.
-* White‑label filters – Override plugin name, slug, icon, URLs.
-
-=== Frontend (React/TS) ===
-
-* SPA architecture – React 18+ with `react-router-dom`.
-* Dual component libraries:
-  * `common` – 30+ Tailwind components (modals, toasts, multi‑select, steppers, etc.).
-  * `classics` – 10+ components matching native WP/WC UI (inputs, tables, tooltips).
-* Tailwind CSS – Configured with `notifybay-` prefix.
-* Pre‑flight guard – `notifybay-ignore-preflight` class prevents Tailwind resets from breaking native styles.
-* State management – React Context integrated with `wp_localize_script`.
-* Production build – Webpack via `@wordpress/scripts`.
-
-== Directory Structure ==
-
-`
-notifybay/
-├─ app/                     # PHP backend
-│  ├─ Admin/
-│  ├─ Api/
-│  ├─ Core/
-│  ├─ Data/
-│  ├─ Database/
-│  ├─ Helper/
-│  ├─ Models/
-│  └─ functions.php
-├─ bin/                     # CLI utilities
-├─ config/                  # Registration files (api, core, migrations)
-├─ src/                     # React/TS SPA
-│  ├─ components/
-│  │   ├─ classics/        # Native‑style components
-│  │   └─ common/           # Modern Tailwind components
-│  ├─ pages/                # Dashboard, logs, etc.
-│  ├─ store/                # Context API store
-│  ├─ styles/               # SCSS & Tailwind guard
-│  ├─ utils/                # API helpers, types, hooks
-│  ├─ App.tsx               # Router & layout
-│  └─ index.tsx             # Entry point
-├─ assets/                  # Images, icons
-├─ languages/               # i18n files
-├─ vendor/                  # Composer dependencies
-├─ notifybay-waitlist-and-stock-alert-woo.php  # Main plugin bootstrap
-├─ uninstall.php            # Cleanup on delete
-├─ rename.sh                # Global find‑replace script
-├─ package.json
-├─ composer.json
-├─ tsconfig.json
-├─ tailwind.config.js
-├─ postcss.config.js
-└─ webpack.config.js
-`
+NotifyBay is an independent product and is not officially affiliated with, endorsed by, or sponsored by WooCommerce or Automattic Inc. WooCommerce is a registered trademark of Automattic Inc.
 
 == Installation ==
 
-1. Clone & Rename:
-   `
-   git clone <repo_url> your-plugin-name
-   cd your-plugin-name
-   `
-2. White‑label: Run the provided `rename.sh` or manually replace the following strings throughout the codebase:
-   * `NotifyBay` -> `YourNamespace`
-   * `WP_BOILERPLATE_` -> `YOUR_PLUGIN_`
-   * `notifybay` (slug) -> `your-plugin-slug`
-   * `notifybay` (snake) -> `your_plugin_slug`
-   * `notifyBay` (JS) -> `yourPlugin`
-   * `NotifyBay` (UI text) -> `Your Plugin Title`
-   * `notifybay-` (Tailwind prefix) -> `yourprefix-`
-3. Install Dependencies:
-   `
-   npm install
-   composer install
-   `
-4. Development: Start hot‑reloading dev server:
-   `
-   npm run start
-   `
-   Ensure `SCRIPT_DEBUG` is `true` in your WordPress installation to load dev assets.
-5. Production Build:
-   `
-   npm run build
-   `
-   Assets are compiled into the `/build` directory.
+1. Upload the plugin files to the `/wp-content/plugins/` directory, or install the plugin directly through the WordPress "Plugins" screen (Plugins → Add New → Upload Plugin).
+2. Make sure WooCommerce is installed and active — NotifyBay is an add-on for WooCommerce and requires it to function.
+3. Activate the plugin through the "Plugins" screen in WordPress.
+4. Go to the NotifyBay menu item in your WordPress admin to configure waitlist and wishlist settings.
 
-== Resource Generator ==
+== Frequently Asked Questions ==
 
-Scaffold a new resource (Model + Migration + API Controller) with:
-`
-npm run make:resource -- <ResourceName>
-`
+= Does this plugin require WooCommerce? =
 
-This creates:
+Yes. NotifyBay adds functionality on top of WooCommerce and will not run without WooCommerce installed and active. You'll see an admin notice if WooCommerce is missing.
 
-* `app/Models/<ResourceName>.php`
-* `app/Database/Migrations/Create<Resources>Table.php`
-* `app/Api/<ResourceName>Controller.php`
-* Registers everything in `config/migrations.php` and `config/api.php`.
+= Can a customer join a waitlist without creating an account? =
 
-== API Testing ==
+Yes. Guests can join a waitlist or wishlist using just their email address. If they later create an account with the same email address, their existing subscriptions are automatically merged into that account.
 
-The `src/pages/Settings.tsx` includes a demo CRUD flow against the `demo-items` endpoint. Modify it to test any newly generated resource and monitor network requests in the browser dev tools.
+= How are restock notifications sent? =
 
-== Layout & Component Systems ==
+Restock notifications are queued and delivered by email in the background using Action Scheduler, so notifying a large number of subscribers at once doesn't slow down your site.
 
-* Layout Switcher (`src/App.tsx`):
-  * `ClassicLayout` – Native‑style settings experience.
-  * `AppLayout` – Modern dashboard layout.
-* Component Libraries:
-  * `classics/` – Native WordPress/WooCommerce look (inputs, tables, tooltips).
-  * `common/` – Modern Tailwind UI (modals, toasts, multi‑select, etc.).
+= Will customers be notified about stock that's already been claimed by someone else? =
 
-== Styling Architecture ==
+No. NotifyBay's Fair-Play dispatch engine calculates how much stock is actually available to offer before sending any notifications, so waitlisted customers aren't alerted about inventory that's already been reserved or sold.
 
-Tailwind’s preflight reset can break native WP styles. Adding the `notifybay-ignore-preflight` class to any element (or its parent) disables the reset for that subtree, preserving native typography, input borders, and other WP/WC styling.
+== Screenshots ==
 
-== Development Tools ==
+1. Screenshots to be added before submission.
 
-* ESLint & Prettier – Pre‑configured for modern JavaScript/TypeScript.
-* GitHub Actions – Optional CI workflow included.
-* Dual Build System – Generates both modern ES modules and legacy builds for older browsers.
+== Changelog ==
 
-== Requirements ==
+= 1.0.0 =
+* Initial release.
 
-* WordPress 5.6+
-* PHP 7.0+
-* Node.js 18+
+== Upgrade Notice ==
 
-== License ==
-
-GPLv2 or later.
+= 1.0.0 =
+Initial release.

@@ -125,7 +125,7 @@ class Dispatcher {
 			$arguments[] = $notify_limit;
 		}
 
-		$lead_ids = $wpdb->get_col( $wpdb->prepare( $sql, $arguments ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$lead_ids = $wpdb->get_col( $wpdb->prepare( $sql, $arguments ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 
 		if ( empty( $lead_ids ) ) {
 
@@ -136,7 +136,7 @@ class Dispatcher {
 		$batch_id        = wp_generate_uuid4();
 		$ids_placeholder = implode( ',', array_fill( 0, count( $lead_ids ), '%d' ) );
 		// phpcs:disable WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
 				"UPDATE {$table} SET status = 'processing', updated_at = %s, last_batch_id = %s WHERE id IN ({$ids_placeholder}) AND status = 'active'", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				array_merge( array( current_time( 'mysql' ), $batch_id ), $lead_ids )

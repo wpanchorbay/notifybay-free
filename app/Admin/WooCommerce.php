@@ -101,7 +101,7 @@ class WooCommerce {
 			$table      = $lead_model->get_table();
 			$type       = ( 'notifybay_waitlist' === $column ) ? 'waitlist' : 'wishlist';
 
-			$count = (int) $wpdb->get_var(
+			$count = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 				$wpdb->prepare(
 					"SELECT COUNT(*) FROM {$wpdb->prefix}notifybay_leads WHERE product_id = %d AND status = 'active' AND type = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 					$post_id,
@@ -197,7 +197,7 @@ class WooCommerce {
 			'disable_wishlist'  => isset( $_POST['notifybay_disable_wishlist'] ),
 			'smart_transition'  => sanitize_text_field( wp_unslash( $_POST['notifybay_smart_transition'] ?? 'default' ) ),
 			'backorder_mode'    => sanitize_text_field( wp_unslash( $_POST['notifybay_backorder_mode'] ?? 'default' ) ),
-			'max_waitlist_size' => isset( $_POST['notifybay_max_waitlist_size'] ) ? (int) wp_unslash( $_POST['notifybay_max_waitlist_size'] ) : '',
+			'max_waitlist_size' => isset( $_POST['notifybay_max_waitlist_size'] ) ? (int) wp_unslash( $_POST['notifybay_max_waitlist_size'] ) : '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- value is cast to (int); the isset() presence checks above need no sanitization. Nonce/capability verified at the top of this handler.
 		);
 
 		update_post_meta( $post_id, '_notifybay_overrides', $overrides );

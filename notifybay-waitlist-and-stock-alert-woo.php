@@ -2,11 +2,12 @@
 /**
  * Plugin Name:       NotifyBay
  * Plugin URI:        https://wpanchorbay.com/plugins/notifybay
- * Description:       A modern WordPress plugin boilerplate with React/TypeScript admin UI, REST API, and modular PHP architecture.
+ * Description:       Adds Waitlist (back-in-stock) alerts and Wishlist (price-tracking) to WooCommerce so store owners can capture leads on out-of-stock or watched products and automatically notify waitlisted customers when items are restocked.
  * Requires at least: 5.6
  * Requires PHP:      7.0
- * Version:           1.2.0
- * Stable tag:        1.2.0
+ * Requires Plugins:  woocommerce
+ * Version:           1.0.0
+ * Stable tag:        1.0.0
  * Author:            WPAnchorBay
  * Author URI:        https://wpanchorbay.com
  * License:           GPLv2 or later
@@ -25,7 +26,7 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'NOTIFYBAY_PATH', plugin_dir_path( __FILE__ ) );
 define( 'NOTIFYBAY_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NOTIFYBAY_URL', plugin_dir_url( __FILE__ ) );
-define( 'NOTIFYBAY_VERSION', '1.2.0' );
+define( 'NOTIFYBAY_VERSION', '1.0.0' );
 define( 'NOTIFYBAY_PLUGIN_NAME', 'notifybay' );
 define( 'NOTIFYBAY_TEXT_DOMAIN', 'notifybay' );
 define( 'NOTIFYBAY_OPTION_NAME', 'notifybay' );
@@ -33,7 +34,6 @@ define( 'NOTIFYBAY_OPTION_NAME', 'notifybay' );
 // deliberately distinct from the `notifybay` code prefix used by hooks, options,
 // constants, the REST namespace and script handles above.
 define( 'NOTIFYBAY_SLUG', 'notifybay-waitlist-and-stock-alert-woo' );
-define( 'NOTIFYBAY_REMOTE_URL', 'https://wpanchorbay.com/wp-json/' );
 
 // Composer autoloader.
 if ( file_exists( NOTIFYBAY_PATH . 'vendor/autoload.php' ) ) {
@@ -45,17 +45,57 @@ if ( file_exists( NOTIFYBAY_PATH . 'vendor/autoload.php' ) ) {
 
 require_once NOTIFYBAY_PATH . 'app/functions.php';
 
-
+/**
+ * Declare compatibility with WooCommerce High-Performance Order Storage (HPOS).
+ *
+ * NotifyBay stores its leads in its own table and never reads or writes the
+ * WooCommerce orders table directly, so it is fully compatible with HPOS.
+ *
+ * @since 1.0.0
+ */
+function notifybay_declare_wc_compatibility() {
+	if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
+			'custom_order_tables',
+			__FILE__,
+			true
+		);
+	}
+}
+add_action( 'before_woocommerce_init', 'notifybay_declare_wc_compatibility' );
 
 /**
- * Begins execution of the plugin.
+ * Admin notice: WooCommerce missing.
+ */
+function notifybay_missing_woocommerce_notice() {
+	?>
+	<div class="notice notice-error">
+		<p>
+			<strong><?php esc_html_e( 'NotifyBay', 'notifybay-waitlist-and-stock-alert-woo' ); ?></strong>
+			<?php esc_html_e( 'requires WooCommerce to be installed and active.', 'notifybay-waitlist-and-stock-alert-woo' ); ?>
+		</p>
+	</div>
+	<?php
+}
+
+/**
+ * Begins execution of the plugin, once WooCommerce is confirmed present.
+ * Runs on `plugins_loaded` priority 20 — a deliberately late priority so
+ * WooCommerce's own classes are guaranteed to be loaded before the
+ * `class_exists( 'WooCommerce' )` check below runs, regardless of plugin
+ * load order.
  *
  * @since 1.0.0
  */
 function notifybay_run() {
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		add_action( 'admin_notices', 'notifybay_missing_woocommerce_notice' );
+		return;
+	}
+
 	\NotifyBay\Core\Plugin::get_instance();
 }
-notifybay_run();
+add_action( 'plugins_loaded', 'notifybay_run', 20 );
 
 /**
  * Activate the plugin.

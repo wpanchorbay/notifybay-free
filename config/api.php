@@ -12,6 +12,9 @@
  * @author     WPAnchorBay <sankarsan@gmail.com>
  */
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 // Note: license activation (NotifyBay\Api\LicenseController) is registered by
 // NotifyBay Pro on its own REST namespace, not here.
 return array(

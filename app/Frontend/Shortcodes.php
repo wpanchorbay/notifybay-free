@@ -89,17 +89,18 @@ class Shortcodes {
 		}
 
 		ob_start();
-		$this->render_ui_standalone( $product, 'waitlist' );
+		$this->render_ui_standalone( $product );
 		return ob_get_clean();
 	}
 
 	/**
 	 * Render the UI standalone (wrapper for the waitlist shortcode).
 	 *
+	 * Free only ever renders the waitlist UI standalone via this path.
+	 *
 	 * @param \WC_Product $product The product.
-	 * @param string      $type    'waitlist' (only type Free renders standalone).
 	 */
-	private function render_ui_standalone( $product, $type ) {
+	private function render_ui_standalone( $product ) {
 		wp_enqueue_style( 'dashicons' );
 		wp_enqueue_script( 'notifybay-frontend' );
 

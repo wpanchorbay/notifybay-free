@@ -11,6 +11,9 @@
  * @author     WPAnchorBay <sankarsan@gmail.com>
  */
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 return array(
 	\NotifyBay\Database\Migrations\CreateNotifybayLeadsTable::class,
 );

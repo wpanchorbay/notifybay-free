@@ -94,16 +94,16 @@ class Settings {
 	 *
 	 * @since 1.0.0
 	 * @access public
-	 * @param string $key     optional meta key.
-	 * @param mixed  $default optional fallback returned when the key is not set. Only used when $key is non-empty.
+	 * @param string $key           optional meta key.
+	 * @param mixed  $default_value optional fallback returned when the key is not set. Only used when $key is non-empty.
 	 * @return array|mixed|null
 	 */
-	public function get_settings( $key = '', $default = false ) {
+	public function get_settings( $key = '', $default_value = false ) {
 		if ( ! $this->settings ) {
 			$this->load_settings();
 		}
 		if ( ! empty( $key ) ) {
-			return isset( $this->settings[ $key ] ) ? $this->settings[ $key ] : $default;
+			return isset( $this->settings[ $key ] ) ? $this->settings[ $key ] : $default_value;
 		}
 		return $this->settings;
 	}

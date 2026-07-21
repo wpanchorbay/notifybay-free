@@ -138,8 +138,6 @@ class ActionSchedulerFallback {
 			// 3. Execute the selected batch inline
 			if ( ! empty( $actions_to_run ) ) {
 				$runner = \ActionScheduler_QueueRunner::instance();
-				error_log( 'NotifyBay | ID     | Hook                                     | Time' );
-				error_log( '----------|--------|------------------------------------------|-----------' );
 				foreach ( $actions_to_run as $action_data ) {
 					$action_id = $action_data['id'];
 					$hook      = $action_data['hook'];
@@ -151,7 +149,7 @@ class ActionSchedulerFallback {
 						$end_time = microtime( true );
 						$duration = round( ( $end_time - $start_time ) * 1000, 2 ); // in ms
 
-						error_log( sprintf( 'NotifyBay | %-6d | %-40s | %s ms', $action_id, $hook, $duration ) );
+						notifybay_log( sprintf( 'Fallback runner processed action #%d (%s) in %s ms', $action_id, $hook, $duration ), 'debug' );
 					}
 				}
 			}

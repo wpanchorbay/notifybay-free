@@ -55,6 +55,7 @@
         <properties>
             <property name="custom_capabilities" type="array">
                 <element value="manage_notifybay"/>
+                <element value="manage_woocommerce"/>
             </property>
         </properties>
     </rule>

@@ -1,6 +1,6 @@
 {
     "name": "sankarsan/notifybay-waitlist-and-stock-alert-woo",
-    "description": "A comprehensive WordPress plugin boilerplate with React/TypeScript frontend.",
+    "description": "Adds Waitlist (back-in-stock) alerts and Wishlist (price-tracking) to WooCommerce so store owners can capture leads on out-of-stock or watched products and automatically notify waitlisted customers when items are restocked.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "authors": [

@@ -38,7 +38,12 @@ copy_plugin_files() {
     cp -r assets "$DEST/"
     cp -r build "$DEST/"
     cp -r vendor "$DEST/"
+    # The plugin-update-checker library is only used by NotifyBay Pro (self-hosted
+    # updates). The free wp.org build must not ship it — repo plugins update via
+    # wordpress.org, not a bundled updater.
+    rm -rf "$DEST/vendor/plugin-update-checker"
     cp -r config "$DEST/"
+    cp -r templates "$DEST/"
 
     # Copy files
     cp index.php "$DEST/"

@@ -16,6 +16,9 @@
  * @author     WPAnchorBay <sankarsan@gmail.com>
  */
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 return array(
 	'defaults' => array(
 		'general_doubleOptIn'               => false,

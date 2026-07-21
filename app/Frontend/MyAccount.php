@@ -65,18 +65,18 @@ class MyAccount {
 		// plugins_loaded hook can register its notifybay_options_defaults filter,
 		// which would permanently cache Settings without the add-on's keys for the
 		// rest of the request.
-		$loader->add_action( 'woocommerce_account_waitlist_endpoint', $this, 'render_waitlist_content' );
-		$loader->add_action( 'woocommerce_account_wishlist_endpoint', $this, 'render_wishlist_content' );
+		$loader->add_action( 'woocommerce_account_notifybay-waitlist_endpoint', $this, 'render_waitlist_content' );
+		$loader->add_action( 'woocommerce_account_notifybay-wishlist_endpoint', $this, 'render_wishlist_content' );
 	}
 
 	/**
 	 * Register custom endpoints.
 	 */
 	public function add_endpoints() {
-		add_rewrite_endpoint( 'waitlist', EP_PAGES );
+		add_rewrite_endpoint( 'notifybay-waitlist', EP_PAGES );
 		$settings = \NotifyBay\Core\Settings::get_instance();
 		if ( $settings->get_settings( 'general_wishlistEnabled', false ) ) {
-			add_rewrite_endpoint( 'wishlist', EP_PAGES );
+			add_rewrite_endpoint( 'notifybay-wishlist', EP_PAGES );
 		}
 	}
 
@@ -87,10 +87,10 @@ class MyAccount {
 	 * @return array
 	 */
 	public function add_query_vars( $vars ) {
-		$vars[]   = 'waitlist';
+		$vars[]   = 'notifybay-waitlist';
 		$settings = \NotifyBay\Core\Settings::get_instance();
 		if ( $settings->get_settings( 'general_wishlistEnabled', false ) ) {
-			$vars[] = 'wishlist';
+			$vars[] = 'notifybay-wishlist';
 		}
 
 		return $vars;
@@ -110,10 +110,10 @@ class MyAccount {
 			unset( $items['customer-logout'] );
 		}
 
-		$items['waitlist'] = __( 'Waitlist', 'notifybay-waitlist-and-stock-alert-woo' );
-		$settings          = \NotifyBay\Core\Settings::get_instance();
+		$items['notifybay-waitlist'] = __( 'Waitlist', 'notifybay-waitlist-and-stock-alert-woo' );
+		$settings                    = \NotifyBay\Core\Settings::get_instance();
 		if ( $settings->get_settings( 'general_wishlistEnabled', false ) ) {
-			$items['wishlist'] = __( 'Wishlist', 'notifybay-waitlist-and-stock-alert-woo' );
+			$items['notifybay-wishlist'] = __( 'Wishlist', 'notifybay-waitlist-and-stock-alert-woo' );
 		}
 
 		if ( $logout ) {

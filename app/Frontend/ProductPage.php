@@ -109,7 +109,7 @@ class ProductPage {
 			$count = $count_cache;
 		}
 
-		$wishlist_url = wc_get_account_endpoint_url( 'wishlist' );
+		$wishlist_url = wc_get_account_endpoint_url( 'notifybay-wishlist' );
 		$icon         = '<span class="dashicons dashicons-heart" style="vertical-align: middle; margin-right: 4px; color: #ff4d4f;"></span>';
 
 		$display = $count > 0 ? 'inline-block' : 'none';

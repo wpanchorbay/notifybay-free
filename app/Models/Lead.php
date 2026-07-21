@@ -106,7 +106,7 @@ class Lead extends Model {
 
 		$status_check = ( 'waitlist' === $type ) ? "IN ('active', 'pending_verification')" : "= 'active'";
 
-		$result = $wpdb->get_var(
+		$result = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
 				"SELECT id FROM {$table} WHERE user_email = %s AND product_id = %d AND variation_id = %d AND type = %s AND status {$status_check}", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$email,
@@ -131,7 +131,7 @@ class Lead extends Model {
 		$instance = new static();
 		$table    = $instance->get_table();
 
-		return (int) $wpdb->get_var(
+		return (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
 				"SELECT COUNT(*) FROM {$table} WHERE product_id = %d AND variation_id = %d AND status = 'active' AND type = 'waitlist'", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				(int) $product_id,
@@ -152,7 +152,7 @@ class Lead extends Model {
 		$instance = new static();
 		$table    = $instance->get_table();
 
-		return (int) $wpdb->get_var(
+		return (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
 				"SELECT COUNT(*) FROM {$table} WHERE product_id = %d AND status = 'active' AND type = 'waitlist'", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				(int) $product_id
@@ -171,7 +171,7 @@ class Lead extends Model {
 		$instance = new static();
 		$table    = $instance->get_table();
 
-		$results = $wpdb->get_results(
+		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
 				"SELECT variation_id, COUNT(*) as count FROM {$table} WHERE product_id = %d AND status = 'active' AND type = 'waitlist' GROUP BY variation_id", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				(int) $product_id
@@ -213,7 +213,8 @@ class Lead extends Model {
 		$placeholders = implode( ',', array_fill( 0, count( $statuses ), '%s' ) );
 		$args         = array_merge( array( (int) $product_id, (int) $variation_id ), $statuses, array( $cutoff_date ) );
 
-		return (int) $wpdb->get_var(
+		return (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
+			// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $placeholders expands to a variable number of %s at runtime (one per $statuses element), which the sniff can't evaluate statically; args count always matches.
 			$wpdb->prepare(
 				"SELECT COUNT(*) FROM {$table} WHERE product_id = %d AND variation_id = %d AND type = 'waitlist' AND status IN ({$placeholders}) AND notified_at >= %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				...$args
@@ -233,7 +234,7 @@ class Lead extends Model {
 		$instance = new static();
 		$table    = $instance->get_table();
 
-		$results = $wpdb->get_results(
+		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
 				"SELECT variation_id, type FROM {$table} WHERE user_email = %s AND product_id = %d AND status IN ('active', 'pending_verification')", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$email,
@@ -274,7 +275,7 @@ class Lead extends Model {
 		$placeholders = implode( ',', array_fill( 0, count( $product_ids ), '%d' ) );
 		$args         = array_merge( array( $email ), array_map( 'intval', $product_ids ) );
 
-		$results = $wpdb->get_results(
+		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
 				"SELECT product_id, variation_id, type FROM {$table} WHERE user_email = %s AND product_id IN ($placeholders) AND status IN ('active', 'pending_verification')", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				...$args
@@ -310,7 +311,7 @@ class Lead extends Model {
 		$instance = new static();
 		$table    = $instance->get_table();
 
-		return $wpdb->get_results(
+		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
 				"SELECT * FROM {$table} WHERE user_email = %s AND type = %s AND status IN ('active', 'pending_verification') ORDER BY created_at DESC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$email,

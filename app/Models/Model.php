@@ -125,7 +125,7 @@ abstract class Model {
 			$data = $this->attributes;
 			unset( $data[ $pk ] ); // Don't update primary key
 
-			$result = $wpdb->update(
+			$result = $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 				$table,
 				$data,
 				array( $pk => $id )
@@ -134,7 +134,7 @@ abstract class Model {
 			return false === $result ? false : true;
 		} else {
 			// Insert
-			$result = $wpdb->insert(
+			$result = $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 				$table,
 				$this->attributes
 			);
@@ -160,7 +160,7 @@ abstract class Model {
 			return false;
 		}
 
-		$result = $wpdb->delete(
+		$result = $wpdb->delete( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$this->get_table(),
 			array( $pk => $this->attributes[ $pk ] )
 		);
