@@ -83,7 +83,7 @@ export const BuyProTooltip: React.FC< BuyProTooltipProps > = ( {
 						onMouseLeave={ handleTooltipMouseLeave }
 					>
 						<span className="notifybay-font-medium notifybay-whitespace-nowrap">
-							{ __( 'Upgrade to unlock', 'notifybay' ) }
+							{ __( 'Upgrade to unlock', 'notifybay-waitlist-and-stock-alert-woo' ) }
 						</span>
 						<a
 							href={ store.pluginData?.support_uri || '#' }
@@ -91,7 +91,7 @@ export const BuyProTooltip: React.FC< BuyProTooltipProps > = ( {
 							rel="noopener noreferrer"
 							className="notifybay-w-full notifybay-bg-[#f02a74] hover:!notifybay-bg-[#e71161] notifybay-text-white hover:!notifybay-text-white notifybay-font-bold notifybay-py-1.5 notifybay-px-3 notifybay-transition-colors focus:notifybay-outline-none focus:notifybay-ring-0 notifybay-cursor-pointer notifybay-text-center notifybay-no-underline"
 						>
-							{ __( 'Buy Pro', 'notifybay' ) }
+							{ __( 'Buy Pro', 'notifybay-waitlist-and-stock-alert-woo' ) }
 						</a>
 						{ /* Tooltip Arrow */ }
 						<div className="notifybay-absolute notifybay-top-full notifybay-left-1/2 -notifybay-translate-x-1/2 notifybay-border-4 notifybay-border-transparent notifybay-border-t-gray-900"></div>

@@ -292,7 +292,7 @@ class Admin {
 		wp_enqueue_style( $handle, $admin_css, array(), $version );
 		wp_style_add_data( $handle, 'rtl', 'replace' );
 
-		$config = $this->get_config();
+		$config   = $this->get_config();
 		$localize = apply_filters(
 			'notifybay_admin_localize',
 			array(
@@ -309,7 +309,7 @@ class Admin {
 				'plugin_settings' => Settings::get_instance()->get_settings(),
 				'products_url'    => admin_url( 'edit.php?post_type=product' ),
 				'settings_url'    => admin_url( 'admin.php?page=wc-settings&tab=' . \NOTIFYBAY_PLUGIN_NAME ),
-				'admin_url'       => ( function() use ( $config ) {
+				'admin_url'       => ( function () use ( $config ) {
 					$menu_config = $config['menu'] ?? array();
 					$show_main   = $config['show_main_menu'] ?? true;
 					$slug = \NOTIFYBAY_PLUGIN_NAME;
@@ -336,7 +336,7 @@ class Admin {
 		$path_to_check = \NOTIFYBAY_PATH . 'languages';
 		wp_set_script_translations(
 			$handle,
-			'notifybay',
+			'notifybay-waitlist-and-stock-alert-woo',
 			$path_to_check
 		);
 	}
@@ -385,7 +385,7 @@ class Admin {
 	 * @return string[]
 	 */
 	public function add_plugin_row_meta( $meta, $plugin_file ) {
-		if ( plugin_basename( \NOTIFYBAY_PATH . 'notifybay.php' ) !== $plugin_file ) {
+		if ( plugin_basename( \NOTIFYBAY_PATH . 'notifybay-waitlist-and-stock-alert-woo.php' ) !== $plugin_file ) {
 			return $meta;
 		}
 
@@ -418,7 +418,7 @@ class Admin {
 		$loader->add_filter( 'admin_body_class', $this, 'add_has_sticky_header' );
 		$loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_resources' );
 
-		$plugin_basename = plugin_basename( \NOTIFYBAY_PATH . 'notifybay.php' );
+		$plugin_basename = plugin_basename( \NOTIFYBAY_PATH . 'notifybay-waitlist-and-stock-alert-woo.php' );
 		$loader->add_filter( 'plugin_action_links_' . $plugin_basename, $this, 'add_plugin_action_links', 10, 1 );
 		$loader->add_filter( 'plugin_row_meta', $this, 'add_plugin_row_meta', 10, 2 );
 	}

@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 
-<p><?php esc_html_e( 'Please click the link below to verify your subscription:', 'notifybay' ); ?></p>
+<p><?php esc_html_e( 'Please click the link below to verify your subscription:', 'notifybay-waitlist-and-stock-alert-woo' ); ?></p>
 <p>
-	<a href="<?php echo esc_url( $verify_url ); ?>"><?php esc_html_e( 'Verify Subscription', 'notifybay' ); ?></a>
+	<a href="<?php echo esc_url( $verify_url ); ?>"><?php esc_html_e( 'Verify Subscription', 'notifybay-waitlist-and-stock-alert-woo' ); ?></a>
 </p>

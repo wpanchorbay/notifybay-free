@@ -228,7 +228,7 @@ class AdminController extends ApiController {
 		$lead = Lead::find( $id );
 
 		if ( ! $lead ) {
-			return new \WP_Error( 'not_found', __( 'Lead not found.', 'notifybay' ), array( 'status' => 404 ) );
+			return new \WP_Error( 'not_found', __( 'Lead not found.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 404 ) );
 		}
 
 		$params = $request->get_params();
@@ -246,7 +246,7 @@ class AdminController extends ApiController {
 			return rest_ensure_response( array( 'success' => true ) );
 		}
 
-		return new \WP_Error( 'db_error', __( 'Could not update lead.', 'notifybay' ), array( 'status' => 500 ) );
+		return new \WP_Error( 'db_error', __( 'Could not update lead.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 500 ) );
 	}
 
 	/**
@@ -260,14 +260,14 @@ class AdminController extends ApiController {
 		$lead = Lead::find( $id );
 
 		if ( ! $lead ) {
-			return new \WP_Error( 'not_found', __( 'Lead not found.', 'notifybay' ), array( 'status' => 404 ) );
+			return new \WP_Error( 'not_found', __( 'Lead not found.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 404 ) );
 		}
 
 		if ( $lead->delete() ) {
 			return rest_ensure_response( array( 'success' => true ) );
 		}
 
-		return new \WP_Error( 'db_error', __( 'Could not delete lead.', 'notifybay' ), array( 'status' => 500 ) );
+		return new \WP_Error( 'db_error', __( 'Could not delete lead.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 500 ) );
 	}
 
 	/**
@@ -281,7 +281,7 @@ class AdminController extends ApiController {
 		$action = $request->get_param( 'bulk_action' );
 
 		if ( empty( $ids ) || ! is_array( $ids ) ) {
-			return new \WP_Error( 'invalid_ids', __( 'No IDs provided.', 'notifybay' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'invalid_ids', __( 'No IDs provided.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 400 ) );
 		}
 
 		global $wpdb;
@@ -303,7 +303,7 @@ class AdminController extends ApiController {
 	 */
 	public function export_leads() {
 		if ( ! current_user_can( 'manage_notifybay' ) ) {
-			wp_die( esc_html__( 'Forbidden', 'notifybay' ) );
+			wp_die( esc_html__( 'Forbidden', 'notifybay-waitlist-and-stock-alert-woo' ) );
 		}
 
 		header( 'Content-Type: text/csv; charset=utf-8' );

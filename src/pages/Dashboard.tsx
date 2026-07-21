@@ -26,17 +26,17 @@ const Dashboard: FC = () => {
 					</div>
 				</div>
 				<h3 className="notifybay-text-[18px] notifybay-font-[600] notifybay-text-gray-900 notifybay-mb-[8px]">
-					{ __( 'Revenue Analytics is a Pro feature', 'notifybay' ) }
+					{ __( 'Revenue Analytics is a Pro feature', 'notifybay-waitlist-and-stock-alert-woo' ) }
 				</h3>
 				<p className="notifybay-text-[14px] notifybay-text-gray-500 notifybay-max-w-[420px] notifybay-mx-auto notifybay-mb-[20px]">
 					{ __(
 						'See potential vs. recovered revenue, historical demand trends, and your most-wanted products with NotifyBay Pro.',
-						'notifybay'
+						'notifybay-waitlist-and-stock-alert-woo'
 					) }
 				</p>
 				<div className="notifybay-inline-flex notifybay-items-center notifybay-gap-[6px] notifybay-text-[12px] notifybay-text-gray-400">
 					<Lock className="notifybay-w-[14px] notifybay-h-[14px]" />
-					{ __( 'Activate NotifyBay Pro to unlock this dashboard.', 'notifybay' ) }
+					{ __( 'Activate NotifyBay Pro to unlock this dashboard.', 'notifybay-waitlist-and-stock-alert-woo' ) }
 				</div>
 			</div>
 		</div>

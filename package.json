@@ -1,5 +1,5 @@
 {
-  "name": "notifybay",
+  "name": "notifybay-waitlist-and-stock-alert-woo",
   "version": "1.0.0",
   "description": "NotifyBay - A modern WordPress plugin boilerplate with React/TypeScript admin UI.",
   "main": "index.js",
@@ -15,7 +15,7 @@
     "lint:js": "wp-scripts lint-js src",
     "lint:js:fix": "wp-scripts lint-js src --fix",
     "format": "wp-scripts format src",
-    "makepot": "wp i18n make-pot . languages/notifybay.pot --domain=notifybay --slug=notifybay --exclude='node_modules,vendor,src'",
+    "makepot": "wp i18n make-pot . languages/notifybay-waitlist-and-stock-alert-woo.pot --domain=notifybay-waitlist-and-stock-alert-woo --slug=notifybay-waitlist-and-stock-alert-woo --exclude='node_modules,vendor,src'",
     "make-json": "wp i18n make-json languages --no-purge",
     "zip": "bash package.sh",
     "rebranding": "bash rename.sh",
@@ -62,7 +62,7 @@
     "recharts": "^3.8.1"
   },
   "wp-i18n": {
-    "domain": "notifybay",
-    "potFile": "languages/notifybay.pot"
+    "domain": "notifybay-waitlist-and-stock-alert-woo",
+    "potFile": "languages/notifybay-waitlist-and-stock-alert-woo.pot"
   }
 }

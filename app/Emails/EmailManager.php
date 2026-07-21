@@ -71,10 +71,10 @@ class EmailManager {
 	 */
 	public static function sample_context() {
 		return array(
-			'product_name'          => __( 'Sample Product', 'notifybay' ),
-			'original_product_name' => __( 'Sample Product', 'notifybay' ),
-			'customer_name'         => __( 'Jane Doe', 'notifybay' ),
-			'customer_first_name'   => __( 'Jane', 'notifybay' ),
+			'product_name'          => __( 'Sample Product', 'notifybay-waitlist-and-stock-alert-woo' ),
+			'original_product_name' => __( 'Sample Product', 'notifybay-waitlist-and-stock-alert-woo' ),
+			'customer_name'         => __( 'Jane Doe', 'notifybay-waitlist-and-stock-alert-woo' ),
+			'customer_first_name'   => __( 'Jane', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'stock_qty'             => 3,
 			'buy_link'              => home_url( '/?p=1' ),
 			'unsubscribe_url'       => home_url( '/?notifybay_action=unsubscribe&token=sample' ),
@@ -90,7 +90,7 @@ class EmailManager {
 	 */
 	private function authorize_email_request( $nonce_action ) {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( esc_html__( 'You are not allowed to do this.', 'notifybay' ) );
+			wp_die( esc_html__( 'You are not allowed to do this.', 'notifybay-waitlist-and-stock-alert-woo' ) );
 		}
 
 		$email_id = isset( $_GET['email_id'] ) ? sanitize_text_field( wp_unslash( $_GET['email_id'] ) ) : '';
@@ -98,7 +98,7 @@ class EmailManager {
 
 		$email = self::get_email( $email_id );
 		if ( ! $email ) {
-			wp_die( esc_html__( 'Email not found.', 'notifybay' ) );
+			wp_die( esc_html__( 'Email not found.', 'notifybay-waitlist-and-stock-alert-woo' ) );
 		}
 
 		$email->set_context( null, self::sample_context() );
@@ -106,7 +106,7 @@ class EmailManager {
 	}
 
 	/**
-	 * admin-post handler: output the rendered email HTML for previewing.
+	 * Admin-post handler: output the rendered email HTML for previewing.
 	 *
 	 * @return void
 	 */
@@ -120,7 +120,7 @@ class EmailManager {
 	}
 
 	/**
-	 * admin-post handler: send a test copy of the email to the site admin.
+	 * Admin-post handler: send a test copy of the email to the site admin.
 	 *
 	 * @return void
 	 */
@@ -128,7 +128,7 @@ class EmailManager {
 		$email = $this->authorize_email_request( 'notifybay_email_test' );
 
 		$to      = get_option( 'admin_email' );
-		$subject = '[' . __( 'Test', 'notifybay' ) . '] ' . $email->get_subject();
+		$subject = '[' . __( 'Test', 'notifybay-waitlist-and-stock-alert-woo' ) . '] ' . $email->get_subject();
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
 
 		wp_mail( $to, $subject, $email->render_final_html(), $headers );
@@ -153,7 +153,7 @@ class EmailManager {
 				<?php
 				printf(
 					/* translators: %s: admin email address */
-					esc_html__( 'NotifyBay test email sent to %s.', 'notifybay' ),
+					esc_html__( 'NotifyBay test email sent to %s.', 'notifybay-waitlist-and-stock-alert-woo' ),
 					esc_html( get_option( 'admin_email' ) )
 				);
 				?>

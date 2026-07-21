@@ -65,7 +65,7 @@ class TemplateRenderer {
 	 * Checks the following locations in order:
 	 * 1. Child theme:  wp-content/themes/child-theme/notifybay/{template_name}.php
 	 * 2. Parent theme: wp-content/themes/parent-theme/notifybay/{template_name}.php
-	 * 3. Plugin:       wp-content/plugins/notifybay/templates/{template_name}.php
+	 * 3. Plugin:       wp-content/plugins/notifybay-waitlist-and-stock-alert-woo/templates/{template_name}.php
 	 *
 	 * Developers can filter the located path via 'notifybay_locate_template'.
 	 *

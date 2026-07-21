@@ -12,18 +12,18 @@ export const StatusTab: React.FC<StatusTabProps> = ({
   isLoadingStatus,
 }) => {
   if (isLoadingStatus) {
-    return <p>{__("Loading system status...", "notifybay")}</p>;
+    return <p>{__("Loading system status...", "notifybay-waitlist-and-stock-alert-woo")}</p>;
   }
 
   return (
     <div className="notifybay-flex notifybay-flex-col notifybay-gap-6">
       <ClassicSettingsTable
-        title={__("Background Engine Status", "notifybay")}
+        title={__("Background Engine Status", "notifybay-waitlist-and-stock-alert-woo")}
         fields={[
           {
             id: "as_jobs",
-            label: __("Action Scheduler Queue", "notifybay"),
-            tooltip: __("Current email job queue", "notifybay"),
+            label: __("Action Scheduler Queue", "notifybay-waitlist-and-stock-alert-woo"),
+            tooltip: __("Current email job queue", "notifybay-waitlist-and-stock-alert-woo"),
             render: () => (
               <div className="notifybay-flex notifybay-flex-wrap notifybay-gap-4">
                 {["pending", "in-progress", "complete", "failed"].map((s) => (
@@ -44,13 +44,13 @@ export const StatusTab: React.FC<StatusTabProps> = ({
           },
           {
             id: "lead_status",
-            label: __("Lead Health", "notifybay"),
-            tooltip: __("Diagnostic database check", "notifybay"),
+            label: __("Lead Health", "notifybay-waitlist-and-stock-alert-woo"),
+            tooltip: __("Diagnostic database check", "notifybay-waitlist-and-stock-alert-woo"),
             render: () => (
               <div className="notifybay-flex notifybay-gap-4">
                 <div className="notifybay-bg-red-50 notifybay-border notifybay-border-red-100 notifybay-p-3 notifybay-rounded-lg notifybay-min-w-[120px]">
                   <div className="notifybay-text-xs notifybay-text-red-500 notifybay-uppercase notifybay-mb-1">
-                    {__("Failed Leads", "notifybay")}
+                    {__("Failed Leads", "notifybay-waitlist-and-stock-alert-woo")}
                   </div>
                   <div className="notifybay-text-xl notifybay-font-bold notifybay-text-red-700">
                     {systemStatus?.failed_leads || 0}
@@ -58,7 +58,7 @@ export const StatusTab: React.FC<StatusTabProps> = ({
                 </div>
                 <div className="notifybay-bg-blue-50 notifybay-border notifybay-border-blue-100 notifybay-p-3 notifybay-rounded-lg notifybay-min-w-[120px]">
                   <div className="notifybay-text-xs notifybay-text-blue-500 notifybay-uppercase notifybay-mb-1">
-                    {__("In Processing", "notifybay")}
+                    {__("In Processing", "notifybay-waitlist-and-stock-alert-woo")}
                   </div>
                   <div className="notifybay-text-xl notifybay-font-bold notifybay-text-blue-700">
                     {systemStatus?.processing_leads || 0}
@@ -71,12 +71,12 @@ export const StatusTab: React.FC<StatusTabProps> = ({
       />
 
       <ClassicSettingsTable
-        title={__("Environment Information", "notifybay")}
+        title={__("Environment Information", "notifybay-waitlist-and-stock-alert-woo")}
         fields={[
           {
             id: "env_info",
-            label: __("Versions", "notifybay"),
-            tooltip: __("Server environment details", "notifybay"),
+            label: __("Versions", "notifybay-waitlist-and-stock-alert-woo"),
+            tooltip: __("Server environment details", "notifybay-waitlist-and-stock-alert-woo"),
             render: () => (
               <div className="notifybay-text-sm notifybay-text-gray-600">
                 <p>

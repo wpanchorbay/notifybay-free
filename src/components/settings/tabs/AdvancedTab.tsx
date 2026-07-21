@@ -22,32 +22,32 @@ export const AdvancedTab: React.FC<AdvancedTabProps> = ({
   return (
     <>
       <ClassicSettingsTable
-        title={__("Setup", "notifybay")}
+        title={__("Setup", "notifybay-waitlist-and-stock-alert-woo")}
         fields={[
           {
             id: "setup_wizard",
-            label: __("Setup Wizard", "notifybay"),
+            label: __("Setup Wizard", "notifybay-waitlist-and-stock-alert-woo"),
             tooltip: __(
               "Re-run the first-time setup wizard to reconfigure the essentials.",
-              "notifybay",
+              "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <a href={wizardUrl} className="button button-secondary">
-                {__("Run Setup Wizard", "notifybay")}
+                {__("Run Setup Wizard", "notifybay-waitlist-and-stock-alert-woo")}
               </a>
             ),
           },
         ]}
       />
       <ClassicSettingsTable
-        title={__("System & Maintenance", "notifybay")}
+        title={__("System & Maintenance", "notifybay-waitlist-and-stock-alert-woo")}
         fields={[
           {
             id: "debug_enableMode",
-            label: __("Debug Mode", "notifybay"),
+            label: __("Debug Mode", "notifybay-waitlist-and-stock-alert-woo"),
             tooltip: __(
               "Logs technical data during execution to help developers troubleshoot background jobs and API calls.",
-              "notifybay",
+              "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <ClassicCheckbox
@@ -58,20 +58,20 @@ export const AdvancedTab: React.FC<AdvancedTabProps> = ({
                     debug_enableMode: val,
                   })
                 }
-                label={__("Enable developer logging", "notifybay")}
+                label={__("Enable developer logging", "notifybay-waitlist-and-stock-alert-woo")}
                 description={__(
                   "Only recommended for troubleshooting. Logs are written to the WooCommerce Status > Logs.",
-                  "notifybay",
+                  "notifybay-waitlist-and-stock-alert-woo",
                 )}
               />
             ),
           },
           {
             id: "advanced_deleteAllOnUninstall",
-            label: __("Deep Uninstall", "notifybay"),
+            label: __("Deep Uninstall", "notifybay-waitlist-and-stock-alert-woo"),
             tooltip: __(
               "Determines if all plugin data should be permanently deleted from the database when the plugin is deleted.",
-              "notifybay",
+              "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <ClassicCheckbox
@@ -84,11 +84,11 @@ export const AdvancedTab: React.FC<AdvancedTabProps> = ({
                 }
                 label={__(
                   "Delete all tables and settings on plugin deletion",
-                  "notifybay",
+                  "notifybay-waitlist-and-stock-alert-woo",
                 )}
                 description={__(
                   "DANGEROUS: If checked, all leads and settings will be permanently erased and cannot be recovered.",
-                  "notifybay",
+                  "notifybay-waitlist-and-stock-alert-woo",
                 )}
               />
             ),

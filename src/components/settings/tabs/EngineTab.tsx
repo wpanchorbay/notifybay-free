@@ -28,18 +28,18 @@ export const EngineTab: React.FC<EngineTabProps> = ({
 
       {/* Expiry Logic Section (Moved from Appearance) */}
       <ClassicSettingsTable
-        title={__("Waitlist Expiry Logic", "notifybay")}
+        title={__("Waitlist Expiry Logic", "notifybay-waitlist-and-stock-alert-woo")}
         description={__(
           "Define the rules for cleaning up old or abandoned waitlist subscriptions.",
-          "notifybay",
+          "notifybay-waitlist-and-stock-alert-woo",
         )}
         fields={[
           {
             id: "appearance_waitlistExpiryEnabled",
-            label: __("Auto-Expire Leads", "notifybay"),
+            label: __("Auto-Expire Leads", "notifybay-waitlist-and-stock-alert-woo"),
             tooltip: __(
               "Automatically remove users from the waitlist after a certain number of days if no restock occurs.",
-              "notifybay",
+              "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <div className="notifybay-flex notifybay-flex-col notifybay-gap-4">
@@ -51,13 +51,13 @@ export const EngineTab: React.FC<EngineTabProps> = ({
                       appearance_waitlistExpiryEnabled: val,
                     })
                   }
-                  label={__("Expire old subscriptions", "notifybay")}
+                  label={__("Expire old subscriptions", "notifybay-waitlist-and-stock-alert-woo")}
                 />
                 {settings.appearance_waitlistExpiryEnabled && (
                   <>
                     <div className="notifybay-ml-6">
                       <label className="notifybay-block notifybay-text-xs notifybay-font-medium notifybay-text-gray-500 notifybay-mb-1">
-                        {__("Default Expiry (Days)", "notifybay")}
+                        {__("Default Expiry (Days)", "notifybay-waitlist-and-stock-alert-woo")}
                       </label>
                       <ClassicSelect
                         value={settings.appearance_waitlistExpiryDefault}
@@ -71,13 +71,13 @@ export const EngineTab: React.FC<EngineTabProps> = ({
                           .split(",")
                           .map((opt) => ({
                             value: opt.trim(),
-                            label: `${opt.trim()} ${__("Days", "notifybay")}`,
+                            label: `${opt.trim()} ${__("Days", "notifybay-waitlist-and-stock-alert-woo")}`,
                           }))}
                       />
                     </div>
                     <div className="notifybay-ml-6">
                       <label className="notifybay-block notifybay-text-xs notifybay-font-medium notifybay-text-gray-500 notifybay-mb-1">
-                        {__("Frontend Options", "notifybay")}
+                        {__("Frontend Options", "notifybay-waitlist-and-stock-alert-woo")}
                       </label>
                       <ClassicInput
                         value={settings.appearance_waitlistExpiryOptions}
@@ -89,7 +89,7 @@ export const EngineTab: React.FC<EngineTabProps> = ({
                         }
                         description={__(
                           "Comma-separated list of day options shown to customers.",
-                          "notifybay",
+                          "notifybay-waitlist-and-stock-alert-woo",
                         )}
                       />
                     </div>
@@ -109,18 +109,18 @@ export const EngineTab: React.FC<EngineTabProps> = ({
 
       {/* Stock Control Section */}
       <ClassicSettingsTable
-        title={__("Stock Control", "notifybay")}
+        title={__("Stock Control", "notifybay-waitlist-and-stock-alert-woo")}
         description={__(
           "Fine-tune when restock alerts should be triggered based on physical inventory levels.",
-          "notifybay",
+          "notifybay-waitlist-and-stock-alert-woo",
         )}
         fields={[
           {
             id: "engine_minStockThreshold",
-            label: __("Minimum Restock Threshold", "notifybay"),
+            label: __("Minimum Restock Threshold", "notifybay-waitlist-and-stock-alert-woo"),
             tooltip: __(
               "Prevents the system from firing mass alerts if only 1 or 2 items are returned or restocked.",
-              "notifybay",
+              "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <ClassicInput
@@ -146,18 +146,18 @@ export const EngineTab: React.FC<EngineTabProps> = ({
 
       {/* Notifications Section */}
       <ClassicSettingsTable
-        title={__("Admin Notifications", "notifybay")}
+        title={__("Admin Notifications", "notifybay-waitlist-and-stock-alert-woo")}
         description={__(
           "Stay informed about your customers' intent by receiving alerts for new signups.",
-          "notifybay",
+          "notifybay-waitlist-and-stock-alert-woo",
         )}
         fields={[
           {
             id: "engine_adminAlerts",
-            label: __("Owner Alerts", "notifybay"),
+            label: __("Owner Alerts", "notifybay-waitlist-and-stock-alert-woo"),
             tooltip: __(
               "Sends a notification to the store administrator whenever a new shopper joins a waitlist or wishlist.",
-              "notifybay",
+              "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <ClassicCheckbox
@@ -168,7 +168,7 @@ export const EngineTab: React.FC<EngineTabProps> = ({
                     engine_adminAlerts: val,
                   })
                 }
-                label={__("Notify store owner of new signups", "notifybay")}
+                label={__("Notify store owner of new signups", "notifybay-waitlist-and-stock-alert-woo")}
               />
             ),
           },

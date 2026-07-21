@@ -20,18 +20,18 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
     <div className="notifybay-flex notifybay-flex-col ">
       {/* Waitlist Display Section */}
       <ClassicSettingsTable
-        title={__("Waitlist Display", "notifybay")}
+        title={__("Waitlist Display", "notifybay-waitlist-and-stock-alert-woo")}
         description={__(
           "Customize how the 'Notify Me' button and social proof elements appear on your product pages.",
-          "notifybay",
+          "notifybay-waitlist-and-stock-alert-woo",
         )}
         fields={[
           {
             id: "appearance_waitlistButtonText",
-            label: __("Button Text", "notifybay"),
+            label: __("Button Text", "notifybay-waitlist-and-stock-alert-woo"),
             tooltip: __(
               "The text shown on the 'Notify Me' button.",
-              "notifybay",
+              "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <ClassicInput
@@ -47,10 +47,10 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
           },
           {
             id: "appearance_waitlistButtonClass",
-            label: __("Button CSS Class", "notifybay"),
+            label: __("Button CSS Class", "notifybay-waitlist-and-stock-alert-woo"),
             tooltip: __(
               "Additional CSS classes for the Waitlist button.",
-              "notifybay",
+              "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <ClassicInput
@@ -61,16 +61,16 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                     appearance_waitlistButtonClass: e.target.value,
                   })
                 }
-                placeholder={__("e.g. my-custom-btn", "notifybay")}
+                placeholder={__("e.g. my-custom-btn", "notifybay-waitlist-and-stock-alert-woo")}
               />
             ),
           },
           {
             id: "appearance_waitlistSuccessMessage",
-            label: __("Success Message", "notifybay"),
+            label: __("Success Message", "notifybay-waitlist-and-stock-alert-woo"),
             tooltip: __(
               "The message shown after a user successfully joins the waitlist.",
-              "notifybay",
+              "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <ClassicTextarea
@@ -96,18 +96,18 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
 
       {/* Custom Styles Section */}
       <ClassicSettingsTable
-        title={__("Custom Styles", "notifybay")}
+        title={__("Custom Styles", "notifybay-waitlist-and-stock-alert-woo")}
         description={__(
           "Advanced styling options. Add custom CSS to fine-tune the look and feel of the plugin's frontend elements.",
-          "notifybay",
+          "notifybay-waitlist-and-stock-alert-woo",
         )}
         fields={[
           {
             id: "appearance_customCss",
-            label: __("Additional CSS", "notifybay"),
+            label: __("Additional CSS", "notifybay-waitlist-and-stock-alert-woo"),
             tooltip: __(
               "Add custom CSS to style the waitlist and wishlist components. Do not include <style> tags.",
-              "notifybay",
+              "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <ClassicTextarea
@@ -120,7 +120,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                 }
                 placeholder={__(
                   ".notifybay-btn { background: #000; }",
-                  "notifybay",
+                  "notifybay-waitlist-and-stock-alert-woo",
                 )}
                 rows={8}
               />

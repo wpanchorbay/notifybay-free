@@ -38,7 +38,7 @@ There is **no automated PHP/JS test suite**. `tests.md` is a manual QA checklist
 
 The plugin does **not** hardcode its wiring — it is driven by `config/*.php` return-array manifests. To register a new class, add it to the right manifest; the bootstrap iterates them.
 
-- **Bootstrap:** `notifybay.php` → `NotifyBay\Core\Plugin::get_instance()`. `Plugin::__construct()` runs three phases:
+- **Bootstrap:** `notifybay-waitlist-and-stock-alert-woo.php` → `NotifyBay\Core\Plugin::get_instance()`. `Plugin::__construct()` runs three phases:
   - `define_core_hooks()` — instantiates every controller in **`config/api.php`** and hooks its `register_routes()` to `rest_api_init`; also boots `LicenseManager`.
   - `define_admin_hooks()` — instantiates every class in **`config/core.php`** and calls its `run($plugin)`. This is where nearly all functional components live (Admin, Settings, Cron, Engine\Dispatcher/Worker, WooCommerceHooks, Frontend\*, Blocks...).
   - `define_public_hooks()` — enqueues front-end CSS + injects custom CSS from settings.

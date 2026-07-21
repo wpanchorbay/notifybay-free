@@ -303,7 +303,7 @@ function addonReducer(
 				label:
 					( originalField.label || '' ) +
 					' ' +
-					__( '(Copy)', 'notifybay' ),
+					__( '(Copy)', 'notifybay-waitlist-and-stock-alert-woo' ),
 			};
 
 			const newSchema = [ ...state.schema ];

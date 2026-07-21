@@ -19,15 +19,15 @@ const ClassicNavbar: FC = () => {
 
 	const menus: MenuLink[] = [
 		{
-			label: __( 'Dashboard', 'notifybay' ),
+			label: __( 'Dashboard', 'notifybay-waitlist-and-stock-alert-woo' ),
 			path: '/',
 		},
 		{
-			label: __( 'Items', 'notifybay' ),
+			label: __( 'Items', 'notifybay-waitlist-and-stock-alert-woo' ),
 			path: '/items',
 		},
 		{
-			label: __( 'Logs', 'notifybay' ),
+			label: __( 'Logs', 'notifybay-waitlist-and-stock-alert-woo' ),
 			path: '/logs',
 		},
 	];

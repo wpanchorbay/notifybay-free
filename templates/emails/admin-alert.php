@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php
 	printf(
 		/* translators: 1: user email, 2: subscription type, 3: product title */
-		esc_html__( 'A new user (%1$s) has joined the %2$s for %3$s.', 'notifybay' ),
+		esc_html__( 'A new user (%1$s) has joined the %2$s for %3$s.', 'notifybay-waitlist-and-stock-alert-woo' ),
 		esc_html( $user_email ),
 		esc_html( $lead_type ),
 		esc_html( $product_title )

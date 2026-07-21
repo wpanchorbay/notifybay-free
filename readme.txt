@@ -4,7 +4,7 @@ Tags: boilerplate, react, typescript, admin, rest-api
 Requires at least: 5.6
 Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 1.0.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,7 +80,7 @@ notifybay/
 ├─ assets/                  # Images, icons
 ├─ languages/               # i18n files
 ├─ vendor/                  # Composer dependencies
-├─ notifybay.php            # Main plugin bootstrap
+├─ notifybay-waitlist-and-stock-alert-woo.php  # Main plugin bootstrap
 ├─ uninstall.php            # Cleanup on delete
 ├─ rename.sh                # Global find‑replace script
 ├─ package.json

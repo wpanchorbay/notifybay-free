@@ -12,18 +12,18 @@ const ClassicLayout: FC = () => {
 	const getPageTitle = () => {
 		const path = location.pathname;
 		if ( path === '/logs' ) {
-			return __( 'Logs', 'notifybay' );
+			return __( 'Logs', 'notifybay-waitlist-and-stock-alert-woo' );
 		}
 		if ( path === '/dashboard' ) {
-			return __( 'Dashboard', 'notifybay' );
+			return __( 'Dashboard', 'notifybay-waitlist-and-stock-alert-woo' );
 		}
 		if ( path === '/' ) {
-			return __( 'Leads', 'notifybay' );
+			return __( 'Leads', 'notifybay-waitlist-and-stock-alert-woo' );
 		}
 		if ( path === '/settings' ) {
-			return __( 'Settings', 'notifybay' );
+			return __( 'Settings', 'notifybay-waitlist-and-stock-alert-woo' );
 		}
-		return store.pluginData?.plugin_name || __( 'NotifyBay', 'notifybay' );
+		return store.pluginData?.plugin_name || __( 'NotifyBay', 'notifybay-waitlist-and-stock-alert-woo' );
 	};
 
 	const context = ( window as any ).notifyBay_Localize?.context || 'admin';

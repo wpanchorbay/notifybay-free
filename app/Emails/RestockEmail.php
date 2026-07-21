@@ -30,9 +30,9 @@ class RestockEmail extends NotifyBayEmail {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->id             = 'notifybay_restock';
-		$this->title          = __( 'NotifyBay: Back in stock', 'notifybay' );
-		$this->description     = __( 'Sent to waitlist subscribers when a product they were waiting for is restocked.', 'notifybay' );
+		$this->id            = 'notifybay_restock';
+		$this->title         = __( 'NotifyBay: Back in stock', 'notifybay-waitlist-and-stock-alert-woo' );
+		$this->description   = __( 'Sent to waitlist subscribers when a product they were waiting for is restocked.', 'notifybay-waitlist-and-stock-alert-woo' );
 		$this->template_html = 'emails/wc/restock.php';
 
 		parent::__construct();
@@ -44,7 +44,7 @@ class RestockEmail extends NotifyBayEmail {
 	 * @return string
 	 */
 	public function get_default_subject() {
-		return __( 'Good news! {product_name} is back in stock', 'notifybay' );
+		return __( 'Good news! {product_name} is back in stock', 'notifybay-waitlist-and-stock-alert-woo' );
 	}
 
 	/**
@@ -53,6 +53,6 @@ class RestockEmail extends NotifyBayEmail {
 	 * @return string
 	 */
 	public function get_default_heading() {
-		return __( 'Back in stock!', 'notifybay' );
+		return __( 'Back in stock!', 'notifybay-waitlist-and-stock-alert-woo' );
 	}
 }

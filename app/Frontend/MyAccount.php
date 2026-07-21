@@ -110,10 +110,10 @@ class MyAccount {
 			unset( $items['customer-logout'] );
 		}
 
-		$items['waitlist'] = __( 'Waitlist', 'notifybay' );
+		$items['waitlist'] = __( 'Waitlist', 'notifybay-waitlist-and-stock-alert-woo' );
 		$settings          = \NotifyBay\Core\Settings::get_instance();
 		if ( $settings->get_settings( 'general_wishlistEnabled', false ) ) {
-			$items['wishlist'] = __( 'Wishlist', 'notifybay' );
+			$items['wishlist'] = __( 'Wishlist', 'notifybay-waitlist-and-stock-alert-woo' );
 		}
 
 		if ( $logout ) {

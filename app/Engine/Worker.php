@@ -67,7 +67,7 @@ class Worker {
 	 *
 	 * @since 1.0.0
 	 * @hook notifybay_email_events
-	 * @param array $events Map of event_type => array{
+	 * @return array Map of event_type => array{
 	 *     subject_setting?: string,   Settings key holding a custom subject (optional).
 	 *     subject_default: string,    Fallback subject with placeholders.
 	 *     body_setting?: string,      Settings key holding a custom body (optional).
@@ -75,7 +75,6 @@ class Worker {
 	 *     status_after: string|null,  Lead status to set after a successful send, or null to leave unchanged.
 	 *     is_verification?: bool,     True bypasses the `processing`-status precondition (double opt-in flow).
 	 * }.
-	 * @return array
 	 */
 	public function get_event_registry() {
 		return apply_filters(
@@ -84,7 +83,7 @@ class Worker {
 				'waitlist_restock' => array(
 					'wc_email'        => 'notifybay_restock',
 					'subject_setting' => 'email_restockSubject',
-					'subject_default' => __( 'Good news! {product_name} is back in stock', 'notifybay' ),
+					'subject_default' => __( 'Good news! {product_name} is back in stock', 'notifybay-waitlist-and-stock-alert-woo' ),
 					'body_setting'    => 'email_restockBody',
 					'template'        => 'emails/restock-notification',
 					'status_after'    => 'notified',
@@ -92,7 +91,7 @@ class Worker {
 				'verification'     => array(
 					'wc_email'        => 'notifybay_verification',
 					'subject_setting' => 'email_verificationSubject',
-					'subject_default' => __( 'Verify your subscription to {product_name}', 'notifybay' ),
+					'subject_default' => __( 'Verify your subscription to {product_name}', 'notifybay-waitlist-and-stock-alert-woo' ),
 					'body_setting'    => 'email_verificationBody',
 					'template'        => 'emails/verification',
 					'status_after'    => null,
@@ -150,12 +149,12 @@ class Worker {
 
 		// Prepare email data
 		$product      = wc_get_product( $lead->variation_id ? $lead->variation_id : $lead->product_id );
-		$product_name = $lead->product_name_snapshot ? $lead->product_name_snapshot : ( $product ? $product->get_name() : __( 'Product', 'notifybay' ) );
+		$product_name = $lead->product_name_snapshot ? $lead->product_name_snapshot : ( $product ? $product->get_name() : __( 'Product', 'notifybay-waitlist-and-stock-alert-woo' ) );
 		$stock_qty    = $product ? $product->get_stock_quantity() : 0;
 
 		// Customer Personalization
-		$customer_name       = __( 'Customer', 'notifybay' );
-		$customer_first_name = __( 'Customer', 'notifybay' );
+		$customer_name       = __( 'Customer', 'notifybay-waitlist-and-stock-alert-woo' );
+		$customer_first_name = __( 'Customer', 'notifybay-waitlist-and-stock-alert-woo' );
 
 		if ( $lead->user_id > 0 ) {
 			$user = get_userdata( $lead->user_id );

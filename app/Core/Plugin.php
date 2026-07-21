@@ -193,7 +193,7 @@ class Plugin {
 	 * @return array The modified array of plugin data.
 	 */
 	public function change_plugin_display_name( $plugins ) {
-		$plugin_basename = plugin_basename( \NOTIFYBAY_PATH . 'notifybay.php' );
+		$plugin_basename = plugin_basename( \NOTIFYBAY_PATH . 'notifybay-waitlist-and-stock-alert-woo.php' );
 
 		if ( isset( $plugins[ $plugin_basename ] ) ) {
 			$plugins[ $plugin_basename ]['Name'] = 'NotifyBay';

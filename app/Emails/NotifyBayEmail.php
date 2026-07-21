@@ -150,7 +150,7 @@ abstract class NotifyBayEmail extends \WC_Email {
 		return sprintf(
 			'<p style="font-size:12px;color:#888;margin-top:24px;"><a href="%s">%s</a></p>',
 			esc_url( $this->context['unsubscribe_url'] ),
-			esc_html__( 'Unsubscribe', 'notifybay' )
+			esc_html__( 'Unsubscribe', 'notifybay-waitlist-and-stock-alert-woo' )
 		);
 	}
 
@@ -183,16 +183,16 @@ abstract class NotifyBayEmail extends \WC_Email {
 			'notifybay_email_test_' . $this->id
 		);
 		?>
-		<h3 class="wc-settings-sub-title"><?php esc_html_e( 'Preview & test', 'notifybay' ); ?></h3>
+		<h3 class="wc-settings-sub-title"><?php esc_html_e( 'Preview & test', 'notifybay-waitlist-and-stock-alert-woo' ); ?></h3>
 		<p>
 			<a href="<?php echo esc_url( $preview_url ); ?>" target="_blank" rel="noopener" class="button button-secondary">
-				<?php esc_html_e( 'Preview email', 'notifybay' ); ?>
+				<?php esc_html_e( 'Preview email', 'notifybay-waitlist-and-stock-alert-woo' ); ?>
 			</a>
 			<a href="<?php echo esc_url( $test_url ); ?>" class="button button-secondary">
-				<?php esc_html_e( 'Send test to admin', 'notifybay' ); ?>
+				<?php esc_html_e( 'Send test to admin', 'notifybay-waitlist-and-stock-alert-woo' ); ?>
 			</a>
 			<span class="description">
-				<?php esc_html_e( 'Preview and test emails render with sample data.', 'notifybay' ); ?>
+				<?php esc_html_e( 'Preview and test emails render with sample data.', 'notifybay-waitlist-and-stock-alert-woo' ); ?>
 			</span>
 		</p>
 		<?php
@@ -206,46 +206,46 @@ abstract class NotifyBayEmail extends \WC_Email {
 
 		$this->form_fields = array(
 			'enabled'            => array(
-				'title'   => __( 'Enable/Disable', 'notifybay' ),
+				'title'   => __( 'Enable/Disable', 'notifybay-waitlist-and-stock-alert-woo' ),
 				'type'    => 'checkbox',
-				'label'   => __( 'Enable this email notification', 'notifybay' ),
+				'label'   => __( 'Enable this email notification', 'notifybay-waitlist-and-stock-alert-woo' ),
 				'default' => 'yes',
 			),
 			'subject'            => array(
-				'title'       => __( 'Subject', 'notifybay' ),
+				'title'       => __( 'Subject', 'notifybay-waitlist-and-stock-alert-woo' ),
 				'type'        => 'text',
 				'desc_tip'    => true,
 				/* translators: %s: list of available merge-tag placeholders */
-				'description' => sprintf( __( 'Available placeholders: %s', 'notifybay' ), $placeholder_hint ),
+				'description' => sprintf( __( 'Available placeholders: %s', 'notifybay-waitlist-and-stock-alert-woo' ), $placeholder_hint ),
 				'placeholder' => $this->get_default_subject(),
 				'default'     => '',
 			),
 			'heading'            => array(
-				'title'       => __( 'Email heading', 'notifybay' ),
+				'title'       => __( 'Email heading', 'notifybay-waitlist-and-stock-alert-woo' ),
 				'type'        => 'text',
 				'desc_tip'    => true,
 				/* translators: %s: list of available merge-tag placeholders */
-				'description' => sprintf( __( 'Available placeholders: %s', 'notifybay' ), $placeholder_hint ),
+				'description' => sprintf( __( 'Available placeholders: %s', 'notifybay-waitlist-and-stock-alert-woo' ), $placeholder_hint ),
 				'placeholder' => $this->get_default_heading(),
 				'default'     => '',
 			),
 			'additional_content' => array(
-				'title'       => __( 'Additional content', 'notifybay' ),
-				'description' => __( 'Text to appear below the main email content.', 'notifybay' ) . ' ' . sprintf(
+				'title'       => __( 'Additional content', 'notifybay-waitlist-and-stock-alert-woo' ),
+				'description' => __( 'Text to appear below the main email content.', 'notifybay-waitlist-and-stock-alert-woo' ) . ' ' . sprintf(
 					/* translators: %s: list of available merge-tag placeholders */
-					__( 'Available placeholders: %s', 'notifybay' ),
+					__( 'Available placeholders: %s', 'notifybay-waitlist-and-stock-alert-woo' ),
 					$placeholder_hint
 				),
 				'css'         => 'width:400px; height: 75px;',
-				'placeholder' => __( 'N/A', 'notifybay' ),
+				'placeholder' => __( 'N/A', 'notifybay-waitlist-and-stock-alert-woo' ),
 				'type'        => 'textarea',
 				'default'     => $this->get_default_additional_content(),
 				'desc_tip'    => true,
 			),
 			'email_type'         => array(
-				'title'       => __( 'Email type', 'notifybay' ),
+				'title'       => __( 'Email type', 'notifybay-waitlist-and-stock-alert-woo' ),
 				'type'        => 'select',
-				'description' => __( 'Choose which format of email to send.', 'notifybay' ),
+				'description' => __( 'Choose which format of email to send.', 'notifybay-waitlist-and-stock-alert-woo' ),
 				'default'     => 'html',
 				'class'       => 'email_type wc-enhanced-select',
 				'options'     => $this->get_email_type_options(),

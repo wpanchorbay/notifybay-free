@@ -84,7 +84,7 @@ class Endpoints {
 	 */
 	private function verify_lead( $token ) {
 		if ( ! $token ) {
-			wp_die( esc_html__( 'Invalid verification token.', 'notifybay' ) );
+			wp_die( esc_html__( 'Invalid verification token.', 'notifybay-waitlist-and-stock-alert-woo' ) );
 		}
 
 		global $wpdb;
@@ -99,7 +99,7 @@ class Endpoints {
 		);
 
 		if ( ! $lead ) {
-			wp_die( esc_html__( 'Invalid or expired verification link.', 'notifybay' ) );
+			wp_die( esc_html__( 'Invalid or expired verification link.', 'notifybay-waitlist-and-stock-alert-woo' ) );
 		}
 
 		$wpdb->update(
@@ -112,8 +112,8 @@ class Endpoints {
 		);
 
 		wp_die(
-			esc_html__( 'Email verified successfully! You will now receive notifications.', 'notifybay' ),
-			esc_html__( 'Verification Successful', 'notifybay' ),
+			esc_html__( 'Email verified successfully! You will now receive notifications.', 'notifybay-waitlist-and-stock-alert-woo' ),
+			esc_html__( 'Verification Successful', 'notifybay-waitlist-and-stock-alert-woo' ),
 			array( 'response' => 200 )
 		);
 	}
@@ -125,7 +125,7 @@ class Endpoints {
 	 */
 	private function unsubscribe_lead( $token ) {
 		if ( ! $token ) {
-			wp_die( esc_html__( 'Invalid unsubscribe token.', 'notifybay' ) );
+			wp_die( esc_html__( 'Invalid unsubscribe token.', 'notifybay-waitlist-and-stock-alert-woo' ) );
 		}
 
 		global $wpdb;
@@ -140,7 +140,7 @@ class Endpoints {
 		);
 
 		if ( ! $lead ) {
-			wp_die( esc_html__( 'Unsubscribe failed. Lead not found.', 'notifybay' ) );
+			wp_die( esc_html__( 'Unsubscribe failed. Lead not found.', 'notifybay-waitlist-and-stock-alert-woo' ) );
 		}
 
 		$wpdb->update(
@@ -153,8 +153,8 @@ class Endpoints {
 		);
 
 		wp_die(
-			esc_html__( 'You have been successfully unsubscribed from this alert.', 'notifybay' ),
-			esc_html__( 'Unsubscribed', 'notifybay' ),
+			esc_html__( 'You have been successfully unsubscribed from this alert.', 'notifybay-waitlist-and-stock-alert-woo' ),
+			esc_html__( 'Unsubscribed', 'notifybay-waitlist-and-stock-alert-woo' ),
 			array( 'response' => 200 )
 		);
 	}
@@ -167,7 +167,7 @@ class Endpoints {
 	 */
 	public function register_personal_data_exporter( $exporters ) {
 		$exporters['notifybay-leads'] = array(
-			'exporter_friendly_name' => __( 'NotifyBay Leads', 'notifybay' ),
+			'exporter_friendly_name' => __( 'NotifyBay Leads', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'callback'               => array( $this, 'personal_data_exporter' ),
 		);
 		return $exporters;
@@ -188,23 +188,23 @@ class Endpoints {
 		foreach ( $leads as $lead ) {
 			$data_to_export[] = array(
 				'group_id'    => 'notifybay-leads',
-				'group_label' => __( 'NotifyBay Leads', 'notifybay' ),
+				'group_label' => __( 'NotifyBay Leads', 'notifybay-waitlist-and-stock-alert-woo' ),
 				'item_id'     => 'lead-' . $lead->id,
 				'data'        => array(
 					array(
-						'name'  => __( 'Email', 'notifybay' ),
+						'name'  => __( 'Email', 'notifybay-waitlist-and-stock-alert-woo' ),
 						'value' => $lead->user_email,
 					),
 					array(
-						'name'  => __( 'Product ID', 'notifybay' ),
+						'name'  => __( 'Product ID', 'notifybay-waitlist-and-stock-alert-woo' ),
 						'value' => $lead->product_id,
 					),
 					array(
-						'name'  => __( 'Status', 'notifybay' ),
+						'name'  => __( 'Status', 'notifybay-waitlist-and-stock-alert-woo' ),
 						'value' => $lead->status,
 					),
 					array(
-						'name'  => __( 'Created', 'notifybay' ),
+						'name'  => __( 'Created', 'notifybay-waitlist-and-stock-alert-woo' ),
 						'value' => $lead->created_at,
 					),
 				),
@@ -225,7 +225,7 @@ class Endpoints {
 	 */
 	public function register_personal_data_eraser( $erasers ) {
 		$erasers['notifybay-leads'] = array(
-			'eraser_friendly_name' => __( 'NotifyBay Leads', 'notifybay' ),
+			'eraser_friendly_name' => __( 'NotifyBay Leads', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'callback'             => array( $this, 'personal_data_eraser' ),
 		);
 		return $erasers;

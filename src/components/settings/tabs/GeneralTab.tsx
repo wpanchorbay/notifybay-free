@@ -18,18 +18,18 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
 }) => {
   return (
     <ClassicSettingsTable
-      title={__("General Logic", "notifybay")}
+      title={__("General Logic", "notifybay-waitlist-and-stock-alert-woo")}
       description={__(
         "Configure the core behavior of your revenue recovery system, including wishlist status and verification rules.",
-        "notifybay",
+        "notifybay-waitlist-and-stock-alert-woo",
       )}
       fields={[
         {
           id: "general_doubleOptIn",
-          label: __("Double Opt-In", "notifybay"),
+          label: __("Double Opt-In", "notifybay-waitlist-and-stock-alert-woo"),
           tooltip: __(
             "Requires guest users to verify their email address before their subscription becomes active.",
-            "notifybay",
+            "notifybay-waitlist-and-stock-alert-woo",
           ),
           render: () => (
             <ClassicCheckbox
@@ -40,20 +40,20 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                   general_doubleOptIn: val,
                 })
               }
-              label={__("Require email verification for all leads", "notifybay")}
+              label={__("Require email verification for all leads", "notifybay-waitlist-and-stock-alert-woo")}
               description={__(
                 "Highly recommended for GDPR and CAN-SPAM compliance.",
-                "notifybay",
+                "notifybay-waitlist-and-stock-alert-woo",
               )}
             />
           ),
         },
         {
           id: "general_backorderWaitlist",
-          label: __("Backorder Behavior", "notifybay"),
+          label: __("Backorder Behavior", "notifybay-waitlist-and-stock-alert-woo"),
           tooltip: __(
             "Choose whether the 'Notify Me' form should appear for products that allow backorders.",
-            "notifybay",
+            "notifybay-waitlist-and-stock-alert-woo",
           ),
           render: () => (
             <ClassicSelect
@@ -67,23 +67,23 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
               options={[
                 {
                   value: "0",
-                  label: __("Waitlist only if backorders disabled", "notifybay"),
+                  label: __("Waitlist only if backorders disabled", "notifybay-waitlist-and-stock-alert-woo"),
                 },
                 {
                   value: "1",
-                  label: __("Show waitlist regardless of backorders", "notifybay"),
+                  label: __("Show waitlist regardless of backorders", "notifybay-waitlist-and-stock-alert-woo"),
                 },
                 {
                   value: "2",
                   label: __(
                     "Never show waitlist for backorderable items",
-                    "notifybay",
+                    "notifybay-waitlist-and-stock-alert-woo",
                   ),
                 },
               ]}
               description={__(
                 "Select the behavior that matches your store's inventory policy.",
-                "notifybay",
+                "notifybay-waitlist-and-stock-alert-woo",
               )}
             />
           ),

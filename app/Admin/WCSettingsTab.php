@@ -24,7 +24,7 @@ class WCSettingsTab extends \WC_Settings_Page {
 	 */
 	public function __construct() {
 		$this->id    = \NOTIFYBAY_PLUGIN_NAME;
-		$this->label = __( 'Leads Settings', 'notifybay' );
+		$this->label = __( 'Leads Settings', 'notifybay-waitlist-and-stock-alert-woo' );
 
 		parent::__construct();
 	}

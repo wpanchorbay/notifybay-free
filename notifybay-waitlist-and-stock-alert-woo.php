@@ -5,13 +5,13 @@
  * Description:       A modern WordPress plugin boilerplate with React/TypeScript admin UI, REST API, and modular PHP architecture.
  * Requires at least: 5.6
  * Requires PHP:      7.0
- * Version:           1.1.0
- * Stable tag:        1.1.0
+ * Version:           1.2.0
+ * Stable tag:        1.2.0
  * Author:            WPAnchorBay
  * Author URI:        https://wpanchorbay.com
  * License:           GPLv2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       notifybay
+ * Text Domain:       notifybay-waitlist-and-stock-alert-woo
  * Domain Path:       /languages
  *
  * @package NotifyBay
@@ -25,10 +25,14 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'NOTIFYBAY_PATH', plugin_dir_path( __FILE__ ) );
 define( 'NOTIFYBAY_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NOTIFYBAY_URL', plugin_dir_url( __FILE__ ) );
-define( 'NOTIFYBAY_VERSION', '1.1.0' );
+define( 'NOTIFYBAY_VERSION', '1.2.0' );
 define( 'NOTIFYBAY_PLUGIN_NAME', 'notifybay' );
 define( 'NOTIFYBAY_TEXT_DOMAIN', 'notifybay' );
 define( 'NOTIFYBAY_OPTION_NAME', 'notifybay' );
+// The wordpress.org distribution slug (== plugin folder + text domain). This is
+// deliberately distinct from the `notifybay` code prefix used by hooks, options,
+// constants, the REST namespace and script handles above.
+define( 'NOTIFYBAY_SLUG', 'notifybay-waitlist-and-stock-alert-woo' );
 define( 'NOTIFYBAY_REMOTE_URL', 'https://wpanchorbay.com/wp-json/' );
 
 // Composer autoloader.

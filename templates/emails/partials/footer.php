@@ -18,6 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 <hr>
 <p>
 	<small>
-		<a href="<?php echo esc_url( $unsubscribe_url ); ?>"><?php esc_html_e( 'Unsubscribe', 'notifybay' ); ?></a>
+		<a href="<?php echo esc_url( $unsubscribe_url ); ?>"><?php esc_html_e( 'Unsubscribe', 'notifybay-waitlist-and-stock-alert-woo' ); ?></a>
 	</small>
 </p>

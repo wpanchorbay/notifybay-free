@@ -116,7 +116,7 @@ class ProductPage {
 		$badge   = '<span class="notifybay-menu-badge" style="display:' . $display . '; background: #ff4d4f; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px; margin-left: 4px; vertical-align: top;">' . $count . '</span>';
 
 		$wishlist_item  = '<li class="menu-item notifybay-menu-wishlist">';
-		$wishlist_item .= '<a href="' . esc_url( $wishlist_url ) . '">' . $icon . __( 'Wishlist', 'notifybay' ) . $badge . '</a>';
+		$wishlist_item .= '<a href="' . esc_url( $wishlist_url ) . '">' . $icon . __( 'Wishlist', 'notifybay-waitlist-and-stock-alert-woo' ) . $badge . '</a>';
 		$wishlist_item .= '</li>';
 
 		return $items . $wishlist_item;

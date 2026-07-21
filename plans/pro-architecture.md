@@ -22,7 +22,7 @@ Free is completely **Pro-agnostic** — it references Pro nowhere. It just expos
 
 `notifybaypro/notifybaypro.php`:
 - Header: `Requires Plugins: woocommerce, notifybay`; define `NOTIFYBAY_PRO_REQUIRED_FREE_VERSION`.
-- Boot on `add_action('plugins_loaded', 'notifybay_pro_run', 20)`. NOTE: Free calls `notifybay_run()` at **file scope** (`notifybay.php:54`), not on a `plugins_loaded` hook — file-scope execution during plugin load precedes any `plugins_loaded` callback regardless of alphabetical order, so Pro on `plugins_loaded` pri 20 is safely after Free. (Do **not** "align" Free to a `plugins_loaded` pri-10 callback based on an earlier draft of this doc that wrongly claimed it already was one.)
+- Boot on `add_action('plugins_loaded', 'notifybay_pro_run', 20)`. NOTE: Free calls `notifybay_run()` at **file scope** (`notifybay-waitlist-and-stock-alert-woo.php:58`), not on a `plugins_loaded` hook — file-scope execution during plugin load precedes any `plugins_loaded` callback regardless of alphabetical order, so Pro on `plugins_loaded` pri 20 is safely after Free. (Do **not** "align" Free to a `plugins_loaded` pri-10 callback based on an earlier draft of this doc that wrongly claimed it already was one.)
 - `notifybay_pro_run()` gates: (a) `defined('NOTIFYBAY_VERSION')` else admin-notice + bail; (b) `version_compare(NOTIFYBAY_VERSION, NOTIFYBAY_PRO_REQUIRED_FREE_VERSION, '<')` else notice + bail; (c) WooCommerce active. Only then `\NotifyBayPro\Core\Plugin::get_instance()->run()`.
 - Define `NOTIFYBAY_PRO_*` constants (PATH/URL/VERSION/REMOTE_URL = `https://wpanchorbay.com/wp-json/`).
 

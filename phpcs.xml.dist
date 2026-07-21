@@ -46,7 +46,7 @@
     <rule ref="WordPress.WP.I18n">
         <properties>
             <property name="text_domain" type="array">
-                <element value="notifybay"/>
+                <element value="notifybay-waitlist-and-stock-alert-woo"/>
             </property>
         </properties>
     </rule>
@@ -67,6 +67,17 @@
                 <element value="NotifyBay"/>
             </property>
         </properties>
+    </rule>
+
+    <!-- Template files legitimately use unprefixed local variables (passed in by
+         TemplateRenderer / WC_Email) and invoke WooCommerce core hooks
+         (woocommerce_email_header/footer). These are the standard WooCommerce
+         template conventions, not plugin-global definitions. -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound">
+        <exclude-pattern>*/templates/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound">
+        <exclude-pattern>*/templates/*</exclude-pattern>
     </rule>
 
 </ruleset>

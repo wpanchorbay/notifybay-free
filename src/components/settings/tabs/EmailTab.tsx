@@ -18,18 +18,18 @@ export const EmailTab: React.FC<EmailTabProps> = ({
     <div className="notifybay-flex notifybay-flex-col">
       {/* Email Sender Identity */}
       <ClassicSettingsTable
-        title={__("Email Identity", "notifybay")}
+        title={__("Email Identity", "notifybay-waitlist-and-stock-alert-woo")}
         description={__(
           "Configure the global 'From' name and email address for all notifications sent by this plugin.",
-          "notifybay",
+          "notifybay-waitlist-and-stock-alert-woo",
         )}
         fields={[
           {
             id: "email_fromName",
-            label: __("From Name", "notifybay"),
+            label: __("From Name", "notifybay-waitlist-and-stock-alert-woo"),
             tooltip: __(
               "The name that will appear in the customer's inbox.",
-              "notifybay",
+              "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <ClassicInput
@@ -40,16 +40,16 @@ export const EmailTab: React.FC<EmailTabProps> = ({
                     email_fromName: e.target.value,
                   })
                 }
-                placeholder={__("e.g. My Store Team", "notifybay")}
+                placeholder={__("e.g. My Store Team", "notifybay-waitlist-and-stock-alert-woo")}
               />
             ),
           },
           {
             id: "email_fromEmail",
-            label: __("From Email", "notifybay"),
+            label: __("From Email", "notifybay-waitlist-and-stock-alert-woo"),
             tooltip: __(
               "The email address used to send notifications.",
-              "notifybay",
+              "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <ClassicInput
@@ -61,7 +61,7 @@ export const EmailTab: React.FC<EmailTabProps> = ({
                     email_fromEmail: e.target.value,
                   })
                 }
-                placeholder={__("e.g. sales@mystore.com", "notifybay")}
+                placeholder={__("e.g. sales@mystore.com", "notifybay-waitlist-and-stock-alert-woo")}
               />
             ),
           },
@@ -79,16 +79,16 @@ export const EmailTab: React.FC<EmailTabProps> = ({
         style={{ maxWidth: 720 }}
       >
         <h3 className="notifybay-font-[600] notifybay-mb-[8px]">
-          {__("Email content & templates", "notifybay")}
+          {__("Email content & templates", "notifybay-waitlist-and-stock-alert-woo")}
         </h3>
         <p className="notifybay-text-gray-600 notifybay-mb-[12px]">
           {__(
             "Subject lines, headings, body content, enable/disable, and test sends for each email are now managed as native WooCommerce emails.",
-            "notifybay",
+            "notifybay-waitlist-and-stock-alert-woo",
           )}
         </p>
         <a href={wcEmailsUrl} className="button button-secondary">
-          {__("Open WooCommerce → Emails", "notifybay")}
+          {__("Open WooCommerce → Emails", "notifybay-waitlist-and-stock-alert-woo")}
         </a>
       </div>
     </div>

@@ -26,19 +26,19 @@ $is_variable            = isset( $is_variable ) ? $is_variable : false;
 			<input type="hidden" name="notifybay_email" value="<?php echo esc_attr( wp_get_current_user()->user_email ); ?>">
 			<button type="button" class="notifybay-wishlist-btn notifybay-submit button <?php echo esc_attr( $css_class ); ?> <?php echo $is_subscribed ? 'active' : ''; ?>" <?php disabled( $is_subscribed || $is_variable ); ?>>
 				<span class="notifybay-icon"></span>
-				<?php echo esc_html( $is_subscribed ? __( 'Already in Wishlist', 'notifybay' ) : $btn_text ); ?>
+				<?php echo esc_html( $is_subscribed ? __( 'Already in Wishlist', 'notifybay-waitlist-and-stock-alert-woo' ) : $btn_text ); ?>
 			</button>
 		<?php else : ?>
 			<div class="notifybay-guest-trigger-wrapper">
 				<button type="button" class="notifybay-wishlist-trigger notifybay-submit button <?php echo esc_attr( $css_class ); ?> <?php echo $is_subscribed ? 'active' : ''; ?>" <?php disabled( $is_subscribed || $is_variable ); ?>>
 					<span class="notifybay-icon"></span>
-					<?php echo esc_html( $is_subscribed ? __( 'Already in Wishlist', 'notifybay' ) : $btn_text ); ?>
+					<?php echo esc_html( $is_subscribed ? __( 'Already in Wishlist', 'notifybay-waitlist-and-stock-alert-woo' ) : $btn_text ); ?>
 				</button>
 			</div>
 
 			<div class="notifybay-guest-form-wrapper" style="display:none;">
 				<div class="notifybay-form-fields">
-					<input type="email" name="notifybay_email" placeholder="<?php esc_attr_e( 'Your email address', 'notifybay' ); ?>">
+					<input type="email" name="notifybay_email" placeholder="<?php esc_attr_e( 'Your email address', 'notifybay-waitlist-and-stock-alert-woo' ); ?>">
 					<button type="button" class="notifybay-guest-submit notifybay-submit button alt <?php echo esc_attr( $css_class ); ?>">
 						<?php echo esc_html( $btn_text ); ?>
 					</button>

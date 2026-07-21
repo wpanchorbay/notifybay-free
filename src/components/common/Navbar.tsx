@@ -17,24 +17,24 @@ const Navbar: FC = () => {
 
 	const menus: MenuLink[] = [
 		{
-			label: __( 'Dashboard', 'notifybay' ),
+			label: __( 'Dashboard', 'notifybay-waitlist-and-stock-alert-woo' ),
 			path: '/',
 		},
 		// Add your menu items here
 		{
-			label: __( 'Logs', 'notifybay' ),
+			label: __( 'Logs', 'notifybay-waitlist-and-stock-alert-woo' ),
 			path: '/logs',
 		},
 		{
-			label: __( 'Components', 'notifybay' ),
+			label: __( 'Components', 'notifybay-waitlist-and-stock-alert-woo' ),
 			path: '/components',
 		},
 		{
-			label: __( 'Components (Classic)', 'notifybay' ),
+			label: __( 'Components (Classic)', 'notifybay-waitlist-and-stock-alert-woo' ),
 			path: '/components-classic',
 		},
 		// {
-		//   label: __("Settings", "notifybay"),
+		//   label: __("Settings", "notifybay-waitlist-and-stock-alert-woo"),
 		//   path: "/settings",
 		// },
 	];

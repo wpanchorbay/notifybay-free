@@ -16,6 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div id="<?php echo esc_attr( $plugin_name ); ?>">
 	<div class="notifybay-loader-container">
-		<p><?php esc_html_e( 'Loading...', 'notifybay' ); ?></p>
+		<p><?php esc_html_e( 'Loading...', 'notifybay-waitlist-and-stock-alert-woo' ); ?></p>
 	</div>
 </div>

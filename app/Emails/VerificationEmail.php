@@ -31,8 +31,8 @@ class VerificationEmail extends NotifyBayEmail {
 	 */
 	public function __construct() {
 		$this->id            = 'notifybay_verification';
-		$this->title         = __( 'NotifyBay: Confirm subscription', 'notifybay' );
-		$this->description    = __( 'Double opt-in email asking a subscriber to confirm their subscription.', 'notifybay' );
+		$this->title         = __( 'NotifyBay: Confirm subscription', 'notifybay-waitlist-and-stock-alert-woo' );
+		$this->description   = __( 'Double opt-in email asking a subscriber to confirm their subscription.', 'notifybay-waitlist-and-stock-alert-woo' );
 		$this->template_html = 'emails/wc/verification.php';
 
 		parent::__construct();
@@ -44,7 +44,7 @@ class VerificationEmail extends NotifyBayEmail {
 	 * @return string
 	 */
 	public function get_default_subject() {
-		return __( 'Verify your subscription to {product_name}', 'notifybay' );
+		return __( 'Verify your subscription to {product_name}', 'notifybay-waitlist-and-stock-alert-woo' );
 	}
 
 	/**
@@ -53,6 +53,6 @@ class VerificationEmail extends NotifyBayEmail {
 	 * @return string
 	 */
 	public function get_default_heading() {
-		return __( 'Confirm your subscription', 'notifybay' );
+		return __( 'Confirm your subscription', 'notifybay-waitlist-and-stock-alert-woo' );
 	}
 }

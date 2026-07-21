@@ -68,7 +68,7 @@ const Settings: React.FC = () => {
       });
       setSystemStatus(response);
     } catch (error) {
-      addToast(__("Failed to load system status.", "notifybay"), "error");
+      addToast(__("Failed to load system status.", "notifybay-waitlist-and-stock-alert-woo"), "error");
     } finally {
       setIsLoadingStatus(false);
     }
@@ -103,7 +103,7 @@ const Settings: React.FC = () => {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Error fetching settings:", error);
-      addToast(__("Failed to load settings.", "notifybay"), "error");
+      addToast(__("Failed to load settings.", "notifybay-waitlist-and-stock-alert-woo"), "error");
     } finally {
       setIsLoading(false);
     }
@@ -123,7 +123,7 @@ const Settings: React.FC = () => {
       if (response.success) {
         setSettings({ ...response.data });
         setOriginalSettings(JSON.parse(JSON.stringify(response.data)));
-        addToast(__("Settings saved successfully.", "notifybay"), "success");
+        addToast(__("Settings saved successfully.", "notifybay-waitlist-and-stock-alert-woo"), "success");
 
         // Prevent WooCommerce "Unsaved Changes" dialog
         const nativeSaveButton = document.querySelector('button[name="save"]');
@@ -135,7 +135,7 @@ const Settings: React.FC = () => {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Error saving settings:", error);
-      addToast(__("Failed to save settings.", "notifybay"), "error");
+      addToast(__("Failed to save settings.", "notifybay-waitlist-and-stock-alert-woo"), "error");
     } finally {
       setIsSaving(false);
       const nativeSaveButton = document.querySelector('button[name="save"]');
@@ -198,19 +198,19 @@ const Settings: React.FC = () => {
   if (!settings) {
     return (
       <div className="notifybay-p-page-default">
-        <p>{__("Failed to load settings.", "notifybay")}</p>
+        <p>{__("Failed to load settings.", "notifybay-waitlist-and-stock-alert-woo")}</p>
       </div>
     );
   }
 
   const baseTabs = [
-    { id: "overview", label: __("Overview", "notifybay") },
-    { id: "general", label: __("General", "notifybay") },
-    { id: "appearance", label: __("Display", "notifybay") },
-    { id: "engine", label: __("Engine Logic", "notifybay") },
-    { id: "email", label: __("Email Templates", "notifybay") },
-    { id: "status", label: __("System Status", "notifybay") },
-    { id: "advanced", label: __("Advanced", "notifybay") },
+    { id: "overview", label: __("Overview", "notifybay-waitlist-and-stock-alert-woo") },
+    { id: "general", label: __("General", "notifybay-waitlist-and-stock-alert-woo") },
+    { id: "appearance", label: __("Display", "notifybay-waitlist-and-stock-alert-woo") },
+    { id: "engine", label: __("Engine Logic", "notifybay-waitlist-and-stock-alert-woo") },
+    { id: "email", label: __("Email Templates", "notifybay-waitlist-and-stock-alert-woo") },
+    { id: "status", label: __("System Status", "notifybay-waitlist-and-stock-alert-woo") },
+    { id: "advanced", label: __("Advanced", "notifybay-waitlist-and-stock-alert-woo") },
   ];
 
   /**
@@ -266,7 +266,7 @@ const Settings: React.FC = () => {
               <p className="notifybay-text-gray-500">
                 {__(
                   "Analytics and revenue insights appear here with NotifyBay Pro.",
-                  "notifybay",
+                  "notifybay-waitlist-and-stock-alert-woo",
                 )}
               </p>
             )}
@@ -330,13 +330,13 @@ const Settings: React.FC = () => {
 
       <ConfirmationModal
         isOpen={showUnsavedModal}
-        title={__("Unsaved Changes", "notifybay")}
+        title={__("Unsaved Changes", "notifybay-waitlist-and-stock-alert-woo")}
         message={__(
           "You have unsaved changes. Would you like to save them before switching tabs?",
-          "notifybay",
+          "notifybay-waitlist-and-stock-alert-woo",
         )}
-        confirmLabel={__("Save", "notifybay")}
-        cancelLabel={__("Discard", "notifybay")}
+        confirmLabel={__("Save", "notifybay-waitlist-and-stock-alert-woo")}
+        cancelLabel={__("Discard", "notifybay-waitlist-and-stock-alert-woo")}
         onConfirm={handleConfirmSave}
         onCancel={() => {
           if (pendingTab) {

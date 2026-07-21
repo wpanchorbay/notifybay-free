@@ -31,8 +31,8 @@ return array(
 		 * Only active if 'show_main_menu' is true.
 		 */
 		'top_level' => array(
-			'page_title' => __( 'NotifyBay', 'notifybay' ),
-			'menu_title' => __( 'NotifyBay', 'notifybay' ),
+			'page_title' => __( 'NotifyBay', 'notifybay-waitlist-and-stock-alert-woo' ),
+			'menu_title' => __( 'NotifyBay', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'capability' => 'manage_notifybay',
 			'menu_slug'  => \NOTIFYBAY_PLUGIN_NAME,
 			'icon_url'   => 'dashicons-admin-plugins', // Dashicon class or full URL to icon
@@ -50,8 +50,8 @@ return array(
 			 */
 			array(
 				'parent_slug' => 'edit.php?post_type=product',
-				'page_title'  => __( 'Leads', 'notifybay' ),
-				'menu_title'  => __( 'Leads', 'notifybay' ),
+				'page_title'  => __( 'Leads', 'notifybay-waitlist-and-stock-alert-woo' ),
+				'menu_title'  => __( 'Leads', 'notifybay-waitlist-and-stock-alert-woo' ),
 				'capability'  => 'manage_notifybay',
 				'menu_slug'   => \NOTIFYBAY_PLUGIN_NAME . '-products',
 			),
@@ -65,7 +65,7 @@ return array(
 	 */
 	'plugin_action_links' => array(
 		array(
-			'text' => __( 'Settings', 'notifybay' ),
+			'text' => __( 'Settings', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'url'  => admin_url( 'admin.php?page=wc-settings&tab=' . \NOTIFYBAY_PLUGIN_NAME ),
 		),
 		/**
@@ -75,11 +75,11 @@ return array(
 		 * a later priority. Keyed `upgrade` so Pro can target it for removal.
 		 */
 		array(
-			'key'      => 'upgrade',
-			'text'     => __( 'Upgrade to Pro', 'notifybay' ),
-			'url'      => 'https://wpanchorbay.com/plugins/notifybay',
-			'target'   => '_blank',
-			'style'    => 'color:#00a32a;font-weight:600;',
+			'key'    => 'upgrade',
+			'text'   => __( 'Upgrade to Pro', 'notifybay-waitlist-and-stock-alert-woo' ),
+			'url'    => 'https://wpanchorbay.com/plugins/notifybay',
+			'target' => '_blank',
+			'style'  => 'color:#00a32a;font-weight:600;',
 		),
 	),
 
@@ -92,16 +92,16 @@ return array(
 	 */
 	'plugin_row_meta'     => array(
 		array(
-			'text' => __( 'Docs', 'notifybay' ),
+			'text' => __( 'Docs', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'url'  => 'https://wpanchorbay.com/docs/' . \NOTIFYBAY_PLUGIN_NAME . '/',
 		),
 		array(
-			'text' => __( 'Support', 'notifybay' ),
+			'text' => __( 'Support', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'url'  => 'https://wpanchorbay.com/support/',
 		),
 		array(
-			'text' => __( 'Rate ★★★★★', 'notifybay' ),
-			'url'  => 'https://wordpress.org/support/plugin/' . \NOTIFYBAY_PLUGIN_NAME . '/reviews/#new-post',
+			'text' => __( 'Rate ★★★★★', 'notifybay-waitlist-and-stock-alert-woo' ),
+			'url'  => 'https://wordpress.org/support/plugin/' . \NOTIFYBAY_SLUG . '/reviews/#new-post',
 		),
 	),
 
@@ -111,9 +111,9 @@ return array(
 	 * General data used throughout the admin dashboard and JS localization.
 	 */
 	'plugin_data'         => array(
-		'plugin_name' => esc_html__( 'NotifyBay', 'notifybay' ),
-		'short_name'  => esc_html__( 'NotifyBay', 'notifybay' ),
-		'menu_label'  => esc_html__( 'NotifyBay', 'notifybay' ),
+		'plugin_name' => esc_html__( 'NotifyBay', 'notifybay-waitlist-and-stock-alert-woo' ),
+		'short_name'  => esc_html__( 'NotifyBay', 'notifybay-waitlist-and-stock-alert-woo' ),
+		'menu_label'  => esc_html__( 'NotifyBay', 'notifybay-waitlist-and-stock-alert-woo' ),
 		'custom_icon' => \NOTIFYBAY_URL . 'assets/img/icon.svg',
 		'menu_icon'   => 'dashicons-admin-plugins',
 		'author_name' => 'WPAnchorBay',

@@ -20,13 +20,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 <p>
 	<?php
 	/* translators: %s: product name */
-	printf( esc_html__( 'The item %s you were waiting for is now available!', 'notifybay' ), '<strong>' . esc_html( $product_name ) . '</strong>' );
+	printf( esc_html__( 'The item %s you were waiting for is now available!', 'notifybay-waitlist-and-stock-alert-woo' ), '<strong>' . esc_html( $product_name ) . '</strong>' );
 	?>
 </p>
 
 <p>
 	<a href="<?php echo esc_url( $buy_link ); ?>" style="background:#000; color:#fff; padding:10px 20px; text-decoration:none; display:inline-block; border-radius:5px;">
-		<?php esc_html_e( 'Buy Now', 'notifybay' ); ?>
+		<?php esc_html_e( 'Buy Now', 'notifybay-waitlist-and-stock-alert-woo' ); ?>
 	</a>
 </p>
 

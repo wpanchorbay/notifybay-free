@@ -7,7 +7,7 @@
 set -e
 
 # Define the zip filename
-PLUGIN_SLUG="notifybay"
+PLUGIN_SLUG="notifybay-waitlist-and-stock-alert-woo"
 ZIP_NAME="$PLUGIN_SLUG.zip"
 
 echo "------------------------------------------------------"
@@ -44,7 +44,7 @@ copy_plugin_files() {
     cp index.php "$DEST/"
     cp readme.txt "$DEST/"
     cp uninstall.php "$DEST/"
-    cp notifybay.php "$DEST/"
+    cp notifybay-waitlist-and-stock-alert-woo.php "$DEST/"
     cp composer.json "$DEST/"
 }
 

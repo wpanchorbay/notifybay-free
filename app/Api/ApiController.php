@@ -98,7 +98,7 @@ class ApiController extends WP_REST_Controller {
 	 * @since 1.0.0
 	 */
 	public function __clone() {
-		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cloning is not allowed.', 'notifybay' ), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cloning is not allowed.', 'notifybay-waitlist-and-stock-alert-woo' ), '1.0.0' );
 	}
 
 	/**
@@ -109,7 +109,7 @@ class ApiController extends WP_REST_Controller {
 	 * @since 1.0.0
 	 */
 	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, esc_html__( 'Unserializing is not allowed.', 'notifybay' ), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Unserializing is not allowed.', 'notifybay-waitlist-and-stock-alert-woo' ), '1.0.0' );
 	}
 
 	/**
@@ -123,14 +123,14 @@ class ApiController extends WP_REST_Controller {
 		if ( ! current_user_can( 'manage_notifybay' ) ) {
 			return new WP_Error(
 				'rest_forbidden',
-				__( 'Sorry, you are not allowed to access this resource.', 'notifybay' ),
+				__( 'Sorry, you are not allowed to access this resource.', 'notifybay-waitlist-and-stock-alert-woo' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
 
 		$nonce = $request->get_header( 'X-WP-Nonce' );
 		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-			return new WP_Error( 'rest_nonce_invalid', __( 'The security token is invalid.', 'notifybay' ), array( 'status' => 403 ) );
+			return new WP_Error( 'rest_nonce_invalid', __( 'The security token is invalid.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 403 ) );
 		}
 
 		return true;
@@ -147,7 +147,7 @@ class ApiController extends WP_REST_Controller {
 		if ( ! current_user_can( 'manage_notifybay' ) ) {
 			return new WP_Error(
 				'rest_forbidden',
-				__( 'Sorry, you are not allowed to access this resource.', 'notifybay' ),
+				__( 'Sorry, you are not allowed to access this resource.', 'notifybay-waitlist-and-stock-alert-woo' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -161,7 +161,7 @@ class ApiController extends WP_REST_Controller {
 		if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
 			return new WP_Error(
 				'rest_invalid_nonce',
-				__( 'Invalid or missing nonce.', 'notifybay' ),
+				__( 'Invalid or missing nonce.', 'notifybay-waitlist-and-stock-alert-woo' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -201,7 +201,7 @@ class ApiController extends WP_REST_Controller {
 			// Return a standard WordPress REST error with a 422 Unprocessable Entity status
 			return new WP_Error(
 				'validation_failed',
-				__( 'Invalid data provided.', 'notifybay' ),
+				__( 'Invalid data provided.', 'notifybay-waitlist-and-stock-alert-woo' ),
 				array(
 					'status' => 422,
 					'errors' => $errors,

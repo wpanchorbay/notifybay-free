@@ -102,7 +102,7 @@ class FrontendController extends ApiController {
 	public function get_batch_product_status( WP_REST_Request $request ) {
 		$product_ids = $request->get_param( 'product_ids' );
 		if ( empty( $product_ids ) || ! is_array( $product_ids ) ) {
-			return new \WP_Error( 'invalid_ids', __( 'Invalid product IDs.', 'notifybay' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'invalid_ids', __( 'Invalid product IDs.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 400 ) );
 		}
 
 		$results = array();
@@ -143,12 +143,12 @@ class FrontendController extends ApiController {
 	public function get_product_status( WP_REST_Request $request ) {
 		$product_id = (int) $request->get_param( 'product_id' );
 		if ( ! $product_id ) {
-			return new \WP_Error( 'invalid_id', __( 'Invalid product ID.', 'notifybay' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'invalid_id', __( 'Invalid product ID.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 400 ) );
 		}
 
 		$product = wc_get_product( $product_id );
 		if ( ! $product ) {
-			return new \WP_Error( 'not_found', __( 'Product not found.', 'notifybay' ), array( 'status' => 404 ) );
+			return new \WP_Error( 'not_found', __( 'Product not found.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 404 ) );
 		}
 
 		global $wpdb;
@@ -244,7 +244,7 @@ class FrontendController extends ApiController {
 		// Nonce check is crucial for security
 		$nonce = $request->get_header( 'X-WP-Nonce' );
 		if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-			return new \WP_Error( 'rest_cookie_invalid', __( 'Security check failed.', 'notifybay' ), array( 'status' => 403 ) );
+			return new \WP_Error( 'rest_cookie_invalid', __( 'Security check failed.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 403 ) );
 		}
 
 		/**
@@ -273,12 +273,12 @@ class FrontendController extends ApiController {
 
 		$settings = Settings::get_instance();
 		if ( 'wishlist' === $validated['type'] && ! $settings->get_settings( 'general_wishlistEnabled', false ) ) {
-			return new \WP_Error( 'feature_disabled', __( 'Wishlist functionality is currently disabled.', 'notifybay' ), array( 'status' => 403 ) );
+			return new \WP_Error( 'feature_disabled', __( 'Wishlist functionality is currently disabled.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 403 ) );
 		}
 
 		// Rate limiting to prevent spam
 		if ( ! $this->check_rate_limit( $validated['email'] ) ) {
-			return new \WP_Error( 'rate_limit', __( 'Too many requests. Please try again later.', 'notifybay' ), array( 'status' => 429 ) );
+			return new \WP_Error( 'rate_limit', __( 'Too many requests. Please try again later.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 429 ) );
 		}
 
 		$user_id = get_current_user_id();
@@ -328,7 +328,7 @@ class FrontendController extends ApiController {
 			if ( $settings->get_settings( 'engine_adminAlerts', false ) ) {
 				$admin_email = get_option( 'admin_email' );
 				/* translators: %s: lead type */
-				$subject = sprintf( __( '[NotifyBay] New %s signup', 'notifybay' ), ucfirst( $validated['type'] ) );
+				$subject = sprintf( __( '[NotifyBay] New %s signup', 'notifybay-waitlist-and-stock-alert-woo' ), ucfirst( $validated['type'] ) );
 				$body    = TemplateRenderer::render(
 					'emails/admin-alert',
 					array(
@@ -342,14 +342,14 @@ class FrontendController extends ApiController {
 			}
 
 			$message = ( 'pending_verification' === $status )
-				? __( 'Please check your email to verify your subscription.', 'notifybay' )
+				? __( 'Please check your email to verify your subscription.', 'notifybay-waitlist-and-stock-alert-woo' )
 				: ( ( 'waitlist' === $validated['type'] )
 					? $settings->get_settings( 'appearance_waitlistSuccessMessage' )
 					: $settings->get_settings( 'appearance_wishlistSuccessMessage' ) );
 
 			// Fallback if somehow settings are missing
 			if ( ! $message ) {
-				$message = __( 'Successfully subscribed! You will be notified as soon as possible.', 'notifybay' );
+				$message = __( 'Successfully subscribed! You will be notified as soon as possible.', 'notifybay-waitlist-and-stock-alert-woo' );
 			}
 
 			// Calculate fresh wishlist count for the response
@@ -368,7 +368,7 @@ class FrontendController extends ApiController {
 		}
 
 		notifybay_log( sprintf( 'Database error during subscription for email %s, product_id %d', $validated['email'], $validated['product_id'] ), 'ERROR' );
-		return new \WP_Error( 'db_error', __( 'Could not process subscription. Please try again.', 'notifybay' ), array( 'status' => 500 ) );
+		return new \WP_Error( 'db_error', __( 'Could not process subscription. Please try again.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 500 ) );
 	}
 
 	/**
@@ -380,17 +380,17 @@ class FrontendController extends ApiController {
 	public function unsubscribe_ajax( \WP_REST_Request $request ) {
 		$nonce = $request->get_header( 'X-WP-Nonce' );
 		if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-			return new \WP_Error( 'rest_cookie_invalid', __( 'Security check failed.', 'notifybay' ), array( 'status' => 403 ) );
+			return new \WP_Error( 'rest_cookie_invalid', __( 'Security check failed.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 403 ) );
 		}
 
 		$lead_id = (int) $request->get_param( 'lead_id' );
 		if ( ! $lead_id ) {
-			return new \WP_Error( 'invalid_id', __( 'Invalid lead ID.', 'notifybay' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'invalid_id', __( 'Invalid lead ID.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 400 ) );
 		}
 
 		$user_email = is_user_logged_in() ? wp_get_current_user()->user_email : '';
 		if ( ! $user_email ) {
-			return new \WP_Error( 'forbidden', __( 'You must be logged in to manage subscriptions.', 'notifybay' ), array( 'status' => 403 ) );
+			return new \WP_Error( 'forbidden', __( 'You must be logged in to manage subscriptions.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 403 ) );
 		}
 
 		global $wpdb;
@@ -421,12 +421,12 @@ class FrontendController extends ApiController {
 
 			return array(
 				'success'        => true,
-				'message'        => __( 'Unsubscribed successfully.', 'notifybay' ),
+				'message'        => __( 'Unsubscribed successfully.', 'notifybay-waitlist-and-stock-alert-woo' ),
 				'wishlist_count' => $wishlist_count,
 			);
 		}
 
-		return new \WP_Error( 'not_found', __( 'Subscription not found or already removed.', 'notifybay' ), array( 'status' => 404 ) );
+		return new \WP_Error( 'not_found', __( 'Subscription not found or already removed.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 404 ) );
 	}
 
 	/**

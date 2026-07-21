@@ -67,7 +67,7 @@ NotifyBay (Plugin Root)
 ├─ languages/               # i18n files (.pot)
 ├─ templates/               # Overridable email and frontend templates
 ├─ vendor/                  # Composer dependencies (including Action Scheduler)
-└─ notifybay.php            # Plugin bootstrap
+└─ notifybay-waitlist-and-stock-alert-woo.php  # Plugin bootstrap
 ```
 
 ---

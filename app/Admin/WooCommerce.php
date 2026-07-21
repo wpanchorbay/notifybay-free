@@ -79,9 +79,9 @@ class WooCommerce {
 		foreach ( $columns as $key => $value ) {
 			$new_columns[ $key ] = $value;
 			if ( 'name' === $key ) {
-				$new_columns['notifybay_waitlist'] = __( 'Waitlist', 'notifybay' );
+				$new_columns['notifybay_waitlist'] = __( 'Waitlist', 'notifybay-waitlist-and-stock-alert-woo' );
 				if ( $wishlist_enabled ) {
-					$new_columns['notifybay_wishlist'] = __( 'Wishlist', 'notifybay' );
+					$new_columns['notifybay_wishlist'] = __( 'Wishlist', 'notifybay-waitlist-and-stock-alert-woo' );
 				}
 			}
 		}
@@ -148,7 +148,7 @@ class WooCommerce {
 	public function add_override_meta_box() {
 		add_meta_box(
 			'notifybay_overrides',
-			__( 'NotifyBay Settings', 'notifybay' ),
+			__( 'NotifyBay Settings', 'notifybay-waitlist-and-stock-alert-woo' ),
 			array( $this, 'render_override_meta_box' ),
 			'product',
 			'side',

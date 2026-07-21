@@ -65,7 +65,7 @@ const Leads: FC = () => {
   const handleDelete = (id: number) => {
     if (
       // eslint-disable-next-line no-alert
-      !confirm(__("Are you sure you want to delete this lead?", "notifybay"))
+      !confirm(__("Are you sure you want to delete this lead?", "notifybay-waitlist-and-stock-alert-woo"))
     ) {
       return;
     }
@@ -75,7 +75,7 @@ const Leads: FC = () => {
       method: "DELETE",
     }).then(() => {
       fetchLeads(currentPage, searchTerm);
-      addToast(__("Lead deleted successfully.", "notifybay"), "success");
+      addToast(__("Lead deleted successfully.", "notifybay-waitlist-and-stock-alert-woo"), "success");
     });
   };
 
@@ -102,7 +102,7 @@ const Leads: FC = () => {
       addToast(
         typeof handled === "string"
           ? handled
-          : __("Bulk action applied successfully.", "notifybay"),
+          : __("Bulk action applied successfully.", "notifybay-waitlist-and-stock-alert-woo"),
         "success",
       );
       return;
@@ -111,7 +111,7 @@ const Leads: FC = () => {
     if (
       bulkAction === "delete" &&
       !confirm(
-        __("Are you sure you want to delete the selected leads?", "notifybay"),
+        __("Are you sure you want to delete the selected leads?", "notifybay-waitlist-and-stock-alert-woo"),
       )
     ) {
       return;
@@ -128,7 +128,7 @@ const Leads: FC = () => {
       fetchLeads(currentPage, searchTerm);
       setSelectedIds([]);
       setBulkAction("");
-      addToast(__("Bulk action applied successfully.", "notifybay"), "success");
+      addToast(__("Bulk action applied successfully.", "notifybay-waitlist-and-stock-alert-woo"), "success");
     });
   };
 
@@ -161,7 +161,7 @@ const Leads: FC = () => {
       },
     })
       .then(() => {
-        addToast(__("Lead updated successfully.", "notifybay"), "success");
+        addToast(__("Lead updated successfully.", "notifybay-waitlist-and-stock-alert-woo"), "success");
         setEditingLead(null);
         fetchLeads(currentPage, searchTerm);
       })
@@ -186,12 +186,12 @@ const Leads: FC = () => {
         />
       ),
     },
-    { key: "user_email", className: "column-primary", label: __("Email", "notifybay") },
-    { key: "product_name", label: __("Product", "notifybay") },
-    { key: "type", label: __("Type", "notifybay") },
-    { key: "target_price", label: __("Target Price", "notifybay") },
-    { key: "status", label: __("Status", "notifybay") },
-    { key: "created_at", label: __("Date", "notifybay") },
+    { key: "user_email", className: "column-primary", label: __("Email", "notifybay-waitlist-and-stock-alert-woo") },
+    { key: "product_name", label: __("Product", "notifybay-waitlist-and-stock-alert-woo") },
+    { key: "type", label: __("Type", "notifybay-waitlist-and-stock-alert-woo") },
+    { key: "target_price", label: __("Target Price", "notifybay-waitlist-and-stock-alert-woo") },
+    { key: "status", label: __("Status", "notifybay-waitlist-and-stock-alert-woo") },
+    { key: "created_at", label: __("Date", "notifybay-waitlist-and-stock-alert-woo") },
   ];
 
   return (
@@ -207,11 +207,11 @@ const Leads: FC = () => {
       }
 
       <div className="notifybay-flex notifybay-w-full notifybay-justify-between notifybay-items-center" style={{ alignItems: 'center' }}>
-        <h1 className="wp-heading-inline">{__("Lead Management", "notifybay")}</h1>
+        <h1 className="wp-heading-inline">{__("Lead Management", "notifybay-waitlist-and-stock-alert-woo")}</h1>
         <div className="notifybay-flex notifybay-items-center notifybay-gap-[12px]" style={{ alignItems: 'center' }}>
           <form onSubmit={handleSearch} className="search-box notifybay-flex notifybay-items-center notifybay-gap-[8px] notifybay-m-0" style={{ alignItems: 'center', margin: 0 }}>
             <label className="screen-reader-text" htmlFor="lead-search-input">
-              {__("Search Leads:", "notifybay")}
+              {__("Search Leads:", "notifybay-waitlist-and-stock-alert-woo")}
             </label>
             <input
               type="search"
@@ -219,19 +219,19 @@ const Leads: FC = () => {
               name="s"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={__("Search...", "notifybay")}
+              placeholder={__("Search...", "notifybay-waitlist-and-stock-alert-woo")}
               style={{ minHeight: '30px', margin: 0 }}
             />
             <input
               type="submit"
               id="search-submit"
               className="button"
-              value={__("Search", "notifybay")}
+              value={__("Search", "notifybay-waitlist-and-stock-alert-woo")}
               style={{ minHeight: '30px', margin: 0, padding: '0 10px', display: 'flex', alignItems: 'center' }}
             />
           </form>
           <button onClick={handleExport} className="page-title-action" style={{ margin: 0, top: 0, minHeight: '30px', display: 'flex', alignItems: 'center', padding: '0 10px' }}>
-            {__("Export CSV ⬇", "notifybay")}
+            {__("Export CSV ⬇", "notifybay-waitlist-and-stock-alert-woo")}
           </button>
         </div>
       </div>
@@ -242,7 +242,7 @@ const Leads: FC = () => {
         <div className="tablenav top">
           <div className="alignleft actions bulkactions">
             <label htmlFor="bulk-action-selector-top" className="screen-reader-text">
-              {__("Select bulk action", "notifybay")}
+              {__("Select bulk action", "notifybay-waitlist-and-stock-alert-woo")}
             </label>
             <select
               name="action"
@@ -250,10 +250,10 @@ const Leads: FC = () => {
               value={bulkAction}
               onChange={(e) => setBulkAction(e.target.value)}
             >
-              <option value="">{__("Bulk Actions", "notifybay")}</option>
-              <option value="active">{__("Mark Active", "notifybay")}</option>
-              <option value="expired">{__("Mark Expired", "notifybay")}</option>
-              <option value="delete">{__("Delete", "notifybay")}</option>
+              <option value="">{__("Bulk Actions", "notifybay-waitlist-and-stock-alert-woo")}</option>
+              <option value="active">{__("Mark Active", "notifybay-waitlist-and-stock-alert-woo")}</option>
+              <option value="expired">{__("Mark Expired", "notifybay-waitlist-and-stock-alert-woo")}</option>
+              <option value="delete">{__("Delete", "notifybay-waitlist-and-stock-alert-woo")}</option>
               {(
                 applyFilters("notifybay_lead_bulk_actions", []) as {
                   value: string;
@@ -271,13 +271,13 @@ const Leads: FC = () => {
               onClick={handleBulkAction}
               disabled={!bulkAction || selectedIds.length === 0}
             >
-              {__("Apply", "notifybay")}
+              {__("Apply", "notifybay-waitlist-and-stock-alert-woo")}
             </button>
           </div>
 
           <div className="tablenav-pages">
             <span className="displaying-num">
-              {totalItems} {__("items", "notifybay")}
+              {totalItems} {__("items", "notifybay-waitlist-and-stock-alert-woo")}
             </span>
             <span className="pagination-links">
               {currentPage > 1 ? (
@@ -306,7 +306,7 @@ const Leads: FC = () => {
               )}
               <span className="paging-input">
                 <span className="tablenav-paging-text">
-                  {currentPage} {__("of", "notifybay")}{" "}
+                  {currentPage} {__("of", "notifybay-waitlist-and-stock-alert-woo")}{" "}
                   <span className="total-pages">{totalPages}</span>
                 </span>
               </span>
@@ -351,13 +351,13 @@ const Leads: FC = () => {
                 <td colSpan={columns.length} className="colspanchange">
                   <div className="notifybay-p-[24px]">
                     <h3 className="notifybay-text-[16px] notifybay-font-[600] notifybay-text-gray-900 notifybay-mb-[16px]">
-                      {__("Quick Edit", "notifybay")}
+                      {__("Quick Edit", "notifybay-waitlist-and-stock-alert-woo")}
                     </h3>
                     <ClassicSettingsTable
                       fields={[
                         {
                           id: "email",
-                          label: __("Email Address", "notifybay"),
+                          label: __("Email Address", "notifybay-waitlist-and-stock-alert-woo"),
                           render: () => (
                             <ClassicInput
                               type="email"
@@ -370,7 +370,7 @@ const Leads: FC = () => {
                         },
                         {
                           id: "status",
-                          label: __("Status", "notifybay"),
+                          label: __("Status", "notifybay-waitlist-and-stock-alert-woo"),
                           render: () => (
                             <ClassicSelect
                               value={editingLead.status}
@@ -378,13 +378,13 @@ const Leads: FC = () => {
                                 setEditingLead({ ...editingLead, status: val })
                               }
                               options={[
-                                { value: "active", label: __("Active", "notifybay") },
-                                { value: "pending_verification", label: __("Pending Verification", "notifybay") },
-                                { value: "notified", label: __("Notified", "notifybay") },
-                                { value: "converted", label: __("Converted", "notifybay") },
-                                { value: "expired", label: __("Expired", "notifybay") },
-                                { value: "failed", label: __("Failed", "notifybay") },
-                                { value: "unsubscribed", label: __("Unsubscribed", "notifybay") },
+                                { value: "active", label: __("Active", "notifybay-waitlist-and-stock-alert-woo") },
+                                { value: "pending_verification", label: __("Pending Verification", "notifybay-waitlist-and-stock-alert-woo") },
+                                { value: "notified", label: __("Notified", "notifybay-waitlist-and-stock-alert-woo") },
+                                { value: "converted", label: __("Converted", "notifybay-waitlist-and-stock-alert-woo") },
+                                { value: "expired", label: __("Expired", "notifybay-waitlist-and-stock-alert-woo") },
+                                { value: "failed", label: __("Failed", "notifybay-waitlist-and-stock-alert-woo") },
+                                { value: "unsubscribed", label: __("Unsubscribed", "notifybay-waitlist-and-stock-alert-woo") },
                               ]}
                             />
                           ),
@@ -393,7 +393,7 @@ const Leads: FC = () => {
                           ? [
                               {
                                 id: "target_price",
-                                label: __("Target Price", "notifybay"),
+                                label: __("Target Price", "notifybay-waitlist-and-stock-alert-woo"),
                                 render: () => (
                                   <ClassicInput
                                     type="number"
@@ -413,10 +413,10 @@ const Leads: FC = () => {
                     />
                     <div className="notifybay-flex notifybay-gap-[12px] notifybay-mt-[24px]">
                       <ClassicButton variant="secondary" onClick={() => setEditingLead(null)}>
-                        {__("Cancel", "notifybay")}
+                        {__("Cancel", "notifybay-waitlist-and-stock-alert-woo")}
                       </ClassicButton>
                       <ClassicButton variant="primary" onClick={handleUpdateLead} disabled={isUpdating}>
-                        {isUpdating ? __("Saving…", "notifybay") : __("Update", "notifybay")}
+                        {isUpdating ? __("Saving…", "notifybay-waitlist-and-stock-alert-woo") : __("Update", "notifybay-waitlist-and-stock-alert-woo")}
                       </ClassicButton>
                     </div>
                   </div>
@@ -457,7 +457,7 @@ const Leads: FC = () => {
                         className="button-link"
                         onClick={() => handleEdit(item)}
                       >
-                        {__("Edit", "notifybay")}
+                        {__("Edit", "notifybay-waitlist-and-stock-alert-woo")}
                       </button> |{" "}
                     </span>
                     <span className="delete">
@@ -466,7 +466,7 @@ const Leads: FC = () => {
                         className="button-link submitdelete notifybay-text-red-500"
                         onClick={() => handleDelete(item.id)}
                       >
-                        {__("Delete", "notifybay")}
+                        {__("Delete", "notifybay-waitlist-and-stock-alert-woo")}
                       </button>
                     </span>
                     {applyFilters("notifybay_lead_row_actions", null, item, {
@@ -474,7 +474,7 @@ const Leads: FC = () => {
                     }) as ReactNode}
                   </div>
                   <button type="button" className="toggle-row">
-                    <span className="screen-reader-text">{__("Show more details", "notifybay")}</span>
+                    <span className="screen-reader-text">{__("Show more details", "notifybay-waitlist-and-stock-alert-woo")}</span>
                   </button>
                 </>
               );
@@ -528,7 +528,7 @@ const Leads: FC = () => {
         <div className="tablenav bottom">
           <div className="tablenav-pages">
             <span className="displaying-num">
-              {totalItems} {__("items", "notifybay")}
+              {totalItems} {__("items", "notifybay-waitlist-and-stock-alert-woo")}
             </span>
             <span className="pagination-links">
               {currentPage > 1 ? (
@@ -557,7 +557,7 @@ const Leads: FC = () => {
               )}
               <span className="paging-input">
                 <span className="tablenav-paging-text">
-                  {currentPage} {__("of", "notifybay")}{" "}
+                  {currentPage} {__("of", "notifybay-waitlist-and-stock-alert-woo")}{" "}
                   <span className="total-pages">{totalPages}</span>
                 </span>
               </span>

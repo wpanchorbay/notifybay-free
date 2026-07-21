@@ -159,7 +159,7 @@ class SettingsController extends ApiController {
 		return new WP_REST_Response(
 			array(
 				'success' => true,
-				'message' => __( 'Settings updated successfully.', 'notifybay' ),
+				'message' => __( 'Settings updated successfully.', 'notifybay-waitlist-and-stock-alert-woo' ),
 				'data'    => $res,
 			),
 			200

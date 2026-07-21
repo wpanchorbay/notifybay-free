@@ -4,11 +4,11 @@ import { __ } from '@wordpress/i18n';
 export const conditionRuleSchema = z.object( {
 	target_field_id: z
 		.string()
-		.min( 1, { message: __( 'Target field is required', 'notifybay' ) } ),
+		.min( 1, { message: __( 'Target field is required', 'notifybay-waitlist-and-stock-alert-woo' ) } ),
 	operator: z.string(),
 	value: z
 		.string()
-		.min( 1, { message: __( 'Rule value is required', 'notifybay' ) } ),
+		.min( 1, { message: __( 'Rule value is required', 'notifybay-waitlist-and-stock-alert-woo' ) } ),
 } );
 
 export const fieldConditionsSchema = z
@@ -24,7 +24,7 @@ export const fieldConditionsSchema = z
 				code: z.ZodIssueCode.custom,
 				message: __(
 					'At least one rule is required when logic is active',
-					'notifybay'
+					'notifybay-waitlist-and-stock-alert-woo'
 				),
 				path: [ 'rules' ],
 			} );
@@ -34,10 +34,10 @@ export const fieldConditionsSchema = z
 export const fieldOptionSchema = z.object( {
 	label: z
 		.string()
-		.min( 1, { message: __( 'Choice label is required', 'notifybay' ) } ),
+		.min( 1, { message: __( 'Choice label is required', 'notifybay-waitlist-and-stock-alert-woo' ) } ),
 	value: z
 		.string()
-		.min( 1, { message: __( 'Choice value is required', 'notifybay' ) } ),
+		.min( 1, { message: __( 'Choice value is required', 'notifybay-waitlist-and-stock-alert-woo' ) } ),
 	price_type: z.string().optional(),
 	price: z.number().optional(),
 	weight: z.number().optional(),
@@ -48,7 +48,7 @@ export const fieldDefinitionSchema = z
 		id: z.string(),
 		type: z.string(),
 		label: z.string().min( 1, {
-			message: __( 'Field label is required', 'notifybay' ),
+			message: __( 'Field label is required', 'notifybay-waitlist-and-stock-alert-woo' ),
 		} ),
 		description: z.string().optional(),
 		placeholder: z.string().optional(),
@@ -74,7 +74,7 @@ export const fieldDefinitionSchema = z
 					code: z.ZodIssueCode.custom,
 					message: __(
 						'At least one choice is required',
-						'notifybay'
+						'notifybay-waitlist-and-stock-alert-woo'
 					),
 					path: [ 'options' ],
 				} );
@@ -91,7 +91,7 @@ export const assignmentSchema = z.object( {
 export const addonGroupSchema = z.object( {
 	title: z
 		.string()
-		.min( 1, { message: __( 'Group Title is required', 'notifybay' ) } ),
+		.min( 1, { message: __( 'Group Title is required', 'notifybay-waitlist-and-stock-alert-woo' ) } ),
 	status: z.enum( [ 'publish', 'draft' ] ),
 	schema: z.array( fieldDefinitionSchema ),
 	assignments: z.array( assignmentSchema ),
