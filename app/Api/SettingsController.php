@@ -5,7 +5,7 @@
  * @package    NotifyBay
  * @subpackage Api
  * @since      1.0.0
- * @author     WPAnchorBay <sankarsan@gmail.com>
+ * @author     WPAnchorBay <sankarsan@wpanchorbay.com>
  */
 
 namespace NotifyBay\Api;
@@ -26,7 +26,7 @@ use WP_REST_Server;
  * @since      1.0.0
  * @package    NotifyBay
  * @subpackage NotifyBay/Api
- * @author     WPAnchorBay <sankarsan@gmail.com>
+ * @author     WPAnchorBay <sankarsan@wpanchorbay.com>
  */
 class SettingsController extends ApiController {
 

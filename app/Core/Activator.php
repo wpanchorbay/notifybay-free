@@ -5,7 +5,7 @@
  * @package    NotifyBay
  * @subpackage Core
  * @since      1.0.0
- * @author     WPAnchorBay <sankarsan@gmail.com>
+ * @author     WPAnchorBay <sankarsan@wpanchorbay.com>
  */
 
 namespace NotifyBay\Core;
@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since      1.0.0
  * @package    NotifyBay
  * @subpackage Core
- * @author     WPAnchorBay <sankarsan@gmail.com>
+ * @author     WPAnchorBay <sankarsan@wpanchorbay.com>
  */
 class Activator {
 

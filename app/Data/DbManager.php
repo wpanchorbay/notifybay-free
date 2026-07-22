@@ -7,7 +7,7 @@
  * @since      1.0.0
  * @package    NotifyBay
  * @subpackage NotifyBay/Data
- * @author     WPAnchorBay <sankarsan@gmail.com>
+ * @author     WPAnchorBay <sankarsan@wpanchorbay.com>
  */
 
 namespace NotifyBay\Data;

@@ -5,7 +5,7 @@
  * @package    NotifyBay
  * @subpackage Admin
  * @since      1.0.0
- * @author     WPAnchorBay <sankarsan@gmail.com>
+ * @author     WPAnchorBay <sankarsan@wpanchorbay.com>
  */
 
 namespace NotifyBay\Admin;
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package    NotifyBay
  * @subpackage NotifyBay/Admin
- * @author     WPAnchorBay <sankarsan@gmail.com>
+ * @author     WPAnchorBay <sankarsan@wpanchorbay.com>
  */
 class Admin {
 

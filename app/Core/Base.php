@@ -5,7 +5,7 @@
  * @package    NotifyBay
  * @subpackage Core
  * @since      1.0.0
- * @author     WPAnchorBay <sankarsan@gmail.com>
+ * @author     WPAnchorBay <sankarsan@wpanchorbay.com>
  */
 
 namespace NotifyBay\Core;

@@ -13,7 +13,7 @@
  * @package    NotifyBay
  * @subpackage Config
  * @since      1.0.0
- * @author     WPAnchorBay <sankarsan@gmail.com>
+ * @author     WPAnchorBay <sankarsan@wpanchorbay.com>
  */
 
 // Prevent direct access.

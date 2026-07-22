@@ -5,7 +5,7 @@
  * @package    NotifyBay
  * @subpackage Helper
  * @since      1.0.0
- * @author     WPAnchorBay <sankarsan@gmail.com>
+ * @author     WPAnchorBay <sankarsan@wpanchorbay.com>
  */
 
 namespace NotifyBay\Helper;
@@ -26,7 +26,7 @@ use NotifyBay\Core\Cron;
  * @since      1.0.0
  * @package    NotifyBay
  * @subpackage NotifyBay/Helper
- * @author     WPAnchorBay <sankarsan@gmail.com>
+ * @author     WPAnchorBay <sankarsan@wpanchorbay.com>
  */
 class Logger {
 

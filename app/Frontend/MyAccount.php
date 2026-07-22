@@ -7,7 +7,7 @@
  * @package    NotifyBay
  * @subpackage Frontend
  * @since      1.0.0
- * @author     WPAnchorBay <sankarsan@gmail.com>
+ * @author     WPAnchorBay <sankarsan@wpanchorbay.com>
  */
 
 namespace NotifyBay\Frontend;
