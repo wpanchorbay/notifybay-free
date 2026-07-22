@@ -259,17 +259,10 @@ const Settings: React.FC = () => {
       <div className="notifybay-animate-fade-in">
         {activeTab === "overview" && (
           <div className="notifybay-flex notifybay-flex-col notifybay-gap-[16px]">
-            {(applyFilters(
+            {applyFilters(
               "notifybay_dashboard_widgets",
               null,
-            ) as React.ReactNode) || (
-              <p className="notifybay-text-gray-500">
-                {__(
-                  "Analytics and revenue insights appear here with NotifyBay Pro.",
-                  "notifybay-waitlist-and-stock-alert-woo",
-                )}
-              </p>
-            )}
+            ) as React.ReactNode}
           </div>
         )}
 

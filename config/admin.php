@@ -83,7 +83,7 @@ return array(
 	'plugin_row_meta'     => array(
 		array(
 			'text' => __( 'Docs', 'notifybay-waitlist-and-stock-alert-woo' ),
-			'url'  => 'https://wpanchorbay.com/docs/' . \NOTIFYBAY_PLUGIN_NAME . '/',
+			'url'  => 'https://docs.wpanchorbay.com/notifybay/',
 		),
 		array(
 			'text' => __( 'Support', 'notifybay-waitlist-and-stock-alert-woo' ),
@@ -109,7 +109,7 @@ return array(
 		'author_name' => 'WPAnchorBay',
 		'author_uri'  => 'https://wpanchorbay.com',
 		'support_uri' => 'https://wpanchorbay.com/support/',
-		'docs_uri'    => 'https://wpanchorbay.com/docs/' . \NOTIFYBAY_PLUGIN_NAME . '/',
+		'docs_uri'    => 'https://docs.wpanchorbay.com/notifybay/',
 		'position'    => 57,
 	),
 );
