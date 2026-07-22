@@ -22,6 +22,12 @@ const Settings: React.FC = () => {
     useState<PluginSettings | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  // The "Overview" tab only has content when NotifyBay Pro supplies dashboard
+  // widgets via this filter; Free itself has nothing to show there.
+  const dashboardWidgets = applyFilters(
+    "notifybay_dashboard_widgets",
+    null,
+  ) as React.ReactNode;
   // Deep-link support: a namespaced ?notifybay_tab= param (used by Pro's
   // license CTA and its "License" plugin action link) opens a specific tab
   // directly. Namespaced to avoid colliding with WooCommerce's own ?tab=/
@@ -31,9 +37,9 @@ const Settings: React.FC = () => {
       const t = new URLSearchParams(window.location.search).get(
         "notifybay_tab",
       );
-      return t || "overview";
+      return t || (dashboardWidgets ? "overview" : "general");
     } catch {
-      return "overview";
+      return dashboardWidgets ? "overview" : "general";
     }
   })();
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -204,7 +210,9 @@ const Settings: React.FC = () => {
   }
 
   const baseTabs = [
-    { id: "overview", label: __("Overview", "notifybay-waitlist-and-stock-alert-woo") },
+    ...(dashboardWidgets
+      ? [{ id: "overview", label: __("Overview", "notifybay-waitlist-and-stock-alert-woo") }]
+      : []),
     { id: "general", label: __("General", "notifybay-waitlist-and-stock-alert-woo") },
     { id: "appearance", label: __("Display", "notifybay-waitlist-and-stock-alert-woo") },
     { id: "engine", label: __("Engine Logic", "notifybay-waitlist-and-stock-alert-woo") },
@@ -257,12 +265,9 @@ const Settings: React.FC = () => {
       </ul>
 
       <div className="notifybay-animate-fade-in">
-        {activeTab === "overview" && (
+        {activeTab === "overview" && dashboardWidgets && (
           <div className="notifybay-flex notifybay-flex-col notifybay-gap-[16px]">
-            {applyFilters(
-              "notifybay_dashboard_widgets",
-              null,
-            ) as React.ReactNode}
+            {dashboardWidgets}
           </div>
         )}
 
