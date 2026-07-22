@@ -1,7 +1,7 @@
-=== NotifyBay ===
+=== NotifyBay - Waitlist and Stock Alert for WooCommerce ===
 Contributors: wpanchorbay, sankarsan
 Tags: woocommerce, waitlist, back-in-stock, wishlist, price-drop-alert
-Requires at least: 5.6
+Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 7.0
 Stable tag: 1.0.0
