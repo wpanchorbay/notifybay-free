@@ -12,6 +12,10 @@ echo "Starting build process for version $VERSION..."
 echo "Running npm run build..."
 npm run build
 
+# 1b. Remove source maps
+echo "Removing source maps..."
+find build -name "*.map" -type f -delete
+
 # 2. Run npm run build:legacy
 # echo "Running npm run build:legacy..."
 # npm run build:legacy

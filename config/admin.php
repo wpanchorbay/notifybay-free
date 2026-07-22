@@ -71,19 +71,6 @@ return array(
 			'text' => __( 'Settings', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'url'  => admin_url( 'admin.php?page=wc-settings&tab=' . \NOTIFYBAY_PLUGIN_NAME ),
 		),
-		/**
-		 * "Upgrade to Pro" — highlighted. Shown unconditionally by Free (which
-		 * stays Pro-agnostic); NotifyBay Pro removes this link from the row when
-		 * it is active, via the same `plugin_action_links_{basename}` filter at
-		 * a later priority. Keyed `upgrade` so Pro can target it for removal.
-		 */
-		array(
-			'key'    => 'upgrade',
-			'text'   => __( 'Upgrade to Pro', 'notifybay-waitlist-and-stock-alert-woo' ),
-			'url'    => 'https://wpanchorbay.com/plugins/notifybay',
-			'target' => '_blank',
-			'style'  => 'color:#00a32a;font-weight:600;',
-		),
 	),
 
 	/**
