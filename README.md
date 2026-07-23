@@ -1,6 +1,6 @@
 # NotifyBay
 
-A sophisticated Waitlist and Wishlist marketing automation plugin for WooCommerce. Built with a modern React/TypeScript admin UI and a robust, high-performance PHP backend.
+A sophisticated Waitlist and back-in-stock alert plugin for WooCommerce. Built with a modern React/TypeScript admin UI and a robust, high-performance PHP backend.
 
 ---
 
@@ -16,7 +16,7 @@ A sophisticated Waitlist and Wishlist marketing automation plugin for WooCommerc
 
 ## Core Purpose
 
-NotifyBay bridges the gap between customer demand and inventory availability. It allows WooCommerce store owners to capture high-intent leads when products are out of stock (Waitlists) or when customers want to monitor price changes (Wishlists). 
+NotifyBay bridges the gap between customer demand and inventory availability. It allows WooCommerce store owners to capture high-intent leads when products are out of stock (Waitlists).
 
 By leveraging background processing and intelligent notification logic, NotifyBay recovers lost revenue without impacting site performance.
 
@@ -26,15 +26,13 @@ By leveraging background processing and intelligent notification logic, NotifyBa
 
 ### Powerful Engine (PHP)
 - **Waitlists & Back-in-Stock Alerts:** Automatically notifies customers when inventory is replenished.
-- **Wishlists & Price Drop Alerts:** Allows customers to track products and alerts them when prices fall.
 - **Fair-Play Engine:** Intelligent dispatch logic (`app/Engine/Dispatcher.php`) that calculates 'available for notification' stock to prevent overselling. It respects a configurable 'Reservation Window' to ensure fair distribution of notifications.
 - **Asynchronous Processing:** High-volume email dispatching is handled in the background via Action Scheduler, ensuring zero impact on the customer checkout experience.
-- **Conversion Tracking:** Deep integration with WooCommerce order hooks (`app/Core/WooCommerceHooks.php`) accurately attributes recovered revenue to NotifyBay alerts.
 - **Guest to User Merging:** Seamlessly merges guest subscriptions into user accounts upon registration.
 
 ### Modern Admin Experience (React/TS)
 - **Single Page Application (SPA):** A fast, responsive dashboard built with React and `react-router-dom`.
-- **Advanced Analytics:** Visualizes 'Potential Revenue' vs. 'Recovered Revenue' to prove ROI.
+- **Settings Dashboard:** A clean overview and configuration experience for managing your waitlist.
 - **Two Component Libraries:** Ships with both a modern Tailwind-styled UI and a 'Classic' component set that mimics native WordPress admin screens.
 - **Settings API Integration:** Declarative settings schema managed via the React frontend.
 
@@ -50,7 +48,7 @@ NotifyBay (Plugin Root)
 │  ├─ Core/                # Base plugin lifecycle, Settings, WC Hooks
 │  ├─ Data/                # DB schema & custom table management
 │  ├─ Engine/              # Dispatcher (Fair-Play) and Worker (Action Scheduler)
-│  ├─ Frontend/            # Product page injection (Buttons, Forms, FOMO banners)
+│  ├─ Frontend/            # Product page injection (waitlist buttons & forms)
 │  ├─ Helper/              # Utilities, Logger
 │  └─ Models/              # Lead management and data models
 ├─ config/                  # Registrations for API, core, migrations

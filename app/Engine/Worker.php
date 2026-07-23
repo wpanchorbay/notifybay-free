@@ -61,9 +61,9 @@ class Worker {
 	 *
 	 * Each event is keyed by its event type string (e.g. `waitlist_restock`) and maps
 	 * to how to build its subject/body and what lead status to transition to after a
-	 * successful send. NotifyBay Pro registers premium events (e.g. `wishlist_price_drop`,
-	 * `hurry_low_stock`) here rather than the Worker special-casing them, so this is the
-	 * single place event-type-specific behavior is defined.
+	 * successful send. A premium add-on (NotifyBay Pro) registers its own events
+	 * here rather than the Worker special-casing them, so this is the single place
+	 * event-type-specific behavior is defined.
 	 *
 	 * @since 1.0.0
 	 * @hook notifybay_email_events
@@ -120,8 +120,8 @@ class Worker {
 		if ( ! isset( $events[ $event_type ] ) ) {
 
 			// Unknown event type: don't send anything, and don't touch the lead's
-			// status. This happens when a premium event (e.g. wishlist_price_drop)
-			// was enqueued while NotifyBay Pro was active but is now processed with
+			// status. This happens when a premium event was enqueued while NotifyBay
+			// Pro was active but is now processed with
 			// Pro deactivated/missing (e.g. right after a Free plugin update, before
 			// Pro catches up). Sending would mean guessing at content for an event we
 			// don't understand — instead leave the lead in `processing`; the stale-lead

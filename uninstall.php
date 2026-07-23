@@ -23,8 +23,8 @@ $notifybay_deep_uninstall = isset( $notifybay_settings['advanced_deleteAllOnUnin
 if ( $notifybay_deep_uninstall ) {
 	global $wpdb;
 
-	// Drop leads table. This also removes any rows NotifyBay Pro wrote
-	// (wishlist/price-drop leads) — Pro owns no tables of its own.
+	// Drop the shared leads table. This also removes any rows a premium add-on
+	// (NotifyBay Pro) wrote — the add-on owns no tables of its own.
 	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}notifybay_leads" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 	// Delete options. This also removes Pro's license_key/license_status,

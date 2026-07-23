@@ -13,9 +13,7 @@
 namespace NotifyBay\Admin;
 
 use NotifyBay\Core\Plugin;
-use NotifyBay\Core\Settings;
 use NotifyBay\Helper\TemplateRenderer;
-use NotifyBay\Models\Lead;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -61,7 +59,7 @@ class WooCommerce {
 		// Meta box for overrides
 		$loader->add_action( 'add_meta_boxes', $this, 'add_override_meta_box' );
 		$loader->add_action( 'save_post_product', $this, 'save_override_meta_box' );
-		$loader->add_action( 'admin_head', $this, 'inject_column_styles' );
+		$loader->add_action( 'admin_enqueue_scripts', $this, 'inject_column_styles' );
 	}
 
 	/**
@@ -71,18 +69,11 @@ class WooCommerce {
 	 * @return array
 	 */
 	public function add_product_columns( $columns ) {
-		// The Wishlist column is a premium (NotifyBay Pro) feature; only show it once
-		// Pro has registered `general_wishlistEnabled` as true via its settings filters.
-		$wishlist_enabled = Settings::get_instance()->get_settings( 'general_wishlistEnabled', false );
-
 		$new_columns = array();
 		foreach ( $columns as $key => $value ) {
 			$new_columns[ $key ] = $value;
 			if ( 'name' === $key ) {
 				$new_columns['notifybay_waitlist'] = __( 'Waitlist', 'notifybay-waitlist-and-stock-alert-woo' );
-				if ( $wishlist_enabled ) {
-					$new_columns['notifybay_wishlist'] = __( 'Wishlist', 'notifybay-waitlist-and-stock-alert-woo' );
-				}
 			}
 		}
 		return $new_columns;
@@ -95,29 +86,27 @@ class WooCommerce {
 	 * @param int    $post_id Post ID.
 	 */
 	public function render_product_columns( $column, $post_id ) {
-		if ( 'notifybay_waitlist' === $column || 'notifybay_wishlist' === $column ) {
-			global $wpdb;
-			$lead_model = new Lead();
-			$table      = $lead_model->get_table();
-			$type       = ( 'notifybay_waitlist' === $column ) ? 'waitlist' : 'wishlist';
-
-			$count = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
-				$wpdb->prepare(
-					"SELECT COUNT(*) FROM {$wpdb->prefix}notifybay_leads WHERE product_id = %d AND status = 'active' AND type = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					$post_id,
-					$type
-				)
-			);
-
-			TemplateRenderer::render(
-				'admin/product-column-leads',
-				array(
-					'count'   => $count,
-					'post_id' => $post_id,
-					'type'    => $type,
-				)
-			);
+		if ( 'notifybay_waitlist' !== $column ) {
+			return;
 		}
+
+		global $wpdb;
+		$count = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$wpdb->prefix}notifybay_leads WHERE product_id = %d AND status = 'active' AND type = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$post_id,
+				'waitlist'
+			)
+		);
+
+		TemplateRenderer::render(
+			'admin/product-column-leads',
+			array(
+				'count'   => $count,
+				'post_id' => $post_id,
+				'type'    => 'waitlist',
+			)
+		);
 	}
 
 	/**
@@ -125,21 +114,16 @@ class WooCommerce {
 	 */
 	public function inject_column_styles() {
 		$screen = get_current_screen();
-		if ( $screen && 'edit-product' === $screen->id ) {
-			echo '<style>
-				.fixed .column-notifybay_waitlist, 
-				.fixed .column-notifybay_wishlist { 
-					width: 85px; 
-					text-align: center;
-				}
-				@media screen and (max-width: 782px) {
-					.fixed .column-notifybay_waitlist, 
-					.fixed .column-notifybay_wishlist { 
-						width: auto; 
-					}
-				}
-			</style>';
+		if ( ! $screen || 'edit-product' !== $screen->id ) {
+			return;
 		}
+
+		$css = '.fixed .column-notifybay_waitlist{width:85px;text-align:center}'
+			. '@media screen and (max-width:782px){.fixed .column-notifybay_waitlist{width:auto}}';
+
+		wp_register_style( 'notifybay-admin-columns', false, array(), \NOTIFYBAY_VERSION );
+		wp_enqueue_style( 'notifybay-admin-columns' );
+		wp_add_inline_style( 'notifybay-admin-columns', $css );
 	}
 
 	/**
@@ -194,11 +178,23 @@ class WooCommerce {
 
 		$overrides = array(
 			'disable_waitlist'  => isset( $_POST['notifybay_disable_waitlist'] ),
-			'disable_wishlist'  => isset( $_POST['notifybay_disable_wishlist'] ),
 			'smart_transition'  => sanitize_text_field( wp_unslash( $_POST['notifybay_smart_transition'] ?? 'default' ) ),
 			'backorder_mode'    => sanitize_text_field( wp_unslash( $_POST['notifybay_backorder_mode'] ?? 'default' ) ),
 			'max_waitlist_size' => isset( $_POST['notifybay_max_waitlist_size'] ) ? (int) wp_unslash( $_POST['notifybay_max_waitlist_size'] ) : '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- value is cast to (int); the isset() presence checks above need no sanitization. Nonce/capability verified at the top of this handler.
 		);
+
+		/**
+		 * Filters the per-product override values saved from the NotifyBay meta box.
+		 *
+		 * Lets an add-on (NotifyBay Pro) persist its own override fields that Free
+		 * does not own. The nonce and capability checks at the top of this handler
+		 * already gate the save.
+		 *
+		 * @since 1.0.0
+		 * @param array $overrides The override values collected from $_POST.
+		 * @param int   $post_id   The product being saved.
+		 */
+		$overrides = apply_filters( 'notifybay_save_product_overrides', $overrides, $post_id );
 
 		update_post_meta( $post_id, '_notifybay_overrides', $overrides );
 	}

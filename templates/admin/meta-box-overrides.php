@@ -22,12 +22,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</label>
 </p>
 
-<p>
-	<label>
-		<input type="checkbox" name="notifybay_disable_wishlist" value="1" <?php checked( ! empty( $overrides['disable_wishlist'] ) ); ?>>
-		<?php esc_html_e( 'Disable Wishlist', 'notifybay-waitlist-and-stock-alert-woo' ); ?>
-	</label>
-</p>
+<?php
+/**
+ * Fires after the Waitlist override field in the NotifyBay product meta box.
+ *
+ * Lets an add-on (NotifyBay Pro) inject its own override fields into this
+ * meta box.
+ *
+ * @since 1.0.0
+ * @param array $overrides The current product-level overrides.
+ */
+do_action( 'notifybay_product_overrides_meta_box', $overrides );
+?>
 
 <p>
 	<label><?php esc_html_e( 'Smart Transition', 'notifybay-waitlist-and-stock-alert-woo' ); ?></label><br>

@@ -1,7 +1,7 @@
 {
   "name": "notifybay-waitlist-and-stock-alert-woo",
   "version": "1.0.0",
-  "description": "NotifyBay - Adds Waitlist (back-in-stock) alerts and Wishlist (price-tracking) to WooCommerce so store owners can capture leads on out-of-stock or watched products and automatically notify waitlisted customers when items are restocked.",
+  "description": "NotifyBay - Adds Waitlist (back-in-stock) alerts to WooCommerce so store owners can capture leads on out-of-stock products and automatically notify waitlisted customers when items are restocked.",
   "main": "index.js",
   "scripts": {
     "start": "wp-scripts start",

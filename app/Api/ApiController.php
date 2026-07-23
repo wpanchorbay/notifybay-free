@@ -170,6 +170,31 @@ class ApiController extends WP_REST_Controller {
 	}
 
 	/**
+	 * Permission callback for public frontend endpoints.
+	 *
+	 * These routes are intentionally reachable by logged-out visitors (the
+	 * product-status and subscribe widgets), but must not be callable
+	 * cross-origin or without a valid REST nonce. This verifies the `wp_rest`
+	 * nonce and does NOT require any capability, so it fits public endpoints
+	 * that still need same-origin protection.
+	 *
+	 * @since 1.0.0
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return bool|WP_Error True if the nonce is valid, WP_Error otherwise.
+	 */
+	public function verify_public_nonce( $request ) {
+		$nonce = $request->get_header( 'X-WP-Nonce' );
+		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+			return new WP_Error(
+				'rest_nonce_invalid',
+				__( 'The security token is invalid.', 'notifybay-waitlist-and-stock-alert-woo' ),
+				array( 'status' => 403 )
+			);
+		}
+		return true;
+	}
+
+	/**
 	 * Laravel-style request validation.
 	 *
 	 * @since 1.0.0

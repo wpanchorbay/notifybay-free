@@ -58,7 +58,7 @@ class FrontendController extends ApiController {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'subscribe' ),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( $this, 'verify_public_nonce' ),
 			)
 		);
 
@@ -68,7 +68,7 @@ class FrontendController extends ApiController {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'get_product_status' ),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( $this, 'verify_public_nonce' ),
 			)
 		);
 
@@ -78,7 +78,7 @@ class FrontendController extends ApiController {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'unsubscribe_ajax' ),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( $this, 'verify_public_nonce' ),
 			)
 		);
 
@@ -88,7 +88,7 @@ class FrontendController extends ApiController {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'get_batch_product_status' ),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( $this, 'verify_public_nonce' ),
 			)
 		);
 	}
@@ -204,22 +204,13 @@ class FrontendController extends ApiController {
 			'is_subscribed_waitlist'  => $is_subscribed_waitlist,
 			'variation_subscriptions' => empty( $variation_subscriptions ) ? new \stdClass() : (object) $variation_subscriptions,
 			'skip_subscription'       => $skip_subscription,
-			// Wishlist and FOMO ('X people are waiting') are premium features and are not
-			// computed by Free. These keys are defaulted here so the response shape is
-			// stable whether or not NotifyBay Pro is active; Pro overwrites them via the
-			// notifybay_product_status_response filter below.
-			'show_wishlist'           => false,
-			'is_subscribed_wishlist'  => false,
-			'wishlist_count'          => 0,
-			'fomo_count'              => 0,
 		);
 
 		/**
 		 * Filters the product-status REST response.
 		 *
-		 * Used by NotifyBay Pro to add Wishlist and FOMO fields (`show_wishlist`,
-		 * `is_subscribed_wishlist`, `wishlist_count`, `fomo_count`, and, for variable
-		 * products, `variation_fomo_map`) which Free does not compute.
+		 * Used by a premium add-on (NotifyBay Pro) to add its own fields to the
+		 * product-status payload which Free does not compute.
 		 *
 		 * @since 1.0.0
 		 * @hook notifybay_product_status_response
@@ -235,23 +226,21 @@ class FrontendController extends ApiController {
 	}
 
 	/**
-	 * Subscribe a user to a waitlist or wishlist.
+	 * Subscribe a user to the waitlist (or any lead type an add-on has registered).
 	 *
 	 * @param WP_REST_Request $request The request object.
 	 * @return array|\WP_Error
 	 */
 	public function subscribe( WP_REST_Request $request ) {
-		// Nonce check is crucial for security
-		$nonce = $request->get_header( 'X-WP-Nonce' );
-		if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-			return new \WP_Error( 'rest_cookie_invalid', __( 'Security check failed.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 403 ) );
-		}
+		// The `wp_rest` nonce is verified by the route's permission_callback
+		// (ApiController::verify_public_nonce).
 
 		/**
 		 * Filters which lead `type` values the subscribe endpoint accepts.
 		 *
-		 * Free only accepts `waitlist`. NotifyBay Pro adds `wishlist` here (rather than
-		 * Free hardcoding both), so Free never processes wishlist signups on its own.
+		 * Free only accepts `waitlist`. A premium add-on (NotifyBay Pro) can append
+		 * its own lead types here, so Free's generic subscribe endpoint processes
+		 * them without hardcoding any premium feature.
 		 *
 		 * @since 1.0.0
 		 * @hook notifybay_allowed_lead_types
@@ -269,11 +258,6 @@ class FrontendController extends ApiController {
 		$validated = $this->validate( $request, $rules );
 		if ( is_wp_error( $validated ) ) {
 			return $validated;
-		}
-
-		$settings = Settings::get_instance();
-		if ( 'wishlist' === $validated['type'] && ! $settings->get_settings( 'general_wishlistEnabled', false ) ) {
-			return new \WP_Error( 'feature_disabled', __( 'Wishlist functionality is currently disabled.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 403 ) );
 		}
 
 		// Rate limiting to prevent spam
@@ -343,28 +327,44 @@ class FrontendController extends ApiController {
 
 			$message = ( 'pending_verification' === $status )
 				? __( 'Please check your email to verify your subscription.', 'notifybay-waitlist-and-stock-alert-woo' )
-				: ( ( 'waitlist' === $validated['type'] )
-					? $settings->get_settings( 'appearance_waitlistSuccessMessage' )
-					: $settings->get_settings( 'appearance_wishlistSuccessMessage' ) );
+				: $settings->get_settings( 'appearance_waitlistSuccessMessage' );
 
-			// Fallback if somehow settings are missing
+			// Fallback if somehow settings are missing.
 			if ( ! $message ) {
 				$message = __( 'Successfully subscribed! You will be notified as soon as possible.', 'notifybay-waitlist-and-stock-alert-woo' );
 			}
 
-			// Calculate fresh wishlist count for the response
-			$wishlist_count = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
-				$wpdb->prepare(
-					"SELECT COUNT(*) FROM {$wpdb->prefix}notifybay_leads WHERE user_email = %s AND type = 'wishlist' AND status = 'active'", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					$validated['email']
-				)
+			/**
+			 * Filters the success message returned by the subscribe endpoint.
+			 *
+			 * Lets an add-on (NotifyBay Pro) supply a type-specific message for
+			 * the lead types it registers via `notifybay_allowed_lead_types`.
+			 *
+			 * @since 1.0.0
+			 * @param string $message   The success message so far.
+			 * @param string $type      The lead type that was subscribed.
+			 * @param string $status    The resulting lead status.
+			 * @param array  $validated The validated request data.
+			 */
+			$message = apply_filters( 'notifybay_subscribe_success_message', $message, $validated['type'], $status, $validated );
+
+			$response = array(
+				'success' => true,
+				'message' => $message,
 			);
 
-			return array(
-				'success'        => true,
-				'message'        => $message,
-				'wishlist_count' => $wishlist_count,
-			);
+			/**
+			 * Filters the subscribe endpoint's success response.
+			 *
+			 * Lets an add-on (NotifyBay Pro) attach extra fields to the response
+			 * for the lead types it owns.
+			 *
+			 * @since 1.0.0
+			 * @param array           $response  The response payload.
+			 * @param array           $validated The validated request data.
+			 * @param WP_REST_Request $request   The original request.
+			 */
+			return apply_filters( 'notifybay_subscribe_response', $response, $validated, $request );
 		}
 
 		notifybay_log( sprintf( 'Database error during subscription for email %s, product_id %d', $validated['email'], $validated['product_id'] ), 'ERROR' );
@@ -378,11 +378,8 @@ class FrontendController extends ApiController {
 	 * @return array|\WP_Error
 	 */
 	public function unsubscribe_ajax( \WP_REST_Request $request ) {
-		$nonce = $request->get_header( 'X-WP-Nonce' );
-		if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-			return new \WP_Error( 'rest_cookie_invalid', __( 'Security check failed.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 403 ) );
-		}
-
+		// The `wp_rest` nonce is verified by the route's permission_callback
+		// (ApiController::verify_public_nonce).
 		$lead_id = (int) $request->get_param( 'lead_id' );
 		if ( ! $lead_id ) {
 			return new \WP_Error( 'invalid_id', __( 'Invalid lead ID.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 400 ) );
@@ -411,19 +408,23 @@ class FrontendController extends ApiController {
 		);
 
 		if ( $result ) {
-			// Calculate fresh wishlist count for the response
-			$wishlist_count = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
-				$wpdb->prepare(
-					"SELECT COUNT(*) FROM {$wpdb->prefix}notifybay_leads WHERE user_email = %s AND type = 'wishlist' AND status = 'active'", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					$user_email
-				)
+			$response = array(
+				'success' => true,
+				'message' => __( 'Unsubscribed successfully.', 'notifybay-waitlist-and-stock-alert-woo' ),
 			);
 
-			return array(
-				'success'        => true,
-				'message'        => __( 'Unsubscribed successfully.', 'notifybay-waitlist-and-stock-alert-woo' ),
-				'wishlist_count' => $wishlist_count,
-			);
+			/**
+			 * Filters the unsubscribe endpoint's success response.
+			 *
+			 * Lets an add-on (NotifyBay Pro) attach a refreshed set of extra fields
+			 * to the response for the lead types it owns.
+			 *
+			 * @since 1.0.0
+			 * @param array  $response   The response payload.
+			 * @param int    $lead_id    The lead that was unsubscribed.
+			 * @param string $user_email The current user's email.
+			 */
+			return apply_filters( 'notifybay_unsubscribe_response', $response, $lead_id, $user_email );
 		}
 
 		return new \WP_Error( 'not_found', __( 'Subscription not found or already removed.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 404 ) );

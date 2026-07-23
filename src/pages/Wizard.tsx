@@ -28,7 +28,6 @@ const Wizard: React.FC = () => {
     email_fromName: "",
     email_fromEmail: "",
     general_doubleOptIn: false,
-    general_wishlistEnabled: true,
     appearance_waitlistButtonText: "Notify me",
     ...(localize.plugin_settings || {}),
   });
@@ -43,7 +42,7 @@ const Wizard: React.FC = () => {
       body: (
         <p className="notifybay-text-gray-600">
           {__(
-            "Let's get your back-in-stock and price-drop alerts set up in a few quick steps.",
+            "Let's get your back-in-stock alerts set up in a few quick steps.",
             "notifybay-waitlist-and-stock-alert-woo",
           )}
         </p>
@@ -97,23 +96,6 @@ const Wizard: React.FC = () => {
                 />
               ),
             },
-            ...(isPro
-              ? [
-                  {
-                    id: "general_wishlistEnabled",
-                    label: __("Wishlist (Pro)", "notifybay-waitlist-and-stock-alert-woo"),
-                    render: () => (
-                      <ClassicCheckbox
-                        checked={settings.general_wishlistEnabled}
-                        onChange={(v: boolean) =>
-                          set({ general_wishlistEnabled: v })
-                        }
-                        label={__("Enable Wishlist / price-drop alerts", "notifybay-waitlist-and-stock-alert-woo")}
-                      />
-                    ),
-                  },
-                ]
-              : []),
           ]}
         />
       ),
@@ -160,11 +142,6 @@ const Wizard: React.FC = () => {
           <code className="notifybay-bg-gray-100 notifybay-p-[8px] notifybay-rounded-[6px]">
             [notifybay_waitlist]
           </code>
-          {isPro && (
-            <code className="notifybay-bg-gray-100 notifybay-p-[8px] notifybay-rounded-[6px]">
-              [notifybay_wishlist]
-            </code>
-          )}
         </div>
       ),
     },

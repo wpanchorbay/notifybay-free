@@ -96,7 +96,7 @@ class Lead extends Model {
 	 * @param string $email        User email.
 	 * @param int    $product_id   Product ID.
 	 * @param int    $variation_id Variation ID (optional).
-	 * @param string $type         Subscription type (waitlist/wishlist).
+	 * @param string $type         Subscription type (e.g. waitlist).
 	 * @return bool
 	 */
 	public static function is_subscribed( $email, $product_id, $variation_id = 0, $type = 'waitlist' ) {
@@ -120,7 +120,7 @@ class Lead extends Model {
 	}
 
 	/**
-	 * Get the count of active leads for a product (for FOMO).
+	 * Get the count of active waitlist leads for a product/variation.
 	 *
 	 * @param int $product_id   Product ID.
 	 * @param int $variation_id Variation ID.
@@ -142,7 +142,6 @@ class Lead extends Model {
 
 	/**
 	 * Get total active waitlist count for a product (all variants combined).
-	 * Used for variable product FOMO before a variant is selected.
 	 *
 	 * @param int $product_id Product ID.
 	 * @return int
@@ -161,12 +160,12 @@ class Lead extends Model {
 	}
 
 	/**
-	 * Get waitlist counts for all variations of a product.
+	 * Get active waitlist counts for all variations of a product.
 	 *
 	 * @param int $product_id Product ID.
 	 * @return array Map of [variation_id => count]
 	 */
-	public static function get_all_variation_fomo_counts( $product_id ) {
+	public static function get_variation_lead_counts( $product_id ) {
 		global $wpdb;
 		$instance = new static();
 		$table    = $instance->get_table();
@@ -198,7 +197,7 @@ class Lead extends Model {
 	 * @param int      $product_id   Product ID.
 	 * @param int      $variation_id Variation ID (0 for simple products).
 	 * @param string   $cutoff_date  MySQL datetime; only leads notified at/after this are counted.
-	 * @param string[] $statuses     Lead statuses to include (e.g. ['notified', 'notified_hurry']).
+	 * @param string[] $statuses     Lead statuses to include (e.g. ['notified']).
 	 * @return int
 	 */
 	public static function count_reserved( $product_id, $variation_id, $cutoff_date, array $statuses = array( 'notified' ) ) {
@@ -303,7 +302,7 @@ class Lead extends Model {
 	 * Get all active/pending leads for a specific user filtered by type.
 	 *
 	 * @param string $email User email.
-	 * @param string $type  'waitlist' or 'wishlist'.
+	 * @param string $type  The lead type to filter by (e.g. 'waitlist').
 	 * @return array List of lead objects.
 	 */
 	public static function get_user_leads_by_type( $email, $type ) {
@@ -319,21 +318,6 @@ class Lead extends Model {
 			),
 			ARRAY_A
 		);
-	}
-
-	/**
-	 * Transition a wishlist lead to waitlist.
-	 *
-	 * @return bool
-	 */
-	public function transition_to_waitlist() {
-		if ( 'wishlist' !== $this->type ) {
-			return false;
-		}
-
-		$this->type       = 'waitlist';
-		$this->updated_at = current_time( 'mysql' );
-		return $this->save();
 	}
 
 	/**

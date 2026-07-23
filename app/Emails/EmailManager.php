@@ -2,9 +2,9 @@
 /**
  * Registers NotifyBay's WooCommerce email classes and provides lookup.
  *
- * Free registers its own emails (restock, verification) here. NotifyBay Pro
- * hooks the same `woocommerce_email_classes` filter separately to add its
- * premium emails (price-drop, hurry) against the shared NotifyBayEmail base.
+ * Free registers its own emails (restock, verification) here. A premium add-on
+ * (NotifyBay Pro) hooks the same `woocommerce_email_classes` filter separately
+ * to add its own emails against the shared NotifyBayEmail base.
  *
  * @package    NotifyBay
  * @subpackage Emails

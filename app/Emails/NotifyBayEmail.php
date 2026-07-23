@@ -10,9 +10,9 @@
  * transitions) and calls render_final_html() on the instance to obtain the
  * rendered, CSS-inlined HTML, then sends via wp_mail() itself.
  *
- * Free ships the base + its own concrete emails (restock, verification);
- * NotifyBay Pro registers additional subclasses (price-drop, hurry) against
- * this same base via the woocommerce_email_classes filter.
+ * Free ships the base + its own concrete emails (restock, verification); a
+ * premium add-on (NotifyBay Pro) registers additional subclasses against this
+ * same base via the woocommerce_email_classes filter.
  *
  * @package    NotifyBay
  * @subpackage Emails

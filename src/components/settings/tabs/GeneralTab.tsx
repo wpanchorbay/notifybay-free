@@ -20,7 +20,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
     <ClassicSettingsTable
       title={__("General Logic", "notifybay-waitlist-and-stock-alert-woo")}
       description={__(
-        "Configure the core behavior of your revenue recovery system, including wishlist status and verification rules.",
+        "Configure the core behavior of your revenue recovery system, including opt-in and verification rules.",
         "notifybay-waitlist-and-stock-alert-woo",
       )}
       fields={[

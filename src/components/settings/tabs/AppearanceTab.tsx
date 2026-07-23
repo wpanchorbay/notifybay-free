@@ -88,46 +88,10 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
       />
 
       {/*
-        Wishlist Display and Social Proof (FOMO) are NotifyBay Pro features.
-        Pro injects its own sections here via the
-        `notifybay_settings_extra_sections` filter (activeTab === "appearance")
-        — see plans/pro-architecture.md.
+        Waitlist appearance is configured above. A premium add-on (NotifyBay Pro)
+        injects its own extra sections here via the
+        `notifybay_settings_extra_sections` filter (activeTab === "appearance").
       */}
-
-      {/* Custom Styles Section */}
-      <ClassicSettingsTable
-        title={__("Custom Styles", "notifybay-waitlist-and-stock-alert-woo")}
-        description={__(
-          "Advanced styling options. Add custom CSS to fine-tune the look and feel of the plugin's frontend elements.",
-          "notifybay-waitlist-and-stock-alert-woo",
-        )}
-        fields={[
-          {
-            id: "appearance_customCss",
-            label: __("Additional CSS", "notifybay-waitlist-and-stock-alert-woo"),
-            tooltip: __(
-              "Add custom CSS to style the waitlist and wishlist components. Do not include <style> tags.",
-              "notifybay-waitlist-and-stock-alert-woo",
-            ),
-            render: () => (
-              <ClassicTextarea
-                value={settings.appearance_customCss}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    appearance_customCss: e.target.value,
-                  })
-                }
-                placeholder={__(
-                  ".notifybay-btn { background: #000; }",
-                  "notifybay-waitlist-and-stock-alert-woo",
-                )}
-                rows={8}
-              />
-            ),
-          },
-        ]}
-      />
     </div>
   );
 };

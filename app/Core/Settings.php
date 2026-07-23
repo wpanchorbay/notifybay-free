@@ -245,8 +245,16 @@ class Settings {
 				continue;
 			}
 
-			$value = $input[ $key ];
-			$type  = $details['type'] ?? 'string';
+			$value  = $input[ $key ];
+			$type   = $details['type'] ?? 'string';
+			$format = $details['format'] ?? '';
+
+			// A field-specific `format` sanitizer takes precedence over the
+			// generic type-based ones (e.g. email fields must use sanitize_email()).
+			if ( 'email' === $format ) {
+				$sanitized_output[ $key ] = sanitize_email( $value );
+				continue;
+			}
 
 			switch ( $type ) {
 				case 'boolean':

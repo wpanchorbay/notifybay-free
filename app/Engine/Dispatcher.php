@@ -52,11 +52,10 @@ class Dispatcher {
 	 */
 	public function run( Plugin $plugin ) {
 		$loader = $plugin->get_loader();
-		// Hook into the async actions scheduled by Action Scheduler.
-		// notifybay_run_price_dispatcher / notifybay_run_hurry_dispatcher are premium
-		// (wishlist price-drop / hurry alerts) and are registered by NotifyBay Pro, which
-		// hooks the same Action Scheduler hook names. Free only handles the base
-		// back-in-stock waitlist and the (free) verification email.
+		// Hook into the async actions scheduled by Action Scheduler. Free only
+		// handles the base back-in-stock waitlist dispatch and the verification
+		// email. A premium add-on (NotifyBay Pro) may register its own Action
+		// Scheduler handlers separately under its own hook names.
 		$loader->add_action( 'notifybay_run_dispatcher', $this, 'dispatch_waitlist', 10, 2 );
 		$loader->add_action( 'notifybay_run_verification', $this, 'dispatch_verification', 10, 1 );
 	}

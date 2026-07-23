@@ -56,11 +56,9 @@ class WooCommerceHooks {
 		$loader->add_action( 'woocommerce_product_set_stock', $this, 'handle_stock_change' );
 		$loader->add_action( 'woocommerce_variation_set_stock', $this, 'handle_stock_change' );
 
-		// Note: price-drop observation (woocommerce_update_product[_variation] ->
-		// notifybay_run_price_dispatcher) and conversion tracking
-		// (woocommerce_order_status_completed -> track_conversions) are premium
-		// (Wishlist price-drop alerts / revenue analytics) and are registered directly
-		// by NotifyBay Pro, not here.
+		// Note: additional stock/order observers and conversion tracking are
+		// provided by a premium add-on (NotifyBay Pro), which registers them
+		// directly, not here.
 
 		// Data Integrity
 		$loader->add_action( 'before_delete_post', $this, 'handle_product_deletion' );

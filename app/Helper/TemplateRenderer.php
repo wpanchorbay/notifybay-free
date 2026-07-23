@@ -103,9 +103,9 @@ class TemplateRenderer {
 		/**
 		 * Filter the located template path.
 		 *
-		 * Fires even when Free has no matching template (path is `false`), so
-		 * NotifyBay Pro can supply premium-only templates (e.g. price-drop,
-		 * hurry-low-stock) that don't ship in Free at all.
+		 * Fires even when Free has no matching template (path is `false`), so a
+		 * premium add-on (NotifyBay Pro) can supply its own templates that don't
+		 * ship in Free at all.
 		 *
 		 * @param string|false $plugin_path   Full path to the located template, or false if not found.
 		 * @param string       $template_name The original template name requested.

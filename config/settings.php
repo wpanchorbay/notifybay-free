@@ -3,12 +3,11 @@
  * Settings Configuration
  *
  * This file defines the default settings and REST API validation schema for the
- * FREE plugin only. Premium (NotifyBay Pro) settings keys — Wishlist, price-drop,
- * Fair-Play, Hurry/FOMO, revenue analytics, and license keys — are NOT declared
- * here. NotifyBay Pro registers its own keys at runtime via the
- * `notifybay_options_properties` (schema) and `notifybay_options_defaults`
- * (defaults) filters in NotifyBay\Core\Settings, so they only exist in the
- * shared `notifybay` option when Pro is installed and active.
+ * FREE plugin only. A premium add-on (NotifyBay Pro) registers any additional
+ * settings keys it needs at runtime via the `notifybay_options_properties`
+ * (schema) and `notifybay_options_defaults` (defaults) filters in
+ * NotifyBay\Core\Settings, so those keys only exist in the shared `notifybay`
+ * option when the add-on is installed and active.
  *
  * @package    NotifyBay
  * @subpackage Config
@@ -29,7 +28,6 @@ return array(
 		'appearance_waitlistExpiryOptions'  => '7,14,30,60,90',
 		'appearance_waitlistExpiryDefault'  => '90',
 		'appearance_waitlistSuccessMessage' => 'Spot reserved! You\'ll be among the first to know when we restock.',
-		'appearance_customCss'              => '',
 		'engine_minStockThreshold'          => 0,
 		'engine_adminAlerts'                => false,
 		'email_fromName'                    => '',
@@ -48,11 +46,13 @@ return array(
 		'appearance_waitlistExpiryOptions'  => array( 'type' => 'string' ),
 		'appearance_waitlistExpiryDefault'  => array( 'type' => 'string' ),
 		'appearance_waitlistSuccessMessage' => array( 'type' => 'string' ),
-		'appearance_customCss'              => array( 'type' => 'string' ),
 		'engine_minStockThreshold'          => array( 'type' => 'integer' ),
 		'engine_adminAlerts'                => array( 'type' => 'boolean' ),
 		'email_fromName'                    => array( 'type' => 'string' ),
-		'email_fromEmail'                   => array( 'type' => 'string' ),
+		'email_fromEmail'                   => array(
+			'type'   => 'string',
+			'format' => 'email',
+		),
 		'debug_enableMode'                  => array( 'type' => 'boolean' ),
 		'advanced_deleteAllOnUninstall'     => array( 'type' => 'boolean' ),
 	),

@@ -222,9 +222,9 @@ const Settings: React.FC = () => {
   ];
 
   /**
-   * Allows NotifyBay Pro to append its own settings tabs (e.g. "Wishlist",
-   * "License") to the sub-navigation. Filter callbacks receive and must
-   * return an array of `{ id, label }` objects.
+   * Allows a premium add-on (NotifyBay Pro) to append its own settings tabs to
+   * the sub-navigation. Filter callbacks receive and must return an array of
+   * `{ id, label }` objects.
    */
   const tabs: { id: string; label: string }[] = applyFilters(
     "notifybay_settings_tabs",
@@ -299,9 +299,9 @@ const Settings: React.FC = () => {
         )}
 
         {/*
-          NotifyBay Pro renders any tab it added via `notifybay_settings_tabs`
-          (e.g. "wishlist", "license") through this filter. Free renders
-          nothing for unknown tab ids.
+          A premium add-on (NotifyBay Pro) renders any tab it added via
+          `notifybay_settings_tabs` through this filter. Free renders nothing
+          for unknown tab ids.
         */}
         {!knownTabIds.includes(activeTab) &&
           (applyFilters(
@@ -313,9 +313,9 @@ const Settings: React.FC = () => {
           ) as React.ReactNode)}
 
         {/*
-          Lets NotifyBay Pro inject extra sections (e.g. a "License Settings"
-          table on the Advanced tab, Wishlist fields on General) into a tab
-          Free already owns, without taking over the whole tab.
+          Lets a premium add-on (NotifyBay Pro) inject extra sections (e.g. a
+          "License Settings" table on the Advanced tab) into a tab Free already
+          owns, without taking over the whole tab.
         */}
         {applyFilters(
           "notifybay_settings_extra_sections",

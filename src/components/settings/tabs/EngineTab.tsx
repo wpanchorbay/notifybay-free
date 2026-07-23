@@ -139,9 +139,8 @@ export const EngineTab: React.FC<EngineTabProps> = ({
       />
 
       {/*
-        Urgency Alerts (Hurry Logic) is a NotifyBay Pro feature. Pro injects
-        its own section here via the `notifybay_settings_extra_sections`
-        filter (activeTab === "engine").
+        A premium add-on (NotifyBay Pro) can inject its own section here via the
+        `notifybay_settings_extra_sections` filter (activeTab === "engine").
       */}
 
       {/* Notifications Section */}
@@ -156,7 +155,7 @@ export const EngineTab: React.FC<EngineTabProps> = ({
             id: "engine_adminAlerts",
             label: __("Owner Alerts", "notifybay-waitlist-and-stock-alert-woo"),
             tooltip: __(
-              "Sends a notification to the store administrator whenever a new shopper joins a waitlist or wishlist.",
+              "Sends a notification to the store administrator whenever a new shopper joins a waitlist.",
               "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (

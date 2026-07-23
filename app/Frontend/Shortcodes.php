@@ -2,7 +2,7 @@
 /**
  * Frontend Shortcodes.
  *
- * Provides [notifybay_waitlist] and [notifybay_wishlist] shortcodes.
+ * Provides the [notifybay_waitlist] shortcode.
  *
  * @package    NotifyBay
  * @subpackage Frontend
@@ -58,9 +58,6 @@ class Shortcodes {
 
 	/**
 	 * Register shortcodes.
-	 *
-	 * Note: [notifybay_wishlist] is a premium (NotifyBay Pro) shortcode and is
-	 * registered by Pro itself, not here, so Free never ships wishlist rendering.
 	 */
 	public function register_shortcodes() {
 		add_shortcode( 'notifybay_waitlist', array( $this, 'render_waitlist_shortcode' ) );
@@ -106,14 +103,12 @@ class Shortcodes {
 
 		$product_id             = $product->get_id();
 		$is_subscribed_waitlist = false;
-		$is_subscribed_wishlist = false;
 		$subscription_map       = array();
 
 		if ( is_user_logged_in() ) {
 			$user_email             = wp_get_current_user()->user_email;
 			$subscription_map       = Lead::get_user_subscriptions_for_product( $user_email, $product_id );
 			$is_subscribed_waitlist = ! empty( $subscription_map[0]['waitlist'] );
-			$is_subscribed_wishlist = ! empty( $subscription_map[0]['wishlist'] );
 		}
 
 		$settings = Settings::get_instance();
@@ -122,7 +117,6 @@ class Shortcodes {
 				   data-product-id="' . esc_attr( $product_id ) . '"
 				   data-product-type="' . esc_attr( $product->get_type() ) . '"
 				   data-subscribed-waitlist="' . esc_attr( $is_subscribed_waitlist ? '1' : '0' ) . '"
-				   data-subscribed-wishlist="' . esc_attr( $is_subscribed_wishlist ? '1' : '0' ) . '"
 				   data-variation-subscriptions=\'' . esc_attr( wp_json_encode( $subscription_map ) ) . '\'
 				   style="margin:0; display:inline-block;">';
 

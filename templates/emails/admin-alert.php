@@ -5,7 +5,7 @@
  * Sent to the store admin when a new lead subscribes.
  *
  * @var string $user_email    The subscriber's email.
- * @var string $lead_type     The subscription type (waitlist/wishlist).
+ * @var string $lead_type     The subscription type (e.g. waitlist).
  * @var string $product_title The product title.
  *
  * @package NotifyBay

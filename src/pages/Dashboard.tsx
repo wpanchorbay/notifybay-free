@@ -4,11 +4,10 @@ import { __ } from '@wordpress/i18n';
 import { BarChart3, Lock } from 'lucide-react';
 
 /**
- * The revenue/conversion analytics dashboard (stat cards, historical demand
- * chart, top-restock and top-wishlist tables) is a NotifyBay Pro feature —
- * its REST backend (`/admin/stats`) only exists when Pro is active. Free
- * renders this thin shell and lets Pro fill it in via the
- * `notifybay_dashboard_widgets` filter (see plans/pro-architecture.md).
+ * The revenue/conversion analytics dashboard is a premium add-on (NotifyBay Pro)
+ * feature — its REST backend (`/admin/stats`) only exists when the add-on is
+ * active. Free renders this thin shell and lets the add-on fill it in via the
+ * `notifybay_dashboard_widgets` filter.
  */
 const Dashboard: FC = () => {
 	const widgets = applyFilters( 'notifybay_dashboard_widgets', null );

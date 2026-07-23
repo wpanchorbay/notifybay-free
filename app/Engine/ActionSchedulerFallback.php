@@ -165,10 +165,9 @@ class ActionSchedulerFallback {
 	private function get_action_weight( $hook ) {
 		/**
 		 * Filters the estimated processing cost ("weight") of each Action Scheduler
-		 * hook the fallback runner budgets for. NotifyBay Pro registers weights for
-		 * the premium hooks it adds (notifybay_run_price_dispatcher,
-		 * notifybay_run_hurry_dispatcher) here rather than Free hardcoding entries
-		 * for hooks it no longer handles.
+		 * hook the fallback runner budgets for. A premium add-on (NotifyBay Pro)
+		 * registers weights for the premium hooks it adds here rather than Free
+		 * hardcoding entries for hooks it does not handle.
 		 *
 		 * @since 1.0.0
 		 * @hook notifybay_fallback_weights

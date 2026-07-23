@@ -46,7 +46,6 @@ class Activator {
 
 		// Register WooCommerce endpoints manually so they are included in the flush
 		add_rewrite_endpoint( 'notifybay-waitlist', EP_PAGES );
-		add_rewrite_endpoint( 'notifybay-wishlist', EP_PAGES );
 
 		// Flush rewrite rules.
 		flush_rewrite_rules();

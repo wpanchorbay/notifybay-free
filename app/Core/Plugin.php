@@ -154,12 +154,6 @@ class Plugin {
 	public function enqueue_public_styles() {
 		$handle = \NOTIFYBAY_OPTION_NAME . '_public';
 		wp_enqueue_style( $handle, \NOTIFYBAY_URL . 'assets/css/public.css', array(), \NOTIFYBAY_VERSION );
-
-		// Load and inject custom CSS from settings
-		$custom_css = \NotifyBay\Core\Settings::get_instance()->get_settings( 'appearance_customCss' );
-		if ( ! empty( $custom_css ) ) {
-			wp_add_inline_style( $handle, $custom_css );
-		}
 	}
 
 	/**

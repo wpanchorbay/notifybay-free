@@ -222,13 +222,14 @@ const Leads: FC = () => {
               placeholder={__("Search...", "notifybay-waitlist-and-stock-alert-woo")}
               style={{ minHeight: '30px', margin: 0 }}
             />
-            <input
+            <button
               type="submit"
               id="search-submit"
               className="button"
-              value={__("Search", "notifybay-waitlist-and-stock-alert-woo")}
-              style={{ minHeight: '30px', margin: 0, padding: '0 10px', display: 'flex', alignItems: 'center' }}
-            />
+              style={{ minHeight: '30px', lineHeight: '30px', margin: 0, padding: '0 10px', display: 'flex', alignItems: 'center' }}
+            >
+              {__("Search", "notifybay-waitlist-and-stock-alert-woo")}
+            </button>
           </form>
           <button onClick={handleExport} className="page-title-action" style={{ margin: 0, top: 0, minHeight: '30px', display: 'flex', alignItems: 'center', padding: '0 10px' }}>
             {__("Export CSV ⬇", "notifybay-waitlist-and-stock-alert-woo")}
@@ -500,7 +501,9 @@ const Leads: FC = () => {
             if (columnKey === "type") {
               return (
                 <span className="notifybay-text-gray-600 notifybay-text-[13px] notifybay-font-medium">
-                  {item.type === "waitlist" ? "⏳ Waitlist" : "⭐ Wishlist"}
+                  {item.type === "waitlist"
+                    ? "⏳ Waitlist"
+                    : item.type.charAt(0).toUpperCase() + item.type.slice(1)}
                 </span>
               );
             }

@@ -56,9 +56,8 @@ class CronTasks {
 		$loader->add_action( 'init', $this, 'schedule_jobs' );
 
 		// The actual worker functions.
-		// Note: the hurry-alert dispatcher trigger (notifybay_daily_hurry_check ->
-		// trigger_hurry_dispatcher) is premium (Hurry/scarcity alerts) and is scheduled
-		// and handled directly by NotifyBay Pro, not here.
+		// Note: additional premium dispatch jobs are scheduled and handled directly
+		// by a premium add-on (NotifyBay Pro), not here.
 		$loader->add_action( 'notifybay_stale_processing_recovery', $this, 'recover_stale_processing_leads' );
 		$loader->add_action( 'notifybay_verification_cleanup', $this, 'cleanup_expired_verifications' );
 		$loader->add_action( 'notifybay_expiry_cleanup', $this, 'cleanup_expired_leads' );

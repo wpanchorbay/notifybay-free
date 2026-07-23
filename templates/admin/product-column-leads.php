@@ -6,7 +6,7 @@
  *
  * @var int    $count   Number of active leads.
  * @var int    $post_id The product post ID.
- * @var string $type    'waitlist' or 'wishlist'.
+ * @var string $type    The lead type (e.g. 'waitlist').
  *
  * @package NotifyBay
  */

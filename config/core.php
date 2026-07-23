@@ -15,8 +15,8 @@
 // Prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-// Note: Gutenberg blocks (Waitlist/Wishlist) are a premium packaging feature and
-// are registered by NotifyBay Pro (its own Blocks class), not here.
+// Note: Gutenberg blocks are a premium packaging feature registered by the
+// NotifyBay Pro add-on (its own Blocks class), not here.
 return array(
 	\NotifyBay\Admin\Admin::class,
 	\NotifyBay\Admin\WooCommerce::class,

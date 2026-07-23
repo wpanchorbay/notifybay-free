@@ -70,8 +70,8 @@ export const EmailTab: React.FC<EmailTabProps> = ({
 
       {/*
         Email content (subject, heading, body, enable/disable, preview & test
-        send) for every NotifyBay email — restock, verification, and the Pro
-        price-drop / hurry alerts — is now managed as native WooCommerce emails
+        send) for every NotifyBay email — restock and verification, plus any a
+        premium add-on registers — is now managed as native WooCommerce emails
         under WooCommerce → Settings → Emails. See app/Emails/.
       */}
       <div

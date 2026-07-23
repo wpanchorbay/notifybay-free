@@ -2,7 +2,7 @@
 /**
  * MyAccount Integration.
  *
- * Registers "Waitlist" and "Wishlist" tabs in WooCommerce My Account.
+ * Registers the "Waitlist" tab in WooCommerce My Account.
  *
  * @package    NotifyBay
  * @subpackage Frontend
@@ -57,16 +57,8 @@ class MyAccount {
 		$loader->add_filter( 'query_vars', $this, 'add_query_vars', 0 );
 		$loader->add_filter( 'woocommerce_account_menu_items', $this, 'add_menu_items' );
 
-		// Content callbacks. Registration itself is unconditional — the wishlist
-		// rewrite endpoint/query var are only added when enabled (see
-		// add_endpoints()/add_query_vars(), both deferred to later hooks), so this
-		// callback simply won't fire when disabled. Settings is deliberately not
-		// read here in run(): that executes at file-load time, before an add-on's
-		// plugins_loaded hook can register its notifybay_options_defaults filter,
-		// which would permanently cache Settings without the add-on's keys for the
-		// rest of the request.
+		// Waitlist tab content callback.
 		$loader->add_action( 'woocommerce_account_notifybay-waitlist_endpoint', $this, 'render_waitlist_content' );
-		$loader->add_action( 'woocommerce_account_notifybay-wishlist_endpoint', $this, 'render_wishlist_content' );
 	}
 
 	/**
@@ -74,10 +66,6 @@ class MyAccount {
 	 */
 	public function add_endpoints() {
 		add_rewrite_endpoint( 'notifybay-waitlist', EP_PAGES );
-		$settings = \NotifyBay\Core\Settings::get_instance();
-		if ( $settings->get_settings( 'general_wishlistEnabled', false ) ) {
-			add_rewrite_endpoint( 'notifybay-wishlist', EP_PAGES );
-		}
 	}
 
 	/**
@@ -87,11 +75,7 @@ class MyAccount {
 	 * @return array
 	 */
 	public function add_query_vars( $vars ) {
-		$vars[]   = 'notifybay-waitlist';
-		$settings = \NotifyBay\Core\Settings::get_instance();
-		if ( $settings->get_settings( 'general_wishlistEnabled', false ) ) {
-			$vars[] = 'notifybay-wishlist';
-		}
+		$vars[] = 'notifybay-waitlist';
 
 		return $vars;
 	}
@@ -111,10 +95,6 @@ class MyAccount {
 		}
 
 		$items['notifybay-waitlist'] = __( 'Waitlist', 'notifybay-waitlist-and-stock-alert-woo' );
-		$settings                    = \NotifyBay\Core\Settings::get_instance();
-		if ( $settings->get_settings( 'general_wishlistEnabled', false ) ) {
-			$items['notifybay-wishlist'] = __( 'Wishlist', 'notifybay-waitlist-and-stock-alert-woo' );
-		}
 
 		if ( $logout ) {
 			$items['customer-logout'] = $logout;
@@ -132,21 +112,6 @@ class MyAccount {
 
 		TemplateRenderer::render(
 			'frontend/waitlist',
-			array(
-				'leads' => $leads,
-			)
-		);
-	}
-
-	/**
-	 * Render the Wishlist tab content.
-	 */
-	public function render_wishlist_content() {
-		$user_email = wp_get_current_user()->user_email;
-		$leads      = Lead::get_user_leads_by_type( $user_email, 'wishlist' );
-
-		TemplateRenderer::render(
-			'frontend/wishlist',
 			array(
 				'leads' => $leads,
 			)
