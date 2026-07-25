@@ -43,6 +43,7 @@ class CreateNotifybayLeadsTable implements MigrationInterface {
 			price_at_subscription DECIMAL(10,2) DEFAULT NULL,
 			user_currency VARCHAR(3) DEFAULT NULL,
 			verification_token VARCHAR(64) DEFAULT NULL,
+			guest_token VARCHAR(64) DEFAULT NULL,
 			user_locale VARCHAR(10) DEFAULT NULL,
 			product_name_snapshot VARCHAR(255) DEFAULT NULL,
 			retry_count TINYINT UNSIGNED NOT NULL DEFAULT 0,
@@ -55,6 +56,7 @@ class CreateNotifybayLeadsTable implements MigrationInterface {
 			KEY idx_product_variation_status (product_id, variation_id, status),
 			KEY idx_user_email_status (user_email, status),
 			KEY idx_verification_token (verification_token),
+			KEY idx_guest_token (guest_token),
 			KEY idx_status_expires_at (status, expires_at),
 			KEY idx_status_created_at (status, created_at),
 			UNIQUE KEY idx_unique_active_lead (user_email, product_id, variation_id, type)

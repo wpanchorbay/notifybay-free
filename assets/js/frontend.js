@@ -535,7 +535,10 @@
                     product_id: productId,
                     variation_id: variationId,
                     type: type,
-                    expiry: expiry
+                    expiry: expiry,
+                    // Reuse this browser's existing ownership token (if any) so all
+                    // of its leads share one token and hydrate together later.
+                    token: self.getCookie('notifybay_guest_token') || ''
                 },
                 success: function (response) {
                     // Show success notice

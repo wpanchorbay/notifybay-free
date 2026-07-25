@@ -94,43 +94,36 @@ class FrontendController extends ApiController {
 	}
 
 	/**
-	 * Compute the guest hydration token for an email address.
+	 * Generate a fresh, unguessable guest ownership token.
 	 *
-	 * The token is an HMAC of the normalized email keyed with a server secret
-	 * (wp_salt). It is returned to the subscriber in the subscribe response and
-	 * must be presented back to the read-only hydration endpoints, proving the
-	 * caller actually subscribed with that email rather than probing arbitrary
-	 * addresses. Forging it requires the site secret, which is never exposed.
+	 * A random secret (never derived from the email) that is stored on every
+	 * lead this browser creates. The read-only hydration endpoints only return
+	 * leads carrying it, so a caller can only see subscriptions its own browser
+	 * made. Because it cannot be computed from a public email address, the
+	 * public subscribe endpoint cannot be used to mint a victim's token.
 	 *
 	 * @since 1.0.0
-	 * @param string $email The subscriber email.
-	 * @return string The hydration token.
+	 * @return string A 64-character alphanumeric token.
 	 */
-	private function hydration_token( $email ) {
-		// Normalize the email the same way on both the issuing (subscribe) and
-		// verifying (hydration) paths so the HMAC round-trips. sanitize_email() is
-		// idempotent, so applying it here makes the token independent of whether
-		// the caller passed a raw or already-sanitized address.
-		$normalized = strtolower( trim( sanitize_email( (string) $email ) ) );
-		return hash_hmac( 'sha256', $normalized, wp_salt() );
+	private function new_guest_token() {
+		return wp_generate_password( 64, false );
 	}
 
 	/**
-	 * Verify a supplied guest hydration token against an email address.
+	 * Resolve the guest token to store on a new lead.
 	 *
-	 * Uses a timing-safe comparison. Returns false for an empty token so a
-	 * missing token never resolves subscription state.
+	 * Reuses the token the browser already holds (sent back from its
+	 * `notifybay_guest_token` cookie) so every lead a guest creates shares one
+	 * token and later hydrates together; otherwise mints a fresh one. Any token
+	 * that is not in the expected shape is discarded and replaced.
 	 *
 	 * @since 1.0.0
-	 * @param string $email The email supplied with the request.
-	 * @param string $token The token supplied with the request.
-	 * @return bool True when the token matches the email.
+	 * @param string $provided The token supplied with the subscribe request.
+	 * @return string A valid guest token.
 	 */
-	private function verify_hydration_token( $email, $token ) {
-		if ( '' === (string) $token ) {
-			return false;
-		}
-		return hash_equals( $this->hydration_token( $email ), (string) $token );
+	private function resolve_guest_token( $provided ) {
+		$provided = (string) $provided;
+		return preg_match( '/^[A-Za-z0-9]{20,64}$/', $provided ) ? $provided : $this->new_guest_token();
 	}
 
 	/**
@@ -149,13 +142,14 @@ class FrontendController extends ApiController {
 		$email   = sanitize_email( $request->get_param( 'email' ) );
 		$token   = (string) $request->get_param( 'token' );
 
-		// Only resolve subscription state when the caller proves ownership of the
-		// email with the token issued to it at subscribe time. Without a valid
-		// token the endpoint returns empty state, so arbitrary emails cannot be
-		// probed for their subscription status.
+		// Only resolve subscription state for leads carrying the caller's own
+		// guest token — the random secret this browser was given when it
+		// subscribed. Results are scoped to that token, so a caller can only see
+		// subscriptions its own browser created and cannot probe an arbitrary
+		// email's status. Without a token the endpoint returns empty state.
 		$all_subscriptions = array();
-		if ( $email && $this->verify_hydration_token( $email, $token ) ) {
-			$all_subscriptions = Lead::get_user_subscriptions_for_products( $email, $product_ids );
+		if ( $email && '' !== $token ) {
+			$all_subscriptions = Lead::get_user_subscriptions_for_products( $email, $product_ids, $token );
 		}
 
 		foreach ( $product_ids as $product_id ) {
@@ -238,11 +232,11 @@ class FrontendController extends ApiController {
 			$guest_email = sanitize_email( $request->get_param( 'email' ) );
 			$guest_token = (string) $request->get_param( 'token' );
 
-			// Require the ownership token before revealing a guest's subscription
-			// state, so arbitrary emails cannot be probed. Without it the response
-			// simply reports "not subscribed".
-			if ( $guest_email && $this->verify_hydration_token( $guest_email, $guest_token ) ) {
-				$variation_subscriptions = Lead::get_user_subscriptions_for_product( $guest_email, $product_id );
+			// Scope to leads carrying this browser's own guest token, so a caller
+			// can only reveal subscriptions it created and cannot probe an
+			// arbitrary email. Without a token the response reports "not subscribed".
+			if ( $guest_email && '' !== $guest_token ) {
+				$variation_subscriptions = Lead::get_user_subscriptions_for_product( $guest_email, $product_id, $guest_token );
 
 				$check_variation        = $variation_id ? $variation_id : 0;
 				$is_subscribed_waitlist = ! empty( $variation_subscriptions[ $check_variation ]['waitlist'] );
@@ -319,6 +313,13 @@ class FrontendController extends ApiController {
 
 		$user_id = get_current_user_id();
 
+		// Guests get a random ownership token bound to this lead so they can later
+		// hydrate their own subscription state without exposing anyone else's. It
+		// is reused across the browser's subscribes (echoed back from the
+		// notifybay_guest_token cookie) and never derived from the email. Logged-in
+		// users hydrate via their account, so they get none.
+		$guest_token = $user_id ? '' : $this->resolve_guest_token( $request->get_param( 'token' ) );
+
 		$settings = Settings::get_instance();
 		$status   = ( $settings->get_settings( 'general_doubleOptIn', false ) ) ? 'pending_verification' : 'active';
 
@@ -344,6 +345,7 @@ class FrontendController extends ApiController {
 			'type'                  => $validated['type'],
 			'status'                => $status,
 			'verification_token'    => wp_generate_password( 32, false ),
+			'guest_token'           => ( '' !== $guest_token ) ? $guest_token : null,
 			'user_locale'           => get_user_locale(),
 			'product_name_snapshot' => get_the_title( $validated['product_id'] ),
 			'expires_at'            => $expires_at,
@@ -403,9 +405,10 @@ class FrontendController extends ApiController {
 			$response = array(
 				'success'         => true,
 				'message'         => $message,
-				// Ownership token the guest presents back to the read-only
-				// hydration endpoints to prove it subscribed with this email.
-				'hydration_token' => $this->hydration_token( $validated['email'] ),
+				// The guest's ownership token (empty for logged-in users). The
+				// browser stores it and presents it back to the read-only
+				// hydration endpoints, which only return leads carrying it.
+				'hydration_token' => $guest_token,
 			);
 
 			/**

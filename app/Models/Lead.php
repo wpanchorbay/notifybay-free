@@ -224,23 +224,39 @@ class Lead extends Model {
 	/**
 	 * Get all active/pending subscriptions for a user for a specific product (including variations).
 	 *
-	 * @param string $email      User email.
-	 * @param int    $product_id Product ID.
+	 * @param string $email       User email.
+	 * @param int    $product_id  Product ID.
+	 * @param string $guest_token Optional guest ownership token. When non-empty,
+	 *                            results are scoped to leads carrying this token,
+	 *                            so a guest only sees subscriptions its own browser
+	 *                            created. Empty for logged-in/internal callers.
 	 * @return array Map of [variation_id => [type => true]]
 	 */
-	public static function get_user_subscriptions_for_product( $email, $product_id ) {
+	public static function get_user_subscriptions_for_product( $email, $product_id, $guest_token = '' ) {
 		global $wpdb;
 		$instance = new static();
 		$table    = $instance->get_table();
 
-		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
-			$wpdb->prepare(
-				"SELECT variation_id, type FROM {$table} WHERE user_email = %s AND product_id = %d AND status IN ('active', 'pending_verification')", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				$email,
-				(int) $product_id
-			),
-			ARRAY_A
-		);
+		if ( '' !== (string) $guest_token ) {
+			$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
+				$wpdb->prepare(
+					"SELECT variation_id, type FROM {$table} WHERE user_email = %s AND product_id = %d AND guest_token = %s AND status IN ('active', 'pending_verification')", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$email,
+					(int) $product_id,
+					(string) $guest_token
+				),
+				ARRAY_A
+			);
+		} else {
+			$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
+				$wpdb->prepare(
+					"SELECT variation_id, type FROM {$table} WHERE user_email = %s AND product_id = %d AND status IN ('active', 'pending_verification')", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$email,
+					(int) $product_id
+				),
+				ARRAY_A
+			);
+		}
 
 		$map = array();
 		foreach ( $results as $row ) {
@@ -260,9 +276,13 @@ class Lead extends Model {
 	 *
 	 * @param string $email       User email.
 	 * @param int[]  $product_ids Array of product IDs.
+	 * @param string $guest_token Optional guest ownership token. When non-empty,
+	 *                            results are scoped to leads carrying this token,
+	 *                            so a guest only sees subscriptions its own browser
+	 *                            created. Empty for logged-in/internal callers.
 	 * @return array Map of [product_id => [variation_id => [type => true]]]
 	 */
-	public static function get_user_subscriptions_for_products( $email, array $product_ids ) {
+	public static function get_user_subscriptions_for_products( $email, array $product_ids, $guest_token = '' ) {
 		if ( empty( $product_ids ) ) {
 			return array();
 		}
@@ -274,9 +294,15 @@ class Lead extends Model {
 		$placeholders = implode( ',', array_fill( 0, count( $product_ids ), '%d' ) );
 		$args         = array_merge( array( $email ), array_map( 'intval', $product_ids ) );
 
+		$token_sql = '';
+		if ( '' !== (string) $guest_token ) {
+			$token_sql = ' AND guest_token = %s';
+			$args[]    = (string) $guest_token;
+		}
+
 		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
-				"SELECT product_id, variation_id, type FROM {$table} WHERE user_email = %s AND product_id IN ($placeholders) AND status IN ('active', 'pending_verification')", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT product_id, variation_id, type FROM {$table} WHERE user_email = %s AND product_id IN ($placeholders){$token_sql} AND status IN ('active', 'pending_verification')", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				...$args
 			),
 			ARRAY_A
