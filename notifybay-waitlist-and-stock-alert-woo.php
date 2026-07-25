@@ -27,6 +27,10 @@ define( 'NOTIFYBAY_PATH', plugin_dir_path( __FILE__ ) );
 define( 'NOTIFYBAY_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NOTIFYBAY_URL', plugin_dir_url( __FILE__ ) );
 define( 'NOTIFYBAY_VERSION', '1.0.0' );
+// Database schema version. Bump whenever the custom table structure changes so
+// the schema is re-applied on plugin UPDATE (activation hooks do not fire on an
+// in-place update). '2' adds the leads.guest_token column.
+define( 'NOTIFYBAY_DB_VERSION', '2' );
 define( 'NOTIFYBAY_PLUGIN_NAME', 'notifybay' );
 define( 'NOTIFYBAY_TEXT_DOMAIN', 'notifybay' );
 define( 'NOTIFYBAY_OPTION_NAME', 'notifybay' );

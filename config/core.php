@@ -18,6 +18,7 @@ defined( 'ABSPATH' ) || exit;
 // Note: Gutenberg blocks are a premium packaging feature registered by the
 // NotifyBay Pro add-on (its own Blocks class), not here.
 return array(
+	\NotifyBay\Data\DbManager::class,
 	\NotifyBay\Admin\Admin::class,
 	\NotifyBay\Admin\WooCommerce::class,
 	\NotifyBay\Core\Settings::class,
