@@ -41,16 +41,21 @@
                 productIds.push($(this).data('product-id'));
             });
 
-            // Attempt to retrieve a remembered guest email from a browser cookie
+            // Attempt to retrieve a remembered guest email and its hydration token
+            // from browser cookies. The token was issued to this browser when it
+            // subscribed and proves ownership of the email to the read-only
+            // hydration endpoint (which returns no status without a valid token).
             const rememberedEmail = this.getCookie('notifybay_guest_email');
+            const rememberedToken = this.getCookie('notifybay_guest_token');
 
-            // Batch hydrate guest subscriptions if the user is not logged in but has a remembered email
-            if (!notifybay_vars.user.is_logged_in && rememberedEmail && productIds.length > 0) {
+            // Batch hydrate guest subscriptions only when we hold both the remembered
+            // email and its ownership token.
+            if (!notifybay_vars.user.is_logged_in && rememberedEmail && rememberedToken && productIds.length > 0) {
                 // Remove any duplicate IDs from the array before sending to the server
                 const uniqueIds = [...new Set(productIds)];
 
                 // Trigger the batch AJAX request to fetch subscription statuses for all products at once
-                self.batchHydrateGuestSubscriptions(uniqueIds, rememberedEmail);
+                self.batchHydrateGuestSubscriptions(uniqueIds, rememberedEmail, rememberedToken);
             }
         },
 
@@ -59,8 +64,9 @@
          *
          * @param {Array} productIds Array of product IDs to fetch
          * @param {string} email     The guest email from cookie
+         * @param {string} token     The ownership token from cookie
          */
-        batchHydrateGuestSubscriptions: function (productIds, email) {
+        batchHydrateGuestSubscriptions: function (productIds, email, token) {
             // Store reference to self for AJAX callback
             const self = this;
 
@@ -73,6 +79,7 @@
                 headers: notifybay_vars.nonce ? { 'X-WP-Nonce': notifybay_vars.nonce } : {},
                 data: {
                     email: email, // The email to check subscriptions for
+                    token: token, // Ownership token proving this browser subscribed with the email
                     product_ids: productIds // List of products to check
                 },
                 success: function (response) {
@@ -534,9 +541,13 @@
                     // Show success notice
                     self.showNotice(response.message, 'success');
 
-                    // Update guest cookie to remember this email
+                    // Update guest cookies to remember this email and its hydration
+                    // token, so subscription state can be re-fetched on later visits.
                     if (!notifybay_vars.user.is_logged_in) {
                         self.setCookie('notifybay_guest_email', email);
+                        if (response.hydration_token) {
+                            self.setCookie('notifybay_guest_token', response.hydration_token);
+                        }
                     }
 
                     // Mark waitlist as subscribed

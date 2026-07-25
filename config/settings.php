@@ -45,7 +45,10 @@ return array(
 		'appearance_waitlistExpiryEnabled'  => array( 'type' => 'boolean' ),
 		'appearance_waitlistExpiryOptions'  => array( 'type' => 'string' ),
 		'appearance_waitlistExpiryDefault'  => array( 'type' => 'string' ),
-		'appearance_waitlistSuccessMessage' => array( 'type' => 'string' ),
+		'appearance_waitlistSuccessMessage' => array(
+			'type'   => 'string',
+			'format' => 'textarea',
+		),
 		'engine_minStockThreshold'          => array( 'type' => 'integer' ),
 		'engine_adminAlerts'                => array( 'type' => 'boolean' ),
 		'email_fromName'                    => array( 'type' => 'string' ),

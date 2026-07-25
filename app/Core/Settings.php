@@ -255,6 +255,10 @@ class Settings {
 				$sanitized_output[ $key ] = sanitize_email( $value );
 				continue;
 			}
+			if ( 'textarea' === $format ) {
+				$sanitized_output[ $key ] = sanitize_textarea_field( $value );
+				continue;
+			}
 
 			switch ( $type ) {
 				case 'boolean':

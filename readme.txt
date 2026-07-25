@@ -60,7 +60,7 @@ No. NotifyBay's Fair-Play dispatch engine calculates how much stock is actually 
 
 The compiled JavaScript in the `build/` directory is generated from human-readable source in the `src/` directory using [@wordpress/scripts](https://www.npmjs.com/package/@wordpress/scripts) (webpack). The full, unminified source code and the build tooling are publicly available at:
 
-https://github.com/wpanchorbay/notifybay-free
+https://github.com/wpanchorbay/notifybay-free/tree/1.0.0
 
 To rebuild the compiled assets from source: run `npm install`, then `npm run build` (or `bash build.sh`).
 

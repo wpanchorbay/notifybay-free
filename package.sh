@@ -60,9 +60,9 @@ copy_plugin_files "dist/woocommerce/$PLUGIN_SLUG"
 
 # 5. Create WordPress Zip
 echo "Step 4: Creating WordPress zip..."
-cd dist/wordpress/$PLUGIN_SLUG
-zip -r "../$ZIP_NAME" . > /dev/null
-cd ../../..
+cd dist/wordpress
+zip -r "$ZIP_NAME" "$PLUGIN_SLUG" > /dev/null
+cd ../..
 # Remove the staging folder after zipping to leave only the zip in the subfolder
 rm -rf "dist/wordpress/$PLUGIN_SLUG"
 

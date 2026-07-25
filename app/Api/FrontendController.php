@@ -94,6 +94,41 @@ class FrontendController extends ApiController {
 	}
 
 	/**
+	 * Compute the guest hydration token for an email address.
+	 *
+	 * The token is an HMAC of the normalized email keyed with a server secret
+	 * (wp_salt). It is returned to the subscriber in the subscribe response and
+	 * must be presented back to the read-only hydration endpoints, proving the
+	 * caller actually subscribed with that email rather than probing arbitrary
+	 * addresses. Forging it requires the site secret, which is never exposed.
+	 *
+	 * @since 1.0.0
+	 * @param string $email The subscriber email.
+	 * @return string The hydration token.
+	 */
+	private function hydration_token( $email ) {
+		return hash_hmac( 'sha256', strtolower( trim( (string) $email ) ), wp_salt() );
+	}
+
+	/**
+	 * Verify a supplied guest hydration token against an email address.
+	 *
+	 * Uses a timing-safe comparison. Returns false for an empty token so a
+	 * missing token never resolves subscription state.
+	 *
+	 * @since 1.0.0
+	 * @param string $email The email supplied with the request.
+	 * @param string $token The token supplied with the request.
+	 * @return bool True when the token matches the email.
+	 */
+	private function verify_hydration_token( $email, $token ) {
+		if ( '' === (string) $token ) {
+			return false;
+		}
+		return hash_equals( $this->hydration_token( $email ), (string) $token );
+	}
+
+	/**
 	 * Get real-time product status for multiple products (used for guest hydration on archives).
 	 *
 	 * @param WP_REST_Request $request The request object.
@@ -107,9 +142,14 @@ class FrontendController extends ApiController {
 
 		$results = array();
 		$email   = sanitize_email( $request->get_param( 'email' ) );
+		$token   = (string) $request->get_param( 'token' );
 
+		// Only resolve subscription state when the caller proves ownership of the
+		// email with the token issued to it at subscribe time. Without a valid
+		// token the endpoint returns empty state, so arbitrary emails cannot be
+		// probed for their subscription status.
 		$all_subscriptions = array();
-		if ( $email ) {
+		if ( $email && $this->verify_hydration_token( $email, $token ) ) {
 			$all_subscriptions = Lead::get_user_subscriptions_for_products( $email, $product_ids );
 		}
 
@@ -190,11 +230,18 @@ class FrontendController extends ApiController {
 				)
 			);
 		} elseif ( ! $user_id && ! $skip_subscription && $request->get_param( 'email' ) ) {
-			$guest_email             = sanitize_email( $request->get_param( 'email' ) );
-			$variation_subscriptions = Lead::get_user_subscriptions_for_product( $guest_email, $product_id );
+			$guest_email = sanitize_email( $request->get_param( 'email' ) );
+			$guest_token = (string) $request->get_param( 'token' );
 
-			$check_variation        = $variation_id ? $variation_id : 0;
-			$is_subscribed_waitlist = ! empty( $variation_subscriptions[ $check_variation ]['waitlist'] );
+			// Require the ownership token before revealing a guest's subscription
+			// state, so arbitrary emails cannot be probed. Without it the response
+			// simply reports "not subscribed".
+			if ( $guest_email && $this->verify_hydration_token( $guest_email, $guest_token ) ) {
+				$variation_subscriptions = Lead::get_user_subscriptions_for_product( $guest_email, $product_id );
+
+				$check_variation        = $variation_id ? $variation_id : 0;
+				$is_subscribed_waitlist = ! empty( $variation_subscriptions[ $check_variation ]['waitlist'] );
+			}
 		}
 
 		$response = array(
@@ -349,8 +396,11 @@ class FrontendController extends ApiController {
 			$message = apply_filters( 'notifybay_subscribe_success_message', $message, $validated['type'], $status, $validated );
 
 			$response = array(
-				'success' => true,
-				'message' => $message,
+				'success'         => true,
+				'message'         => $message,
+				// Ownership token the guest presents back to the read-only
+				// hydration endpoints to prove it subscribed with this email.
+				'hydration_token' => $this->hydration_token( $validated['email'] ),
 			);
 
 			/**

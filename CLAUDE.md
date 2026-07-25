@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-NotifyBay is a WooCommerce **Waitlist & Wishlist** marketing-automation plugin: a PHP backend (`app/`) plus a React/TypeScript SPA admin UI (`src/`, compiled into `build/`). It captures leads when products are out of stock (back-in-stock alerts) or when customers want price-drop alerts, then dispatches notifications asynchronously via Action Scheduler.
+NotifyBay is a WooCommerce **Waitlist / back-in-stock alert** marketing-automation plugin: a PHP backend (`app/`) plus a React/TypeScript SPA admin UI (`src/`, compiled into `build/`). It captures leads when products are out of stock, then dispatches back-in-stock notifications asynchronously via Action Scheduler. (Wishlist and price-drop alerts are **not** part of the free plugin; they live in the separate NotifyBay Pro add-on.)
 
 ## Commands
 
@@ -51,7 +51,7 @@ The plugin does **not** hardcode its wiring — it is driven by `config/*.php` r
 
 ## Frontend architecture (`src/`)
 
-- **Two independent React apps**, two webpack entries (`webpack.config.js`): `admin` (`src/admin.tsx` → `AdminApp.tsx`, the SPA dashboard with `react-router-dom`) and `settings` (`src/settings.tsx` → `SettingsApp.tsx`). `src/blocks.tsx` builds the Gutenberg Waitlist/Wishlist blocks. All output to `build/`.
+- **Two independent React apps**, two webpack entries (`webpack.config.js`): `admin` (`src/admin.tsx` → `AdminApp.tsx`, the SPA dashboard with `react-router-dom`) and `settings` (`src/settings.tsx` → `SettingsApp.tsx`). All output to `build/`.
 - **Legacy target:** `BUILD_TARGET=legacy` (`npm run build:legacy`) produces an alternate build; components under `src/components/classics/` are a "Classic" WP-admin-styled component set alongside the modern Tailwind `common/` set.
 - **State:** React Context (`src/store/` — `wpabStore.tsx`, `AddonContext.tsx`, toast). No Redux.
 - **API access:** `src/utils/apiFetch.ts` wraps `@wordpress/api-fetch` against the REST controllers in `app/Api/`. Types in `src/utils/types.ts`; validation via `zod` and `src/utils/validation.ts`.
