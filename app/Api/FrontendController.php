@@ -107,7 +107,12 @@ class FrontendController extends ApiController {
 	 * @return string The hydration token.
 	 */
 	private function hydration_token( $email ) {
-		return hash_hmac( 'sha256', strtolower( trim( (string) $email ) ), wp_salt() );
+		// Normalize the email the same way on both the issuing (subscribe) and
+		// verifying (hydration) paths so the HMAC round-trips. sanitize_email() is
+		// idempotent, so applying it here makes the token independent of whether
+		// the caller passed a raw or already-sanitized address.
+		$normalized = strtolower( trim( sanitize_email( (string) $email ) ) );
+		return hash_hmac( 'sha256', $normalized, wp_salt() );
 	}
 
 	/**
