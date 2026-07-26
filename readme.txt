@@ -1,7 +1,7 @@
 === NotifyBay - Waitlist and Stock Alert for WooCommerce ===
 Contributors: wpanchorbay, sankarsan
 Tags: woocommerce, waitlist, back-in-stock, stock-alert, inventory
-Requires at least: 6.8
+Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 7.0
 Stable tag: 1.0.0
@@ -51,10 +51,6 @@ Restock notifications are queued and delivered by email in the background using 
 = Will customers be notified about stock that's already been claimed by someone else? =
 
 No. NotifyBay's Fair-Play dispatch engine calculates how much stock is actually available to offer before sending any notifications, so waitlisted customers aren't alerted about inventory that's already been reserved or sold.
-
-== Screenshots ==
-
-1. Screenshots to be added before submission.
 
 == Source Code ==
 

@@ -311,6 +311,24 @@ class AdminController extends ApiController {
 		header( 'Content-Type: text/csv; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename=notifybay-leads-' . gmdate( 'Y-m-d' ) . '.csv' );
 
+		/**
+		 * Neutralize spreadsheet formula injection.
+		 *
+		 * A cell beginning with =, +, -, @ (or a leading tab/carriage return) is
+		 * interpreted as a formula by Excel/Sheets. Prefixing such values with a
+		 * single quote forces them to be treated as plain text.
+		 *
+		 * @param mixed $value The raw cell value.
+		 * @return string The safe cell value.
+		 */
+		$notifybay_csv_safe = function ( $value ) {
+			$value = (string) $value;
+			if ( '' !== $value && preg_match( '/^[=+\-@\t\r]/', $value ) ) {
+				return "'" . $value;
+			}
+			return $value;
+		};
+
 		$output = fopen( 'php://output', 'w' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		fputcsv( $output, array( 'ID', 'Email', 'User ID', 'Product ID', 'Variation ID', 'Type', 'Status', 'Price at Subscription', 'Created At' ) );
 
@@ -322,16 +340,19 @@ class AdminController extends ApiController {
 		foreach ( $leads as $lead ) {
 			fputcsv(
 				$output,
-				array(
-					$lead['id'],
-					$lead['user_email'],
-					$lead['user_id'],
-					$lead['product_id'],
-					$lead['variation_id'],
-					$lead['type'],
-					$lead['status'],
-					$lead['price_at_subscription'],
-					$lead['created_at'],
+				array_map(
+					$notifybay_csv_safe,
+					array(
+						$lead['id'],
+						$lead['user_email'],
+						$lead['user_id'],
+						$lead['product_id'],
+						$lead['variation_id'],
+						$lead['type'],
+						$lead['status'],
+						$lead['price_at_subscription'],
+						$lead['created_at'],
+					)
 				)
 			);
 		}

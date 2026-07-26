@@ -80,8 +80,8 @@ class DbManager {
 	/**
 	 * Re-apply the schema when the stored DB version is behind the code's.
 	 *
-	 * dbDelta is idempotent, so this safely adds any new columns/indexes on
-	 * update without touching existing data.
+	 * The dbDelta call is idempotent, so this safely adds any new
+	 * columns/indexes on update without touching existing data.
 	 *
 	 * @since 1.0.0
 	 * @return void

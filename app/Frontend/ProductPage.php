@@ -91,7 +91,7 @@ class ProductPage {
 	 * @param array       $args    Additional arguments.
 	 * @return string
 	 */
-	public function maybe_hide_archive_add_to_cart( $html, $product, $args ) {
+	public function maybe_hide_archive_add_to_cart( $html, $product, $args ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- $args is required by the woocommerce_loop_add_to_cart_link filter signature.
 		if ( ! $product->is_in_stock() && ! $product->is_type( 'variable' ) ) {
 			return '';
 		}

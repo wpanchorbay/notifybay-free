@@ -3,7 +3,7 @@
  * Plugin Name:       NotifyBay - Waitlist and Stock Alert for WooCommerce
  * Plugin URI:        https://wpanchorbay.com/plugins/notifybay-waitlist-and-stock-alert-for-woocommerce
  * Description:       Adds Waitlist (back-in-stock) alerts to WooCommerce so store owners can capture leads on out-of-stock products and automatically notify waitlisted customers when items are restocked.
- * Requires at least: 6.8
+ * Requires at least: 7.0
  * Requires PHP:      7.0
  * Requires Plugins:  woocommerce
  * Version:           1.0.0

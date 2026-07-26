@@ -35,6 +35,19 @@ abstract class Model {
 	protected $primary_key = 'id';
 
 	/**
+	 * Column names that callers may filter/search on via paginate().
+	 *
+	 * Column names cannot be bound as prepared-statement parameters, so any
+	 * key passed in paginate()'s $where/$search arrays is checked against this
+	 * allow-list before it is interpolated into SQL. Subclasses MUST declare
+	 * their queryable columns; an empty list (the default) disallows all
+	 * filtering, which fails closed rather than trusting caller-supplied keys.
+	 *
+	 * @var string[]
+	 */
+	protected $queryable_columns = array();
+
+	/**
 	 * Model attributes.
 	 *
 	 * @var array
@@ -229,17 +242,26 @@ abstract class Model {
 
 		$where_sql    = '1=1';
 		$where_values = array();
+		$allowed_cols = $instance->queryable_columns;
 
 		if ( ! empty( $where ) ) {
 			foreach ( $where as $col => $val ) {
-				$where_sql     .= " AND {$col} = %s";
+				// Column names cannot be bound via prepare(); only allow-listed
+				// columns are interpolated, so untrusted keys are dropped.
+				if ( ! in_array( $col, $allowed_cols, true ) ) {
+					continue;
+				}
+				$where_sql     .= " AND `{$col}` = %s";
 				$where_values[] = $val;
 			}
 		}
 
 		if ( ! empty( $search ) ) {
 			foreach ( $search as $col => $val ) {
-				$where_sql     .= " AND {$col} LIKE %s";
+				if ( ! in_array( $col, $allowed_cols, true ) ) {
+					continue;
+				}
+				$where_sql     .= " AND `{$col}` LIKE %s";
 				$where_values[] = '%' . $wpdb->esc_like( $val ) . '%';
 			}
 		}

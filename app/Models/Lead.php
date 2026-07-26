@@ -28,6 +28,13 @@ class Lead extends Model {
 	protected $table = 'notifybay_leads';
 
 	/**
+	 * Columns callers may filter/search on via paginate().
+	 *
+	 * @var string[]
+	 */
+	protected $queryable_columns = array( 'user_email', 'user_id', 'product_id', 'variation_id', 'type', 'status' );
+
+	/**
 	 * Perform an Insert OR Update if duplicate key exists.
 	 * This is essential for Smart Transition and preventing duplicate active leads.
 	 *
