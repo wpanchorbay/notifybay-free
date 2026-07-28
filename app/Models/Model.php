@@ -195,10 +195,10 @@ abstract class Model {
 
 		// Table and primary-key column are bound as %i identifiers so nothing is
 		// interpolated into the SQL string.
-		$row = $wpdb->get_row(
+		$row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional for this real-time data-access layer.
 			$wpdb->prepare( 'SELECT * FROM %i WHERE %i = %d', $table, $pk, $id ),
 			ARRAY_A
-		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional for this real-time data-access layer.
+		);
 
 		if ( $row ) {
 			return new static( $row );
@@ -218,10 +218,10 @@ abstract class Model {
 		$table    = $instance->get_table();
 
 		// Table is bound as a %i identifier so nothing is interpolated into SQL.
-		$results = $wpdb->get_results(
+		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional for this real-time data-access layer.
 			$wpdb->prepare( 'SELECT * FROM %i', $table ),
 			ARRAY_A
-		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional for this real-time data-access layer.
+		);
 
 		$models = array();
 		foreach ( $results as $row ) {
@@ -284,23 +284,23 @@ abstract class Model {
 		// Count total. `$where_sql` holds only literal placeholder fragments
 		// (` AND %i = %s`), so interpolating it into the prepared string is the
 		// same bound-placeholder pattern used for `IN (...)` lists.
-		$total = (int) $wpdb->get_var( // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where_sql holds only prepared %i/%s fragments for allow-listed columns; the taint heuristic can't see that every identifier and value is bound.
+		$total = (int) $wpdb->get_var( // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional, and $where_sql holds only prepared %i/%s fragments so every identifier and value is bound.
 			$wpdb->prepare(
 				"SELECT COUNT(*) FROM %i WHERE 1=1{$where_sql}", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where_sql is a literal placeholder fragment; all values are bound below.
 				array_merge( array( $table ), $where_args )
 			)
-		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional for this real-time data-access layer.
+		);
 
 		// Fetch the page. The ORDER BY column is the model's hardcoded primary key,
 		// bound as a %i identifier.
 		$data_args = array_merge( array( $table ), $where_args, array( $instance->primary_key, $per_page, $offset ) );
-		$results   = $wpdb->get_results( // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where_sql holds only prepared %i/%s fragments for allow-listed columns; the taint heuristic can't see that every identifier and value is bound.
+		$results   = $wpdb->get_results( // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional, and $where_sql holds only prepared %i/%s fragments so every identifier and value is bound.
 			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $data_args is built at runtime (table + optional filters + primary key + limit/offset); its count always matches the placeholders.
 				"SELECT * FROM %i WHERE 1=1{$where_sql} ORDER BY %i DESC LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where_sql is a literal placeholder fragment; all values are bound.
 				$data_args
 			),
 			ARRAY_A
-		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional for this real-time data-access layer.
+		);
 
 		$models = array();
 		if ( $results ) {

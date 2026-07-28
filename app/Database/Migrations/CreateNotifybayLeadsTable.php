@@ -73,8 +73,8 @@ class CreateNotifybayLeadsTable implements MigrationInterface {
 	 */
 	public function down() {
 		global $wpdb;
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Custom {$wpdb->prefix}notifybay_leads table; the table name is bound as a %i identifier. Uninstall-time schema change.
-			$wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'notifybay_leads' )
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; the table name is bound as a %i identifier. Uninstall-time schema change.
+			$wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'notifybay_leads' ) // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange -- Uninstall-time DROP; table name bound as a %i identifier.
 		);
 	}
 }
