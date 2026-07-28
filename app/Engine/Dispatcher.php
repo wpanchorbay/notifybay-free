@@ -114,17 +114,34 @@ class Dispatcher {
 			return; // All stock is currently reserved; nobody to notify this run.
 		}
 
-		// 2. Query active leads for this product/variation
+		// 2. Query active leads for this product/variation. The two branches differ
+		// only by the optional LIMIT, kept in fully-literal queries so nothing is
+		// concatenated into the SQL. Table (%i) and all values are bound.
 		$table     = $wpdb->prefix . 'notifybay_leads';
 		$now_mysql = current_time( 'mysql' );
-		$sql       = "SELECT id FROM {$table} WHERE product_id = %d AND variation_id = %d AND type = 'waitlist' AND status = 'active' AND (expires_at IS NULL OR expires_at = '0000-00-00 00:00:00' OR expires_at > %s) ORDER BY created_at ASC";
-		$arguments = array( $product_id, $variation_id, $now_mysql );
-		if ( null !== $notify_limit && $notify_limit > 0 ) {
-			$sql        .= ' LIMIT %d';
-			$arguments[] = $notify_limit;
-		}
 
-		$lead_ids = $wpdb->get_col( $wpdb->prepare( $sql, $arguments ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
+		if ( null !== $notify_limit && $notify_limit > 0 ) {
+			$lead_ids = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional for this real-time dispatch loop.
+				$wpdb->prepare(
+					"SELECT id FROM %i WHERE product_id = %d AND variation_id = %d AND type = 'waitlist' AND status = 'active' AND (expires_at IS NULL OR expires_at = '0000-00-00 00:00:00' OR expires_at > %s) ORDER BY created_at ASC LIMIT %d",
+					$table,
+					$product_id,
+					$variation_id,
+					$now_mysql,
+					$notify_limit
+				)
+			);
+		} else {
+			$lead_ids = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional for this real-time dispatch loop.
+				$wpdb->prepare(
+					"SELECT id FROM %i WHERE product_id = %d AND variation_id = %d AND type = 'waitlist' AND status = 'active' AND (expires_at IS NULL OR expires_at = '0000-00-00 00:00:00' OR expires_at > %s) ORDER BY created_at ASC",
+					$table,
+					$product_id,
+					$variation_id,
+					$now_mysql
+				)
+			);
+		}
 
 		if ( empty( $lead_ids ) ) {
 
@@ -134,14 +151,12 @@ class Dispatcher {
 		// 4. Update status to 'processing' to lock them
 		$batch_id        = wp_generate_uuid4();
 		$ids_placeholder = implode( ',', array_fill( 0, count( $lead_ids ), '%d' ) );
-		// phpcs:disable WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
-			$wpdb->prepare(
-				"UPDATE {$table} SET status = 'processing', updated_at = %s, last_batch_id = %s WHERE id IN ({$ids_placeholder}) AND status = 'active'", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				array_merge( array( current_time( 'mysql' ), $batch_id ), $lead_ids )
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached bulk write is intentional for this real-time dispatch loop.
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- The IN() list is a runtime-sized %d placeholder set; the arg count always matches.
+				"UPDATE %i SET status = 'processing', updated_at = %s, last_batch_id = %s WHERE id IN ({$ids_placeholder}) AND status = 'active'", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $ids_placeholder is a literal list of %d placeholders; the table and every value are bound.
+				array_merge( array( $table, current_time( 'mysql' ), $batch_id ), $lead_ids )
 			)
 		);
-		// phpcs:enable
 
 		// 5. Enqueue worker jobs
 		foreach ( $lead_ids as $lead_id ) {

@@ -150,12 +150,17 @@ class AdminController extends ApiController {
 
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $as_table ) ) ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$groups_table = $wpdb->prefix . 'actionscheduler_groups';
-			$query        = "SELECT a.status, COUNT(*) as count 
-				 FROM {$as_table} a 
-				 LEFT JOIN {$groups_table} g ON a.group_id = g.group_id 
-				 WHERE g.slug = 'notifybay_alerts' 
-				 GROUP BY a.status";
-			$results      = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
+			$results      = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Action Scheduler tables; a direct, uncached read is intentional for this admin status widget.
+				$wpdb->prepare(
+					"SELECT a.status, COUNT(*) as count
+					 FROM %i a
+					 LEFT JOIN %i g ON a.group_id = g.group_id
+					 WHERE g.slug = 'notifybay_alerts'
+					 GROUP BY a.status",
+					$as_table,
+					$groups_table
+				)
+			);
 			foreach ( $results as $res ) {
 				$jobs[ $res->status ] = (int) $res->count;
 			}
@@ -163,10 +168,14 @@ class AdminController extends ApiController {
 
 		// Failed Leads
 		$lead_table   = $wpdb->prefix . 'notifybay_leads';
-		$failed_leads = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$lead_table} WHERE status = 'failed'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
+		$failed_leads = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional for this admin status widget.
+			$wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE status = 'failed'", $lead_table )
+		);
 
 		// Processing Leads (potentially stuck)
-		$processing_leads = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$lead_table} WHERE status = 'processing'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
+		$processing_leads = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional for this admin status widget.
+			$wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE status = 'processing'", $lead_table )
+		);
 
 		return rest_ensure_response(
 			array(
@@ -290,11 +299,19 @@ class AdminController extends ApiController {
 		$ids_placeholder = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
 
 		if ( 'delete' === $action ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- {$table} is internal; IN() uses %d placeholders built from the id count; $ids bound via prepare(). Bulk write, no cache.
-			$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE id IN ({$ids_placeholder})", $ids ) ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
+			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached bulk write is intentional for this admin action.
+				$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- The IN() list is a runtime-sized %d placeholder set (one per id); the arg count always matches.
+					"DELETE FROM %i WHERE id IN ({$ids_placeholder})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $ids_placeholder is a literal list of %d placeholders; the table and every id are bound.
+					array_merge( array( $table ), $ids )
+				)
+			);
 		} elseif ( in_array( $action, array( 'active', 'expired', 'unsubscribed' ), true ) ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- {$table} is internal; IN() uses %d placeholders; status/date/ids bound via prepare(). Bulk write, no cache.
-			$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET status = %s, updated_at = %s WHERE id IN ({$ids_placeholder})", array_merge( array( $action, current_time( 'mysql' ) ), $ids ) ) ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
+			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached bulk write is intentional for this admin action.
+				$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- The IN() list is a runtime-sized %d placeholder set; the arg count always matches.
+					"UPDATE %i SET status = %s, updated_at = %s WHERE id IN ({$ids_placeholder})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $ids_placeholder is a literal list of %d placeholders; the table and every value are bound.
+					array_merge( array( $table, $action, current_time( 'mysql' ) ), $ids )
+				)
+			);
 		}
 
 		return rest_ensure_response( array( 'success' => true ) );
@@ -335,7 +352,10 @@ class AdminController extends ApiController {
 		global $wpdb;
 		$lead_model = new Lead();
 		$table      = $lead_model->get_table();
-		$leads = $wpdb->get_results("SELECT * FROM {$table} ORDER BY created_at DESC", ARRAY_A); // phpcs:ignore
+		$leads      = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional for this admin CSV export.
+			$wpdb->prepare( 'SELECT * FROM %i ORDER BY created_at DESC', $table ),
+			ARRAY_A
+		);
 
 		foreach ( $leads as $lead ) {
 			fputcsv(

@@ -38,6 +38,16 @@ copy_plugin_files() {
     cp -r assets "$DEST/"
     cp -r build "$DEST/"
     cp -r vendor "$DEST/"
+    # Ship the human-readable JS/CSS source and the build tooling alongside the
+    # compiled build/ output, so the wordpress.org "code must be human-readable"
+    # guideline is satisfied from inside the package itself (not only via the
+    # readme's repository link). node_modules is intentionally never bundled.
+    cp -r src "$DEST/"
+    cp package.json "$DEST/"
+    cp webpack.config.js "$DEST/"
+    cp tsconfig.json "$DEST/"
+    cp postcss.config.js "$DEST/"
+    cp tailwind.config.js "$DEST/"
     # The plugin-update-checker library is only used by NotifyBay Pro (self-hosted
     # updates). The free wp.org build must not ship it — repo plugins update via
     # wordpress.org, not a bundled updater.
@@ -59,10 +69,12 @@ copy_plugin_files "dist/wordpress/$PLUGIN_SLUG"
 copy_plugin_files "dist/woocommerce/$PLUGIN_SLUG"
 
 # 5. Create WordPress Zip
+# The wp.org build puts the plugin files at the ROOT of the zip (no wrapping
+# slug folder), so the archive contents map directly onto SVN trunk/.
 echo "Step 4: Creating WordPress zip..."
-cd dist/wordpress
-zip -r "$ZIP_NAME" "$PLUGIN_SLUG" > /dev/null
-cd ../..
+cd "dist/wordpress/$PLUGIN_SLUG"
+zip -r "../$ZIP_NAME" . > /dev/null
+cd ../../..
 # Remove the staging folder after zipping to leave only the zip in the subfolder
 rm -rf "dist/wordpress/$PLUGIN_SLUG"
 
@@ -79,5 +91,6 @@ echo "Done! Packages created successfully:"
 echo "- dist/wordpress/$ZIP_NAME"
 echo "- dist/woocommerce/$ZIP_NAME"
 echo ""
-echo "Note: The zip files now contain the required parent directory '$PLUGIN_SLUG'."
+echo "Note: The WordPress zip has files at the root (no '$PLUGIN_SLUG' folder);"
+echo "      the WooCommerce zip wraps them in the '$PLUGIN_SLUG' folder."
 echo "------------------------------------------------------"

@@ -93,7 +93,8 @@ class Endpoints {
 
 		$lead = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}notifybay_leads WHERE verification_token = %s AND status = 'pending_verification'", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT * FROM %i WHERE verification_token = %s AND status = 'pending_verification'",
+				$table,
 				$token
 			)
 		);
@@ -134,7 +135,8 @@ class Endpoints {
 
 		$lead = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}notifybay_leads WHERE verification_token = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				'SELECT * FROM %i WHERE verification_token = %s',
+				$table,
 				$token
 			)
 		);

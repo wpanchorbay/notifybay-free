@@ -222,7 +222,8 @@ class FrontendController extends ApiController {
 
 			$is_subscribed_waitlist = (bool) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 				$wpdb->prepare(
-					"SELECT id FROM {$wpdb->prefix}notifybay_leads WHERE product_id = %d AND variation_id = %d AND user_email = %s AND type = 'waitlist' AND status IN ('active', 'pending_verification')", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					"SELECT id FROM %i WHERE product_id = %d AND variation_id = %d AND user_email = %s AND type = 'waitlist' AND status IN ('active', 'pending_verification')",
+					$wpdb->prefix . 'notifybay_leads',
 					$product_id,
 					$check_variation,
 					$user_email

@@ -54,11 +54,13 @@ No. NotifyBay's Fair-Play dispatch engine calculates how much stock is actually 
 
 == Source Code ==
 
-The compiled JavaScript in the `build/` directory is generated from human-readable source in the `src/` directory using [@wordpress/scripts](https://www.npmjs.com/package/@wordpress/scripts) (webpack). The full, unminified source code and the build tooling are publicly available at:
+The compiled JavaScript in the `build/` directory is generated from human-readable source using [@wordpress/scripts](https://www.npmjs.com/package/@wordpress/scripts) (webpack). The full, unminified source (the `src/` directory) and the build tooling (`package.json`, `webpack.config.js`, `tsconfig.json`, `postcss.config.js`, `tailwind.config.js`) are **included in this package**, alongside the compiled `build/` output.
+
+The same source is also published publicly at:
 
 https://github.com/wpanchorbay/notifybay-free/tree/1.0.0
 
-To rebuild the compiled assets from source: run `npm install`, then `npm run build` (or `bash build.sh`).
+To rebuild the compiled assets from source: run `npm install`, then `npm run build`.
 
 == Changelog ==
 

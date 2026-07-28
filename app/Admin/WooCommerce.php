@@ -93,7 +93,8 @@ class WooCommerce {
 		global $wpdb;
 		$count = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$wpdb->prefix}notifybay_leads WHERE product_id = %d AND status = 'active' AND type = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT COUNT(*) FROM %i WHERE product_id = %d AND status = 'active' AND type = %s",
+				$wpdb->prefix . 'notifybay_leads',
 				$post_id,
 				'waitlist'
 			)
