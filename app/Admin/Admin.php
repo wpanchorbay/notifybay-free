@@ -164,21 +164,46 @@ class Admin {
 	 * @return void
 	 */
 	public function redirect_to_dashboard() {
+		wp_safe_redirect( $this->get_admin_page_url() );
+		exit;
+	}
+
+	/**
+	 * Build the URL of the plugin's main admin screen.
+	 *
+	 * The screen is registered either as a top-level menu or as a submenu of
+	 * another screen. Those two cases produce different URLs, and a submenu
+	 * cannot be reached through `admin.php` at all — WordPress looks the page
+	 * up under its registered parent, so `admin.php?page=notifybay-products`
+	 * resolves to a permissions error rather than the Leads screen. Build the
+	 * URL from the same `config/admin.php` data that registered the menu so
+	 * the two can never drift apart.
+	 *
+	 * @access public
+	 * @since 1.0.0
+	 * @return string Absolute admin URL.
+	 */
+	public function get_admin_page_url() {
 		$config      = $this->get_config();
 		$menu_config = $config['menu'] ?? array();
 		$show_main   = $config['show_main_menu'] ?? true;
 
-		$slug = \NOTIFYBAY_PLUGIN_NAME;
-
 		if ( $show_main && ! empty( $menu_config['top_level']['menu_slug'] ) ) {
-			$slug = $menu_config['top_level']['menu_slug'];
-		} elseif ( ! empty( $menu_config['sub_menus'][0]['menu_slug'] ) ) {
-			$slug = $menu_config['sub_menus'][0]['menu_slug'];
+			return admin_url( 'admin.php?page=' . $menu_config['top_level']['menu_slug'] );
 		}
 
-		$redirect_url = admin_url( 'admin.php?page=' . $slug );
-		wp_safe_redirect( $redirect_url );
-		exit;
+		if ( ! empty( $menu_config['sub_menus'][0]['menu_slug'] ) ) {
+			$slug   = $menu_config['sub_menus'][0]['menu_slug'];
+			$parent = $menu_config['sub_menus'][0]['parent_slug'] ?? 'admin.php';
+
+			// A parent such as `edit.php?post_type=product` already carries a
+			// query string, so `page` must be appended with `&`, not `?`.
+			$separator = ( false === strpos( $parent, '?' ) ) ? '?' : '&';
+
+			return admin_url( $parent . $separator . 'page=' . $slug );
+		}
+
+		return admin_url( 'admin.php?page=' . \NOTIFYBAY_PLUGIN_NAME );
 	}
 
 	/**
@@ -292,7 +317,6 @@ class Admin {
 		wp_enqueue_style( $handle, $admin_css, array(), $version );
 		wp_style_add_data( $handle, 'rtl', 'replace' );
 
-		$config   = $this->get_config();
 		$localize = apply_filters(
 			'notifybay_admin_localize',
 			array(
@@ -309,17 +333,7 @@ class Admin {
 				'plugin_settings' => Settings::get_instance()->get_settings(),
 				'products_url'    => admin_url( 'edit.php?post_type=product' ),
 				'settings_url'    => admin_url( 'admin.php?page=wc-settings&tab=' . \NOTIFYBAY_PLUGIN_NAME ),
-				'admin_url'       => ( function () use ( $config ) {
-					$menu_config = $config['menu'] ?? array();
-					$show_main   = $config['show_main_menu'] ?? true;
-					$slug = \NOTIFYBAY_PLUGIN_NAME;
-					if ( $show_main && ! empty( $menu_config['top_level']['menu_slug'] ) ) {
-						$slug = $menu_config['top_level']['menu_slug'];
-					} elseif ( ! empty( $menu_config['sub_menus'][0]['menu_slug'] ) ) {
-						$slug = $menu_config['sub_menus'][0]['menu_slug'];
-					}
-					return admin_url( 'admin.php?page=' . $slug );
-				} )(),
+				'admin_url'       => $this->get_admin_page_url(),
 				'wc_emails_url'   => admin_url( 'admin.php?page=wc-settings&tab=email' ),
 				'show_wizard'     => 'yes' !== get_option( 'notifybay_wizard_completed' ),
 				'is_pro'          => defined( 'NOTIFYBAY_PRO_VERSION' ),

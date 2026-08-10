@@ -8,7 +8,6 @@ export interface PluginData {
 	plugin_name: string;
 	short_name: string;
 	menu_label: string;
-	custom_icon: string;
 	menu_icon: string;
 	author_name: string;
 	author_uri: string;

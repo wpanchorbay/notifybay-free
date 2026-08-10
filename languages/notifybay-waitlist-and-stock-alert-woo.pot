@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-23T10:57:26+00:00\n"
+"POT-Creation-Date: 2026-08-09T06:28:22+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: notifybay-waitlist-and-stock-alert-woo\n"
@@ -48,28 +48,28 @@ msgstr ""
 msgid "Waitlist"
 msgstr ""
 
-#: app/Admin/WooCommerce.php:135
+#: app/Admin/WooCommerce.php:136
 msgid "NotifyBay Settings"
 msgstr ""
 
-#: app/Api/AdminController.php:231
-#: app/Api/AdminController.php:263
+#: app/Api/AdminController.php:240
+#: app/Api/AdminController.php:272
 msgid "Lead not found."
 msgstr ""
 
-#: app/Api/AdminController.php:249
+#: app/Api/AdminController.php:258
 msgid "Could not update lead."
 msgstr ""
 
-#: app/Api/AdminController.php:270
+#: app/Api/AdminController.php:279
 msgid "Could not delete lead."
 msgstr ""
 
-#: app/Api/AdminController.php:284
+#: app/Api/AdminController.php:293
 msgid "No IDs provided."
 msgstr ""
 
-#: app/Api/AdminController.php:308
+#: app/Api/AdminController.php:325
 msgid "Forbidden"
 msgstr ""
 
@@ -99,53 +99,53 @@ msgstr ""
 msgid "Invalid data provided."
 msgstr ""
 
-#: app/Api/FrontendController.php:105
+#: app/Api/FrontendController.php:138
 msgid "Invalid product IDs."
 msgstr ""
 
-#: app/Api/FrontendController.php:146
+#: app/Api/FrontendController.php:185
 msgid "Invalid product ID."
 msgstr ""
 
-#: app/Api/FrontendController.php:151
+#: app/Api/FrontendController.php:190
 msgid "Product not found."
 msgstr ""
 
-#: app/Api/FrontendController.php:265
+#: app/Api/FrontendController.php:312
 msgid "Too many requests. Please try again later."
 msgstr ""
 
 #. translators: %s: lead type
-#: app/Api/FrontendController.php:315
+#: app/Api/FrontendController.php:370
 #, php-format
 msgid "[NotifyBay] New %s signup"
 msgstr ""
 
-#: app/Api/FrontendController.php:329
+#: app/Api/FrontendController.php:384
 msgid "Please check your email to verify your subscription."
 msgstr ""
 
-#: app/Api/FrontendController.php:334
+#: app/Api/FrontendController.php:389
 msgid "Successfully subscribed! You will be notified as soon as possible."
 msgstr ""
 
-#: app/Api/FrontendController.php:371
+#: app/Api/FrontendController.php:430
 msgid "Could not process subscription. Please try again."
 msgstr ""
 
-#: app/Api/FrontendController.php:385
+#: app/Api/FrontendController.php:444
 msgid "Invalid lead ID."
 msgstr ""
 
-#: app/Api/FrontendController.php:390
+#: app/Api/FrontendController.php:449
 msgid "You must be logged in to manage subscriptions."
 msgstr ""
 
-#: app/Api/FrontendController.php:413
+#: app/Api/FrontendController.php:472
 msgid "Unsubscribed successfully."
 msgstr ""
 
-#: app/Api/FrontendController.php:430
+#: app/Api/FrontendController.php:489
 msgid "Subscription not found or already removed."
 msgstr ""
 
@@ -299,58 +299,58 @@ msgstr ""
 msgid "Invalid verification token."
 msgstr ""
 
-#: app/Frontend/Endpoints.php:102
+#: app/Frontend/Endpoints.php:103
 msgid "Invalid or expired verification link."
 msgstr ""
 
-#: app/Frontend/Endpoints.php:115
+#: app/Frontend/Endpoints.php:116
 msgid "Email verified successfully! You will now receive notifications."
 msgstr ""
 
-#: app/Frontend/Endpoints.php:116
+#: app/Frontend/Endpoints.php:117
 msgid "Verification Successful"
 msgstr ""
 
-#: app/Frontend/Endpoints.php:128
+#: app/Frontend/Endpoints.php:129
 msgid "Invalid unsubscribe token."
 msgstr ""
 
-#: app/Frontend/Endpoints.php:143
+#: app/Frontend/Endpoints.php:145
 msgid "Unsubscribe failed. Lead not found."
 msgstr ""
 
-#: app/Frontend/Endpoints.php:156
+#: app/Frontend/Endpoints.php:158
 msgid "You have been successfully unsubscribed from this alert."
 msgstr ""
 
-#: app/Frontend/Endpoints.php:157
+#: app/Frontend/Endpoints.php:159
 #: build/admin.js:13
 msgid "Unsubscribed"
 msgstr ""
 
-#: app/Frontend/Endpoints.php:170
-#: app/Frontend/Endpoints.php:191
-#: app/Frontend/Endpoints.php:228
+#: app/Frontend/Endpoints.php:172
+#: app/Frontend/Endpoints.php:193
+#: app/Frontend/Endpoints.php:230
 msgid "NotifyBay Leads"
 msgstr ""
 
-#: app/Frontend/Endpoints.php:195
+#: app/Frontend/Endpoints.php:197
 #: build/admin.js:13
 msgid "Email"
 msgstr ""
 
-#: app/Frontend/Endpoints.php:199
+#: app/Frontend/Endpoints.php:201
 msgid "Product ID"
 msgstr ""
 
-#: app/Frontend/Endpoints.php:203
+#: app/Frontend/Endpoints.php:205
 #: templates/frontend/waitlist.php:29
 #: templates/frontend/waitlist.php:52
 #: build/admin.js:13
 msgid "Status"
 msgstr ""
 
-#: app/Frontend/Endpoints.php:207
+#: app/Frontend/Endpoints.php:209
 msgid "Created"
 msgstr ""
 
@@ -359,7 +359,8 @@ msgstr ""
 #: config/admin.php:104
 #: config/admin.php:105
 #: config/admin.php:106
-#: notifybay-waitlist-and-stock-alert-woo.php:71
+#: notifybay-waitlist-and-stock-alert-woo.php:75
+#: notifybay-waitlist-and-stock-alert-woo.php:123
 #: build/admin.js:13
 msgid "NotifyBay"
 msgstr ""
@@ -387,8 +388,117 @@ msgstr ""
 msgid "Rate ★★★★★"
 msgstr ""
 
-#: notifybay-waitlist-and-stock-alert-woo.php:72
+#: notifybay-waitlist-and-stock-alert-woo.php:76
 msgid "requires WooCommerce to be installed and active."
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:126
+msgid "Quick question before you go"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:127
+msgid "If you have a moment, let us know why you're deactivating so we can improve NotifyBay."
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:128
+#: build/admin.js:13
+msgid "Cancel"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:129
+msgid "Skip & Deactivate"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:130
+msgid "Submit & Deactivate"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:133
+msgid "What information is sent?"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:134
+msgid "Pressing \"Submit & Deactivate\" sends the reason you select and any note you type, along with your site address, the email address of your account, and your WordPress version, to wpanchorbay.com. Pressing \"Skip & Deactivate\" sends nothing."
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:139
+msgid "I couldn't get it working"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:141
+msgid "What were you trying to configure?"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:145
+msgid "It's missing a feature I need"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:147
+msgid "What feature?"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:151
+msgid "It conflicted with my theme or another plugin"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:153
+msgid "Which theme/plugin?"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:157
+msgid "It slowed down my site"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:159
+msgid "Please describe what felt slow"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:163
+msgid "Restock emails weren't reaching my customers"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:165
+msgid "What did you see happen?"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:169
+msgid "I found a better alternative"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:171
+msgid "Which plugin?"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:175
+msgid "It's too complicated to set up"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:177
+msgid "What part was confusing?"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:181
+msgid "I no longer need waitlists on my store"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:186
+msgid "It's temporary — I'm troubleshooting/debugging"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:191
+msgid "Other"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:193
+msgid "Please share the reason"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:202
+msgid "Enjoying NotifyBay?"
+msgstr ""
+
+#: notifybay-waitlist-and-stock-alert-woo.php:203
+msgid "You've been using NotifyBay for a few days now. If it's been helpful, would you mind leaving a quick review? It really helps!"
 msgstr ""
 
 #: templates/admin/meta-box-overrides.php:21
@@ -678,10 +788,6 @@ msgstr ""
 
 #: build/admin.js:13
 msgid "Failed"
-msgstr ""
-
-#: build/admin.js:13
-msgid "Cancel"
 msgstr ""
 
 #: build/admin.js:13

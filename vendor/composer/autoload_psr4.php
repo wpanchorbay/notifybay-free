@@ -6,6 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'WPAB\\DeactivationFeedback\\' => array($vendorDir . '/deactivation-feedback/src'),
     'Rakit\\Validation\\' => array($vendorDir . '/rakit/validation/src'),
     'NotifyBay\\' => array($baseDir . '/app'),
 );

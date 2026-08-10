@@ -104,7 +104,6 @@ return array(
 		'plugin_name' => esc_html__( 'NotifyBay', 'notifybay-waitlist-and-stock-alert-woo' ),
 		'short_name'  => esc_html__( 'NotifyBay', 'notifybay-waitlist-and-stock-alert-woo' ),
 		'menu_label'  => esc_html__( 'NotifyBay', 'notifybay-waitlist-and-stock-alert-woo' ),
-		'custom_icon' => \NOTIFYBAY_URL . 'assets/img/icon.svg',
 		'menu_icon'   => 'dashicons-admin-plugins',
 		'author_name' => 'WPAnchorBay',
 		'author_uri'  => 'https://wpanchorbay.com',

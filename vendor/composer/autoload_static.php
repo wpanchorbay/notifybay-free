@@ -7,6 +7,10 @@ namespace Composer\Autoload;
 class ComposerStaticInitNotifybayUniqueHash
 {
     public static $prefixLengthsPsr4 = array (
+        'W' => 
+        array (
+            'WPAB\\DeactivationFeedback\\' => 26,
+        ),
         'R' => 
         array (
             'Rakit\\Validation\\' => 17,
@@ -18,6 +22,10 @@ class ComposerStaticInitNotifybayUniqueHash
     );
 
     public static $prefixDirsPsr4 = array (
+        'WPAB\\DeactivationFeedback\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/deactivation-feedback/src',
+        ),
         'Rakit\\Validation\\' => 
         array (
             0 => __DIR__ . '/..' . '/rakit/validation/src',

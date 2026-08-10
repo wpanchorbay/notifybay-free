@@ -10,13 +10,14 @@
         }
     ],
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.4",
         "rakit/validation": "^1.4",
         "woocommerce/action-scheduler": "^3.9"
     },
     "autoload": {
         "psr-4": {
-            "NotifyBay\\": "app/"
+            "NotifyBay\\": "app/",
+            "WPAB\\DeactivationFeedback\\": "vendor/deactivation-feedback/src/"
         }
     }
 }

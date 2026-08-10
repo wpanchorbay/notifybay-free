@@ -10,13 +10,23 @@ set -e
 PLUGIN_SLUG="notifybay-waitlist-and-stock-alert-woo"
 ZIP_NAME="$PLUGIN_SLUG.zip"
 
+# Single source of truth for the version: the plugin header. Passing it through
+# to build.sh keeps the "Source Code:" URL injected into build/*.js pointing at
+# the tag actually being released — build.sh otherwise silently falls back to
+# its hardcoded 1.0.0 default and the header rots on every future release.
+VERSION=$(grep -m1 -oP '^\s*\*\s*Version:\s*\K[0-9a-zA-Z.\-]+' "$PLUGIN_SLUG.php")
+if [ -z "$VERSION" ]; then
+	echo "ERROR: could not read Version from $PLUGIN_SLUG.php" >&2
+	exit 1
+fi
+
 echo "------------------------------------------------------"
 echo "  Packaging $PLUGIN_SLUG..."
 echo "------------------------------------------------------"
 
 # 1. Run the build script
 echo "Step 1: Running build process..."
-bash build.sh
+bash build.sh "$VERSION"
 
 # 2. Cleanup previous distribution if exists
 echo "Step 2: Cleaning up old files..."
