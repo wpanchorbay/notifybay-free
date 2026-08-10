@@ -178,10 +178,8 @@ class WooCommerce {
 		}
 
 		$overrides = array(
-			'disable_waitlist'  => isset( $_POST['notifybay_disable_waitlist'] ),
-			'smart_transition'  => sanitize_text_field( wp_unslash( $_POST['notifybay_smart_transition'] ?? 'default' ) ),
-			'backorder_mode'    => sanitize_text_field( wp_unslash( $_POST['notifybay_backorder_mode'] ?? 'default' ) ),
-			'max_waitlist_size' => isset( $_POST['notifybay_max_waitlist_size'] ) ? (int) wp_unslash( $_POST['notifybay_max_waitlist_size'] ) : '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- value is cast to (int); the isset() presence checks above need no sanitization. Nonce/capability verified at the top of this handler.
+			'disable_waitlist' => isset( $_POST['notifybay_disable_waitlist'] ),
+			'backorder_mode'   => sanitize_text_field( wp_unslash( $_POST['notifybay_backorder_mode'] ?? 'default' ) ),
 		);
 
 		/**

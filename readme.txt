@@ -67,7 +67,7 @@ Capping notifications to the number of units actually restocked — the Fair-Pla
 7. The Products list gains a Waitlist column showing pent-up demand for every product at a glance.
 8. Customers manage their own subscriptions from a dedicated Waitlist tab in WooCommerce My Account.
 9. A guided setup wizard gets the waitlist live in a few steps.
-10. Per-product NotifyBay settings, including backorder behaviour and a maximum waitlist size.
+10. Per-product NotifyBay settings, including a per-product waitlist disable switch and backorder behaviour override.
 11. Restock and verification emails are native WooCommerce emails, editable under WooCommerce → Settings → Emails.
 
 == External services ==
