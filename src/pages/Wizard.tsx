@@ -134,10 +134,15 @@ const Wizard: React.FC = () => {
       body: (
         <div className="notifybay-flex notifybay-flex-col notifybay-gap-[8px]">
           <p className="notifybay-text-gray-600">
-            {__(
-              "NotifyBay adds its button to product pages automatically. To place it elsewhere, use the block or shortcode:",
-              "notifybay-waitlist-and-stock-alert-woo",
-            )}
+            {isPro
+              ? __(
+                  "NotifyBay adds its button to product pages automatically. To place it elsewhere, use the NotifyBay Waitlist block or the shortcode:",
+                  "notifybay-waitlist-and-stock-alert-woo",
+                )
+              : __(
+                  "NotifyBay adds its button to product pages automatically. To place it elsewhere, use the shortcode:",
+                  "notifybay-waitlist-and-stock-alert-woo",
+                )}
           </p>
           <code className="notifybay-bg-gray-100 notifybay-p-[8px] notifybay-rounded-[6px]">
             [notifybay_waitlist]
