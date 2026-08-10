@@ -6,7 +6,7 @@
  * Requires at least: 6.8
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            WPAnchorBay
  * Author URI:        https://wpanchorbay.com
  * License:           GPLv2 or later
@@ -25,7 +25,7 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'NOTIFYBAY_PATH', plugin_dir_path( __FILE__ ) );
 define( 'NOTIFYBAY_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NOTIFYBAY_URL', plugin_dir_url( __FILE__ ) );
-define( 'NOTIFYBAY_VERSION', '1.0.0' );
+define( 'NOTIFYBAY_VERSION', '1.0.1' );
 // Database schema version. Bump whenever the custom table structure changes so
 // the schema is re-applied on plugin UPDATE (activation hooks do not fire on an
 // in-place update). '2' adds the leads.guest_token column.

@@ -4,7 +4,7 @@ Tags: woocommerce, waitlist, back-in-stock, stock-alert, inventory
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -88,16 +88,22 @@ The compiled JavaScript in the `build/` directory is generated from human-readab
 
 The same source is also published publicly at:
 
-https://github.com/wpanchorbay/notifybay-free/tree/1.0.0
+https://github.com/wpanchorbay/notifybay-free/tree/1.0.1
 
 To rebuild the compiled assets from source: run `npm install`, then `npm run build`.
 
 == Changelog ==
 
+= 1.0.1 =
+* Fix: the `templates/` directory (required to render the Leads Settings admin screen, product-column lead counts, and per-product override meta box) was missing from the packaged release, leaving those screens blank. Packaging now includes it correctly.
+
 = 1.0.0 =
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+Fixes a blank Leads Settings screen under WooCommerce → Settings caused by missing template files in the 1.0.0 package.
 
 = 1.0.0 =
 Initial release.
