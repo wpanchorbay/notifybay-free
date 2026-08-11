@@ -7,6 +7,7 @@ import { SkeletonSettings } from "../components/loading/SkeletonSettings";
 import { TopProgressBar } from "../components/loading/TopProgressBar";
 import apiFetch from "../utils/apiFetch";
 import { PluginSettings } from "../utils/types";
+import { useWpabStore } from "../store/wpabStore";
 
 // Import modular tab components
 import { GeneralTab } from "../components/settings/tabs/GeneralTab";
@@ -15,8 +16,10 @@ import { EngineTab } from "../components/settings/tabs/EngineTab";
 import { EmailTab } from "../components/settings/tabs/EmailTab";
 import { StatusTab } from "../components/settings/tabs/StatusTab";
 import { AdvancedTab } from "../components/settings/tabs/AdvancedTab";
+import { ProPreviewSections } from "../components/settings/ProPreviewSections";
 
 const Settings: React.FC = () => {
+  const { is_pro: isPro } = useWpabStore();
   const [settings, setSettings] = useState<PluginSettings | null>(null);
   const [originalSettings, setOriginalSettings] =
     useState<PluginSettings | null>(null);
@@ -311,6 +314,14 @@ const Settings: React.FC = () => {
             settings,
             setSettings,
           ) as React.ReactNode)}
+
+        {/*
+          Free users get a disabled, greyed-out preview of every Pro settings
+          section in the exact spot Pro would inject the real one — see
+          ProPreviewSections. Once Pro is active this never renders (isPro),
+          and the filter below renders the real section in the same slot.
+        */}
+        {!isPro && <ProPreviewSections tab={activeTab} />}
 
         {/*
           Lets a premium add-on (NotifyBay Pro) inject extra sections (e.g. a

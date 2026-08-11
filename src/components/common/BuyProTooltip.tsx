@@ -86,7 +86,7 @@ export const BuyProTooltip: React.FC< BuyProTooltipProps > = ( {
 							{ __( 'Upgrade to unlock', 'notifybay-waitlist-and-stock-alert-woo' ) }
 						</span>
 						<a
-							href={ store.pluginData?.support_uri || '#' }
+							href={ store.pluginData?.buy_pro_url || '#' }
 							target="_blank"
 							rel="noopener noreferrer"
 							className="notifybay-w-full notifybay-bg-[#f02a74] hover:!notifybay-bg-[#e71161] notifybay-text-white hover:!notifybay-text-white notifybay-font-bold notifybay-py-1.5 notifybay-px-3 notifybay-transition-colors focus:notifybay-outline-none focus:notifybay-ring-0 notifybay-cursor-pointer notifybay-text-center notifybay-no-underline"

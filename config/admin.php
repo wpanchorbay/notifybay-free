@@ -14,6 +14,10 @@
 // Prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+// Defined once and reused below (plugin_action_links + plugin_data) so the
+// two never drift apart.
+$notifybay_buy_pro_url = 'https://wpanchorbay.com/plugins/notifybay-waitlist-and-stock-alert-for-woocommerce/#pricing';
+
 return array(
 
 	/**
@@ -67,6 +71,18 @@ return array(
 	 * These links appear next to "Activate/Deactivate" on the WordPress Plugins page.
 	 */
 	'plugin_action_links' => array(
+		// Keyed 'upgrade' on purpose: NotifyBay Pro's
+		// remove_free_upgrade_link() (app/Core/Plugin.php) unsets this exact
+		// key once Pro is active, so an already-paying customer never sees an
+		// upgrade nag on their own plugin row. Do not rename this key without
+		// updating that removal too.
+		array(
+			'key'    => 'upgrade',
+			'text'   => __( 'Upgrade to Pro', 'notifybay-waitlist-and-stock-alert-woo' ),
+			'url'    => $notifybay_buy_pro_url,
+			'target' => '_blank',
+			'style'  => 'color:#f02a74;font-weight:600;',
+		),
 		array(
 			'text' => __( 'Settings', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'url'  => admin_url( 'admin.php?page=wc-settings&tab=' . \NOTIFYBAY_PLUGIN_NAME ),
@@ -109,6 +125,7 @@ return array(
 		'author_uri'  => 'https://wpanchorbay.com',
 		'support_uri' => 'https://wpanchorbay.com/support/',
 		'docs_uri'    => 'https://docs.wpanchorbay.com/notifybay/',
+		'buy_pro_url' => $notifybay_buy_pro_url,
 		'position'    => 57,
 	),
 );

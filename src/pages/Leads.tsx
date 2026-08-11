@@ -12,6 +12,7 @@ import CustomModal from "../components/common/CustomModal";
 import { ClassicInput, ClassicSelect, ClassicSettingsTable, ClassicCheckbox } from "../components/classics";
 import { useToast } from "../store/toast/use-toast";
 import { LeadData } from "../utils/types";
+import { BuyProTooltip } from "../components/common/BuyProTooltip";
 
 interface PaginationResponse {
   data: LeadData[];
@@ -133,11 +134,8 @@ const Leads: FC = () => {
   };
 
   const handleExport = () => {
-    const url = `${
-      (window as any).notifybay.rest_url
-    }notifybay/v1/admin/leads/export?_wpnonce=${
-      (window as any).notifybay.nonce
-    }`;
+    const baseUrl = store.rest_url.endsWith("/") ? store.rest_url : `${store.rest_url}/`;
+    const url = `${baseUrl}admin/leads/export?_wpnonce=${store.nonce}`;
     window.open(url, "_blank");
   };
 
@@ -265,6 +263,15 @@ const Leads: FC = () => {
                   {opt.label}
                 </option>
               ))}
+              {!store.is_pro && (
+                <option
+                  value=""
+                  disabled
+                  data-notifybay-pro-preview="leads-resend-bulk"
+                >
+                  {__("Resend failed (Pro)", "notifybay-waitlist-and-stock-alert-woo")}
+                </option>
+              )}
             </select>
             <button
               type="button"
@@ -473,6 +480,24 @@ const Leads: FC = () => {
                     {applyFilters("notifybay_lead_row_actions", null, item, {
                       refresh: () => fetchLeads(currentPage, searchTerm),
                     }) as ReactNode}
+                    {!store.is_pro && item.status === "failed" && (
+                      <span
+                        className="notifybay-resend notifybay-pro-locked"
+                        data-notifybay-pro-preview="leads-resend"
+                      >
+                        {" | "}
+                        <BuyProTooltip>
+                          <button
+                            type="button"
+                            className="button-link"
+                            disabled
+                            style={{ opacity: 0.5, cursor: "not-allowed" }}
+                          >
+                            {__("Resend", "notifybay-waitlist-and-stock-alert-woo")}
+                          </button>
+                        </BuyProTooltip>
+                      </span>
+                    )}
                   </div>
                   <button type="button" className="toggle-row">
                     <span className="screen-reader-text">{__("Show more details", "notifybay-waitlist-and-stock-alert-woo")}</span>

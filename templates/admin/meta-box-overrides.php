@@ -33,6 +33,29 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param array $overrides The current product-level overrides.
  */
 do_action( 'notifybay_product_overrides_meta_box', $overrides );
+
+// Free-only: a disabled preview of Pro's "Disable Wishlist" override field, so
+// a free user can see what NotifyBay Pro adds here. Once Pro is active, the
+// action above renders the real, functional field in this same spot instead.
+if ( ! defined( 'NOTIFYBAY_PRO_VERSION' ) ) :
+	$notifybay_admin_config = include \NOTIFYBAY_PATH . 'config/admin.php';
+	$buy_pro_url            = $notifybay_admin_config['plugin_data']['buy_pro_url'] ?? '#';
+	?>
+	<p data-notifybay-pro-preview="disable-wishlist" style="opacity:.6;cursor:not-allowed;">
+		<label>
+			<input type="checkbox" value="1" disabled>
+			<?php esc_html_e( 'Disable Wishlist', 'notifybay-waitlist-and-stock-alert-woo' ); ?>
+			<span class="notifybay-pro-badge" style="display:inline-block;margin-left:6px;padding:1px 6px;border-radius:10px;background:#f02a74;color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;vertical-align:middle;">
+				<?php esc_html_e( 'Pro', 'notifybay-waitlist-and-stock-alert-woo' ); ?>
+			</span>
+		</label>
+		<br>
+		<a href="<?php echo esc_url( $buy_pro_url ); ?>" target="_blank" rel="noopener" style="font-size:11px;color:#f02a74;">
+			<?php esc_html_e( 'Unlock with Pro', 'notifybay-waitlist-and-stock-alert-woo' ); ?>
+		</a>
+	</p>
+	<?php
+endif;
 ?>
 
 <p>

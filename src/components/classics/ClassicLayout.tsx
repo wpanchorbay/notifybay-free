@@ -31,9 +31,22 @@ const ClassicLayout: FC = () => {
 	return (
 		<div className="">
 			{ context !== 'settings' && (
-				<h1 className="notifybay-ignore-preflight notifybay-font-[600] notifybay-text-[16px] notifybay-p-x-page-default notifybay-bg-white notifybay-m-0 notifybay-py-[18px]">
-					{ getPageTitle() }
-				</h1>
+				<div className="notifybay-flex notifybay-items-center notifybay-justify-between notifybay-p-x-page-default notifybay-bg-white notifybay-py-[18px]">
+					<h1 className="notifybay-ignore-preflight notifybay-font-[600] notifybay-text-[16px] notifybay-m-0">
+						{ getPageTitle() }
+					</h1>
+					{ ! store.is_pro && (
+						<a
+							href={ store.pluginData?.buy_pro_url || '#' }
+							target="_blank"
+							rel="noopener noreferrer"
+							className="notifybay-ignore-preflight notifybay-no-underline notifybay-text-[13px] notifybay-font-[600]"
+							style={ { color: '#f02a74' } }
+						>
+							{ __( 'Unlock with Pro ✦', 'notifybay-waitlist-and-stock-alert-woo' ) }
+						</a>
+					) }
+				</div>
 			) }
 			<div className="notifybay-mt-2 notifybay-p-x-page-default">
 				<Outlet />

@@ -97,8 +97,8 @@ export const AdvancedTab: React.FC<AdvancedTabProps> = ({
       />
       {/*
         License activation is a NotifyBay Pro feature. Pro injects its "License
-        Settings" table here via the `notifybay_settings_sections` (or an
-        AdvancedTab-specific) @wordpress/hooks filter — see the registry pattern
+        Settings" table here via the `notifybay_settings_extra_sections`
+        @wordpress/hooks filter (see Settings.tsx) — see the registry pattern
         in plans/pro-architecture.md. Free renders nothing when Pro is inactive.
       */}
     </>

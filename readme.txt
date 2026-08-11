@@ -4,7 +4,7 @@ Tags: woocommerce, waitlist, back-in-stock, stock-alert, inventory
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -94,6 +94,10 @@ To rebuild the compiled assets from source: run `npm install`, then `npm run bui
 
 == Changelog ==
 
+= 1.0.2 =
+* Fix: removed two per-product override fields ("Smart Transition", "Max Waitlist Size") that saved a value but never actually did anything.
+* Fix: Setup Wizard no longer tells users to use a Gutenberg block for manual placement unless NotifyBay Pro is active.
+
 = 1.0.1 =
 * Fix: the `templates/` directory (required to render the Leads Settings admin screen, product-column lead counts, and per-product override meta box) was missing from the packaged release, leaving those screens blank. Packaging now includes it correctly.
 
@@ -101,6 +105,9 @@ To rebuild the compiled assets from source: run `npm install`, then `npm run bui
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.0.2 =
+Removes two non-functional per-product settings fields and fixes wizard copy referencing a Free-tier block that no longer exists.
 
 = 1.0.1 =
 Fixes a blank Leads Settings screen under WooCommerce → Settings caused by missing template files in the 1.0.0 package.

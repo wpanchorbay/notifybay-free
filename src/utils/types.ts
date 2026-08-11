@@ -13,6 +13,7 @@ export interface PluginData {
 	author_uri: string;
 	support_uri: string;
 	docs_uri: string;
+	buy_pro_url: string;
 	position: number;
 }
 
@@ -90,6 +91,7 @@ export interface BoilerplateStore {
 	nonce: string;
 	store: string;
 	rest_url: string;
+	is_pro: boolean;
 	pluginData: PluginData;
 	wpSettings: WpSettings;
 	plugin_settings: PluginSettings;
