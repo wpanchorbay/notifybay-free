@@ -205,7 +205,7 @@ const Leads: FC = () => {
       }
 
       <div className="notifybay-flex notifybay-w-full notifybay-justify-between notifybay-items-center" style={{ alignItems: 'center' }}>
-        <h1 className="wp-heading-inline">{__("Lead Management", "notifybay-waitlist-and-stock-alert-woo")}</h1>
+        <h1 className="wp-heading-inline notifybay-ignore-preflight">{__("Lead Management", "notifybay-waitlist-and-stock-alert-woo")}</h1>
         <div className="notifybay-flex notifybay-items-center notifybay-gap-[12px]" style={{ alignItems: 'center' }}>
           <form onSubmit={handleSearch} className="search-box notifybay-flex notifybay-items-center notifybay-gap-[8px] notifybay-m-0" style={{ alignItems: 'center', margin: 0 }}>
             <label className="screen-reader-text" htmlFor="lead-search-input">
