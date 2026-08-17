@@ -62,3 +62,13 @@ The plugin does **not** hardcode its wiring — it is driven by `config/*.php` r
 - PHP must pass `phpcs.xml.dist` (WordPress-Extra + WordPress-Docs): full docblocks, Yoda conditions, escaping/sanitization, text domain `notifybay`. Run `lint:php:fix` before committing PHP.
 - All user-facing strings use the `notifybay` text domain; regenerate the `.pot` with `npm run makepot` when adding strings.
 - `graphify-out/` is a generated knowledge-graph artifact (gitignored-style output) — ignore it for code work.
+
+## Release process
+
+Triggers: "make a zip", "make a release zip", "update the version", "is it ready to release".
+
+- **Version bump:** fetch `https://api.wordpress.org/plugins/info/1.0/notifybay-waitlist-and-stock-alert-woo.json`, take its `"version"`, bump the patch number by 1. Compare to the version already in `notifybay-waitlist-and-stock-alert-woo.php`'s header — use whichever is higher, never decrease.
+- **Update the version** in: `notifybay-waitlist-and-stock-alert-woo.php` `Version:` header, `define( 'NOTIFYBAY_VERSION', ... )`, `package.json` `"version"`, `readme.txt` `Stable tag:`, `languages/notifybay-waitlist-and-stock-alert-woo.pot` `Project-Id-Version`. Do **not** touch `NOTIFYBAY_DB_VERSION` — that's a database schema version, unrelated to the release version.
+- **Changelog / Upgrade Notice:** draft new `== Changelog ==` and `== Upgrade Notice ==` entries in `readme.txt` from what was built this session, matching the existing single `* Fix: ...` bullet style (no tab). Confirm the draft with the user before writing it.
+- **Build & zip:** `npm run zip` (`package.sh`) already derives the version straight from the plugin header and produces the zip in `dist/` — bump the header first, then run it. No script changes needed.
+- **Ready to release** = version synced everywhere above, changelog/upgrade notice written, `npm run zip` succeeds. Mention the `wp-plugin-review` skill as an optional deeper security/WPCS check — don't run it automatically.

@@ -13,6 +13,18 @@ interface EngineTabProps {
   setSettings: (settings: PluginSettings) => void;
 }
 
+/**
+ * Parse a numeric input's raw string value, falling back to `fallback` when the
+ * input is empty/invalid rather than ever producing NaN. A NaN making it into
+ * `setSettings` would serialize to `null` in the save request, which the
+ * server-side sanitizer silently skips — reverting the field while still
+ * reporting a successful save.
+ */
+const parseIntOr = (raw: string, fallback: number): number => {
+  const n = parseInt(raw, 10);
+  return Number.isNaN(n) ? fallback : n;
+};
+
 export const EngineTab: React.FC<EngineTabProps> = ({
   settings,
   setSettings,
@@ -129,7 +141,7 @@ export const EngineTab: React.FC<EngineTabProps> = ({
                 onChange={(e) =>
                   setSettings({
                     ...settings,
-                    engine_minStockThreshold: parseInt(e.target.value),
+                    engine_minStockThreshold: parseIntOr(e.target.value, settings.engine_minStockThreshold),
                   })
                 }
               />

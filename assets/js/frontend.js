@@ -60,13 +60,58 @@
         },
 
         /**
+         * Fetch a fresh `wp_rest` nonce and hand it to `callback`.
+         *
+         * A nonce baked into the page at render time can go stale on a
+         * page-cached storefront (a guest may load a cached page hours after
+         * it was cached). Called once, on a 403, before retrying the original
+         * request.
+         *
+         * Logged-in and guest visitors need two different refresh mechanisms.
+         * A plain REST GET with no `X-WP-Nonce` header — which is exactly what
+         * a "give me a fresh nonce" request looks like — hits WordPress core's
+         * own CSRF guard (`rest_cookie_check_errors()`): with no nonce present,
+         * core forces the request's current user to 0 *before* our callback
+         * runs, regardless of how valid the visitor's login cookie is. A nonce
+         * minted in that state is scoped to user 0, not the real logged-in
+         * user, and fails verification on the retry. Core's own officially
+         * documented fix for this is the `rest-nonce` admin-ajax action, which
+         * authenticates purely by cookie (no REST nonce required) and is only
+         * registered for logged-in users. Guests use our own REST route
+         * instead, since they're already user 0 and unaffected by the above.
+         *
+         * @param {Function} callback Invoked once the refresh attempt settles.
+         */
+        refreshNonce: function (callback) {
+            if (notifybay_vars.user.is_logged_in) {
+                $.get(notifybay_vars.ajax_url + '?action=rest-nonce')
+                    .done(function (response) {
+                        // admin-ajax echoes the raw nonce string, not JSON.
+                        if (response) {
+                            notifybay_vars.nonce = String(response).trim();
+                        }
+                    })
+                    .always(callback);
+                return;
+            }
+            $.get(notifybay_vars.rest_url + '/nonce')
+                .done(function (response) {
+                    if (response && response.nonce) {
+                        notifybay_vars.nonce = response.nonce;
+                    }
+                })
+                .always(callback);
+        },
+
+        /**
          * Fetch and apply subscription states for guest users in bulk (cache-busting).
          *
-         * @param {Array} productIds Array of product IDs to fetch
-         * @param {string} email     The guest email from cookie
-         * @param {string} token     The ownership token from cookie
+         * @param {Array}   productIds Array of product IDs to fetch
+         * @param {string}  email      The guest email from cookie
+         * @param {string}  token      The ownership token from cookie
+         * @param {boolean} retried    Internal: true once a nonce-refresh retry has been attempted.
          */
-        batchHydrateGuestSubscriptions: function (productIds, email, token) {
+        batchHydrateGuestSubscriptions: function (productIds, email, token, retried) {
             // Store reference to self for AJAX callback
             const self = this;
 
@@ -81,6 +126,16 @@
                     email: email, // The email to check subscriptions for
                     token: token, // Ownership token proving this browser subscribed with the email
                     product_ids: productIds // List of products to check
+                },
+                error: function (xhr) {
+                    // A stale nonce (e.g. from a page-cached view) would otherwise
+                    // fail this silently — the guest would just see "Notify Me"
+                    // instead of "Already on Waitlist" with no indication why.
+                    if (xhr.status === 403 && !retried) {
+                        self.refreshNonce(function () {
+                            self.batchHydrateGuestSubscriptions(productIds, email, token, true);
+                        });
+                    }
                 },
                 success: function (response) {
                     // Ensure the response contains the results object
@@ -520,7 +575,9 @@
             const originalText = $btn.text();
             $btn.text('Processing...').prop('disabled', true);
 
-            // AJAX POST request to the subscription endpoint
+            // AJAX POST request to the subscription endpoint. Wrapped in a named
+            // function so a stale-nonce 403 can be retried once with a fresh nonce.
+            const doSubmit = function (retried) {
             $.ajax({
                 url: notifybay_vars.rest_url + '/subscribe',
                 method: 'POST',
@@ -576,6 +633,15 @@
                     $root.data('variation-subscriptions', subsCache);
                 },
                 error: function (xhr) {
+                    // A stale nonce (e.g. a guest loading a page-cached product page
+                    // long after it was cached) is recoverable — retry once with a
+                    // fresh nonce before surfacing an error to the shopper.
+                    if (xhr.status === 403 && !retried) {
+                        self.refreshNonce(function () {
+                            doSubmit(true);
+                        });
+                        return;
+                    }
                     // Show error notice
                     const msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : "Error occurred";
                     self.showNotice(msg, 'error');
@@ -583,6 +649,9 @@
                     $btn.text(originalText).prop('disabled', false);
                 }
             });
+            };
+
+            doSubmit(false);
         },
 
         /**
@@ -600,7 +669,9 @@
             // UI State: Loading
             $btn.prop('disabled', true).text('Removing...');
 
-            // AJAX request to the AJAX-optimized unsubscribe endpoint
+            // AJAX request to the AJAX-optimized unsubscribe endpoint. Wrapped in a
+            // named function so a stale-nonce 403 can be retried once with a fresh nonce.
+            const doRemove = function (retried) {
             $.ajax({
                 url: notifybay_vars.rest_url + '/unsubscribe-ajax',
                 method: 'POST',
@@ -632,6 +703,14 @@
                     });
                 },
                 error: function (xhr) {
+                    // A stale nonce is recoverable — retry once with a fresh nonce
+                    // before surfacing an error.
+                    if (xhr.status === 403 && !retried) {
+                        self.refreshNonce(function () {
+                            doRemove(true);
+                        });
+                        return;
+                    }
                     // Error notice
                     const msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : "Error occurred";
                     self.showNotice(msg, 'error');
@@ -639,6 +718,9 @@
                     $btn.prop('disabled', false).text('Remove');
                 }
             });
+            };
+
+            doRemove(false);
         }
     };
 

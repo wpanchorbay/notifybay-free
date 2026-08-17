@@ -330,7 +330,7 @@ class Admin {
 					'dateFormat' => get_option( 'date_format' ),
 					'timeFormat' => get_option( 'time_format' ),
 				),
-				'plugin_settings' => Settings::get_instance()->get_settings(),
+				'plugin_settings' => apply_filters( 'notifybay_settings_response', Settings::get_instance()->get_settings() ),
 				'products_url'    => admin_url( 'edit.php?post_type=product' ),
 				'settings_url'    => admin_url( 'admin.php?page=wc-settings&tab=' . \NOTIFYBAY_PLUGIN_NAME ),
 				'admin_url'       => $this->get_admin_page_url(),

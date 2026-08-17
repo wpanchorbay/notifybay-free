@@ -241,7 +241,12 @@ class Settings {
 		$sanitized_output = get_option( \NOTIFYBAY_OPTION_NAME, $default_options );
 
 		foreach ( $properties as $key => $details ) {
-			if ( ! isset( $input[ $key ] ) ) {
+			// A key that's absent, or explicitly `null` (e.g. a numeric field the
+			// client couldn't parse), keeps its previously stored value rather
+			// than being coerced — coercing `null` through absint()/sanitize_*()
+			// would silently persist a `0`/empty value instead of leaving the
+			// field alone.
+			if ( ! array_key_exists( $key, $input ) || null === $input[ $key ] ) {
 				continue;
 			}
 
@@ -266,6 +271,12 @@ class Settings {
 					break;
 				case 'integer':
 					$sanitized_output[ $key ] = absint( $value );
+					// A schema-declared `minimum` floors the sanitized value. Added
+					// so a field like NotifyBay Pro's `engine_fairPlayRatio` can't be
+					// saved as 0 and silently disable the feature it multiplies.
+					if ( isset( $details['minimum'] ) ) {
+						$sanitized_output[ $key ] = max( (int) $details['minimum'], $sanitized_output[ $key ] );
+					}
 					break;
 				case 'string':
 					$sanitized_output[ $key ] = sanitize_text_field( $value );

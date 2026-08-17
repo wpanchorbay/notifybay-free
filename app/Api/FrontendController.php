@@ -91,6 +91,31 @@ class FrontendController extends ApiController {
 				'permission_callback' => array( $this, 'verify_public_nonce' ),
 			)
 		);
+
+		register_rest_route(
+			$this->namespace . $this->version,
+			'/nonce',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'refresh_nonce' ),
+				// Intentionally public: a `wp_rest` nonce is not a secret (it's
+				// already inlined in every page's HTML), it just needs to be fresh.
+				// This lets frontend JS recover from an expired nonce (e.g. after a
+				// guest loads a page-cached product page hours after it was cached)
+				// without requiring a full page reload.
+				'permission_callback' => '__return_true',
+			)
+		);
+	}
+
+	/**
+	 * Issue a fresh `wp_rest` nonce for frontend JS to retry a failed request with.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function refresh_nonce() {
+		nocache_headers();
+		return rest_ensure_response( array( 'nonce' => wp_create_nonce( 'wp_rest' ) ) );
 	}
 
 	/**

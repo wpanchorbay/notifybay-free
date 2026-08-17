@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: NotifyBay - Waitlist and Stock Alert for WooCommerce 1.0.0\n"
+"Project-Id-Version: NotifyBay - Waitlist and Stock Alert for WooCommerce 1.0.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/notifybay-waitlist-and-stock-alert-woo\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-09T06:28:22+00:00\n"
+"POT-Creation-Date: 2026-08-13T09:10:56+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: notifybay-waitlist-and-stock-alert-woo\n"
@@ -21,7 +21,7 @@ msgstr ""
 
 #. Plugin URI of the plugin
 #: notifybay-waitlist-and-stock-alert-woo.php
-msgid "https://wpanchorbay.com/plugins/notifybay-waitlist-and-stock-alert-for-woocommerce"
+msgid "https://wpanchorbay.com/plugins/notifybay-waitlist-and-stock-alert-for-woocommerce/"
 msgstr ""
 
 #. Description of the plugin
@@ -99,53 +99,53 @@ msgstr ""
 msgid "Invalid data provided."
 msgstr ""
 
-#: app/Api/FrontendController.php:138
+#: app/Api/FrontendController.php:163
 msgid "Invalid product IDs."
 msgstr ""
 
-#: app/Api/FrontendController.php:185
+#: app/Api/FrontendController.php:210
 msgid "Invalid product ID."
 msgstr ""
 
-#: app/Api/FrontendController.php:190
+#: app/Api/FrontendController.php:215
 msgid "Product not found."
 msgstr ""
 
-#: app/Api/FrontendController.php:312
+#: app/Api/FrontendController.php:337
 msgid "Too many requests. Please try again later."
 msgstr ""
 
 #. translators: %s: lead type
-#: app/Api/FrontendController.php:370
+#: app/Api/FrontendController.php:395
 #, php-format
 msgid "[NotifyBay] New %s signup"
 msgstr ""
 
-#: app/Api/FrontendController.php:384
+#: app/Api/FrontendController.php:409
 msgid "Please check your email to verify your subscription."
 msgstr ""
 
-#: app/Api/FrontendController.php:389
+#: app/Api/FrontendController.php:414
 msgid "Successfully subscribed! You will be notified as soon as possible."
 msgstr ""
 
-#: app/Api/FrontendController.php:430
+#: app/Api/FrontendController.php:455
 msgid "Could not process subscription. Please try again."
 msgstr ""
 
-#: app/Api/FrontendController.php:444
+#: app/Api/FrontendController.php:469
 msgid "Invalid lead ID."
 msgstr ""
 
-#: app/Api/FrontendController.php:449
+#: app/Api/FrontendController.php:474
 msgid "You must be logged in to manage subscriptions."
 msgstr ""
 
-#: app/Api/FrontendController.php:472
+#: app/Api/FrontendController.php:497
 msgid "Unsubscribed successfully."
 msgstr ""
 
-#: app/Api/FrontendController.php:489
+#: app/Api/FrontendController.php:514
 msgid "Subscription not found or already removed."
 msgstr ""
 
@@ -286,7 +286,7 @@ msgstr ""
 #: app/Engine/Worker.php:152
 #: templates/frontend/waitlist.php:28
 #: templates/frontend/waitlist.php:47
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Product"
 msgstr ""
 
@@ -324,7 +324,7 @@ msgid "You have been successfully unsubscribed from this alert."
 msgstr ""
 
 #: app/Frontend/Endpoints.php:159
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Unsubscribed"
 msgstr ""
 
@@ -335,7 +335,7 @@ msgid "NotifyBay Leads"
 msgstr ""
 
 #: app/Frontend/Endpoints.php:197
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Email"
 msgstr ""
 
@@ -346,7 +346,7 @@ msgstr ""
 #: app/Frontend/Endpoints.php:205
 #: templates/frontend/waitlist.php:29
 #: templates/frontend/waitlist.php:52
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Status"
 msgstr ""
 
@@ -354,37 +354,41 @@ msgstr ""
 msgid "Created"
 msgstr ""
 
-#: config/admin.php:37
-#: config/admin.php:38
-#: config/admin.php:104
-#: config/admin.php:105
-#: config/admin.php:106
+#: config/admin.php:41
+#: config/admin.php:42
+#: config/admin.php:120
+#: config/admin.php:121
+#: config/admin.php:122
 #: notifybay-waitlist-and-stock-alert-woo.php:75
 #: notifybay-waitlist-and-stock-alert-woo.php:123
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "NotifyBay"
 msgstr ""
 
-#: config/admin.php:56
-#: config/admin.php:57
-#: build/admin.js:13
+#: config/admin.php:60
+#: config/admin.php:61
+#: build/admin.js:1
 msgid "Leads"
 msgstr ""
 
-#: config/admin.php:71
-#: build/admin.js:13
+#: config/admin.php:81
+msgid "Upgrade to Pro"
+msgstr ""
+
+#: config/admin.php:87
+#: build/admin.js:1
 msgid "Settings"
 msgstr ""
 
-#: config/admin.php:85
+#: config/admin.php:101
 msgid "Docs"
 msgstr ""
 
-#: config/admin.php:89
+#: config/admin.php:105
 msgid "Support"
 msgstr ""
 
-#: config/admin.php:93
+#: config/admin.php:109
 msgid "Rate ★★★★★"
 msgstr ""
 
@@ -401,7 +405,7 @@ msgid "If you have a moment, let us know why you're deactivating so we can impro
 msgstr ""
 
 #: notifybay-waitlist-and-stock-alert-woo.php:128
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Cancel"
 msgstr ""
 
@@ -505,50 +509,40 @@ msgstr ""
 msgid "Disable Waitlist"
 msgstr ""
 
-#: templates/admin/meta-box-overrides.php:39
-msgid "Smart Transition"
+#: templates/admin/meta-box-overrides.php:47
+msgid "Disable Wishlist"
 msgstr ""
 
-#: templates/admin/meta-box-overrides.php:41
-#: templates/admin/meta-box-overrides.php:50
-msgid "Use Global Setting"
+#: templates/admin/meta-box-overrides.php:49
+#: build/settings.js:1
+msgid "Pro"
 msgstr ""
 
-#: templates/admin/meta-box-overrides.php:42
-msgid "Enabled"
+#: templates/admin/meta-box-overrides.php:54
+#: build/admin.js:1
+#: build/settings.js:1
+msgid "Unlock with Pro"
 msgstr ""
 
-#: templates/admin/meta-box-overrides.php:43
-msgid "Disabled"
-msgstr ""
-
-#: templates/admin/meta-box-overrides.php:48
-#: build/settings.js:13
+#: templates/admin/meta-box-overrides.php:62
+#: build/settings.js:1
 msgid "Backorder Behavior"
 msgstr ""
 
-#: templates/admin/meta-box-overrides.php:51
+#: templates/admin/meta-box-overrides.php:64
+msgid "Use Global Setting"
+msgstr ""
+
+#: templates/admin/meta-box-overrides.php:65
 msgid "Waitlist if no backorders"
 msgstr ""
 
-#: templates/admin/meta-box-overrides.php:52
+#: templates/admin/meta-box-overrides.php:66
 msgid "Always waitlist"
 msgstr ""
 
-#: templates/admin/meta-box-overrides.php:53
+#: templates/admin/meta-box-overrides.php:67
 msgid "Never waitlist if backorderable"
-msgstr ""
-
-#: templates/admin/meta-box-overrides.php:58
-msgid "Max Waitlist Size"
-msgstr ""
-
-#: templates/admin/meta-box-overrides.php:59
-msgid "Use Global"
-msgstr ""
-
-#: templates/admin/meta-box-overrides.php:60
-msgid "Set to 0 or leave empty for global limit."
 msgstr ""
 
 #: templates/admin/product-column-leads.php:21
@@ -662,616 +656,778 @@ msgstr ""
 msgid "Remove"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Revenue Analytics is a Pro feature"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "See potential vs. recovered revenue, historical demand trends, and your most-wanted products with NotifyBay Pro."
 msgstr ""
 
-#: build/admin.js:13
-msgid "Activate NotifyBay Pro to unlock this dashboard."
+#: build/admin.js:1
+msgid "Active Waitlist"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
+msgid "Price Watchers"
+msgstr ""
+
+#: build/admin.js:1
+msgid "Converted Sales"
+msgstr ""
+
+#: build/admin.js:1
+msgid "Potential Recovery"
+msgstr ""
+
+#: build/admin.js:1
+msgid "New Leads Trend"
+msgstr ""
+
+#: build/admin.js:1
+msgid "Top Requested Restocks"
+msgstr ""
+
+#: build/admin.js:1
+msgid "Top Price-Drop Wishes"
+msgstr ""
+
+#: build/admin.js:1
 msgid "Logs"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Dashboard"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
+msgid "Unlock with Pro ✦"
+msgstr ""
+
+#: build/admin.js:1
+#: build/settings.js:1
+msgid "Upgrade to unlock"
+msgstr ""
+
+#: build/admin.js:1
+#: build/settings.js:1
+msgid "Buy Pro"
+msgstr ""
+
+#: build/admin.js:1
 msgid "Lead updated successfully."
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Type"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Target Price"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Date"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Lead Management"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Search Leads:"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Search..."
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Search"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Export CSV ⬇"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Select bulk action"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Bulk Actions"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Mark Active"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Mark Expired"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Delete"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
+msgid "Resend failed (Pro)"
+msgstr ""
+
+#: build/admin.js:1
 msgid "Bulk action applied successfully."
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Are you sure you want to delete the selected leads?"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Apply"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "items"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "of"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Quick Edit"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Email Address"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Active"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Pending Verification"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Notified"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Converted"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Expired"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Failed"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Saving…"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Update"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Edit"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Are you sure you want to delete this lead?"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Lead deleted successfully."
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
+msgid "Resend"
+msgstr ""
+
+#: build/admin.js:1
 msgid "Show more details"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Welcome to NotifyBay"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Let's get your back-in-stock alerts set up in a few quick steps."
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Sender identity"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "From name"
 msgstr ""
 
-#: build/admin.js:13
-#: build/settings.js:13
+#: build/admin.js:1
+#: build/settings.js:1
 msgid "e.g. My Store Team"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "From email"
 msgstr ""
 
-#: build/admin.js:13
-#: build/settings.js:13
+#: build/admin.js:1
+#: build/settings.js:1
 msgid "e.g. sales@mystore.com"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Choose features"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Double opt-in"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Require email confirmation"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Button text"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Waitlist button label"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "This button shows on out-of-stock products so shoppers can join the waitlist."
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Add it to your store"
 msgstr ""
 
-#: build/admin.js:13
-msgid "NotifyBay adds its button to product pages automatically. To place it elsewhere, use the block or shortcode:"
+#: build/admin.js:1
+msgid "NotifyBay adds its button to product pages automatically. To place it elsewhere, use the NotifyBay Waitlist block or the shortcode:"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
+msgid "NotifyBay adds its button to product pages automatically. To place it elsewhere, use the shortcode:"
+msgstr ""
+
+#: build/admin.js:1
 msgid "Activate your license"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Activate your NotifyBay Pro license to receive automatic updates and unlock all Pro features."
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Open license settings"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "You're all set!"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "NotifyBay is ready. Email content is managed under WooCommerce → Settings → Emails."
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "NotifyBay Setup Wizard"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Setup progress"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Current"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Complete"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Upcoming"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Back"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Skip setup"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Finish Setup"
 msgstr ""
 
-#: build/admin.js:13
+#: build/admin.js:1
 msgid "Next"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "General Logic"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Configure the core behavior of your revenue recovery system, including opt-in and verification rules."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Double Opt-In"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Requires guest users to verify their email address before their subscription becomes active."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Require email verification for all leads"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Highly recommended for GDPR and CAN-SPAM compliance."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Choose whether the 'Notify Me' form should appear for products that allow backorders."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Waitlist only if backorders disabled"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Show waitlist regardless of backorders"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Never show waitlist for backorderable items"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Select the behavior that matches your store's inventory policy."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Waitlist Display"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Customize how the 'Notify Me' button and social proof elements appear on your product pages."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Button Text"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "The text shown on the 'Notify Me' button."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Button CSS Class"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Additional CSS classes for the Waitlist button."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "e.g. my-custom-btn"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Success Message"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "The message shown after a user successfully joins the waitlist."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Waitlist Expiry Logic"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Define the rules for cleaning up old or abandoned waitlist subscriptions."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Auto-Expire Leads"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Automatically remove users from the waitlist after a certain number of days if no restock occurs."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Expire old subscriptions"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Default Expiry (Days)"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Days"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Frontend Options"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Comma-separated list of day options shown to customers."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Stock Control"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Fine-tune when restock alerts should be triggered based on physical inventory levels."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Minimum Restock Threshold"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Prevents the system from firing mass alerts if only 1 or 2 items are returned or restocked."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Admin Notifications"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Stay informed about your customers' intent by receiving alerts for new signups."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Owner Alerts"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Sends a notification to the store administrator whenever a new shopper joins a waitlist."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Notify store owner of new signups"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Email Identity"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Configure the global 'From' name and email address for all notifications sent by this plugin."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "From Name"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "The name that will appear in the customer's inbox."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "From Email"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "The email address used to send notifications."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Email content & templates"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Subject lines, headings, body content, enable/disable, and test sends for each email are now managed as native WooCommerce emails."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Open WooCommerce → Emails"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Loading system status..."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Background Engine Status"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Action Scheduler Queue"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Current email job queue"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Lead Health"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Diagnostic database check"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Failed Leads"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "In Processing"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Environment Information"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Versions"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Server environment details"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Setup"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Setup Wizard"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Re-run the first-time setup wizard to reconfigure the essentials."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Run Setup Wizard"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "System & Maintenance"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Debug Mode"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Logs technical data during execution to help developers troubleshoot background jobs and API calls."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Enable developer logging"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Only recommended for troubleshooting. Logs are written to the WooCommerce Status > Logs."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Deep Uninstall"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Determines if all plugin data should be permanently deleted from the database when the plugin is deleted."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Delete all tables and settings on plugin deletion"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "DANGEROUS: If checked, all leads and settings will be permanently erased and cannot be recovered."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
+msgid "Wishlist"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Enable wishlist functionality (price-drop notifications) across the store."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Enable Wishlist"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Enable Wishlist features"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Social Proof (FOMO)"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Show how many other people are waiting for this product."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Enable FOMO Banner"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Show waiting count on product page"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Use {count} as a placeholder."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Only show if count is equal or higher than this."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Wishlist Display"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Optional extra CSS class(es) added to the wishlist button."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Shown after a product is added to the wishlist."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Archive Visibility"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Show on shop archives"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Fair-Play Restock"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Prevents customer frustration by only notifying a number of people equal to the actual units restocked."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Fair-Play"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Only notify leads equal to available stock"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Notification multiplier per unit restocked."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Reservation window, in hours."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Sales Attribution"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Conversion Window (Days)"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Urgency Alerts"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Hurry Logic"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Enable follow-up urgency alerts"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Trigger alert when stock falls below this level."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Minimum hours after restock before the hurry alert fires."
+msgstr ""
+
+#: build/settings.js:1
 msgid "Failed to load system status."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Failed to load settings."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Settings saved successfully."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Failed to save settings."
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Overview"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "General"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Display"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Engine Logic"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Email Templates"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "System Status"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Advanced"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Unsaved Changes"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "You have unsaved changes. Would you like to save them before switching tabs?"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Save"
 msgstr ""
 
-#: build/settings.js:13
+#: build/settings.js:1
 msgid "Discard"
 msgstr ""
