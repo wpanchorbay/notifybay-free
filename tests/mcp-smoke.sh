@@ -7,7 +7,10 @@
 # them.
 #
 # Leaves the site as it found it: the endpoint is switched back off, the seeded
-# lead is deleted, and the probe account is removed.
+# lead is deleted, the throwaway account is removed, and the application
+# password it issued to the borrowed administrator is revoked by name. That last
+# one matters -- without it, every run would leave a live credential holding
+# manage_options on a real account.
 #
 #   KIT=/path/to/mcp-kit WP_PATH=/var/www/html WP_URL=http://localhost \
 #     bash tests/mcp-smoke.sh
@@ -30,6 +33,18 @@ WP_PATH="${WP_PATH:-/var/www/html}"
 export MCP_BASE="${WP_URL:-http://localhost}"
 export MCP_WORK; MCP_WORK="$( mktemp -d )"
 
+# The one existing account this script borrows. It needs manage_options (for the
+# settings route) and manage_notifybay (for delete-leads), which an
+# administrator has. Override if your admin is not called "admin".
+#
+# Borrowing rather than provisioning is a compromise: the kit's own harness
+# creates a dedicated wpab_probe_admin instead, precisely so it never touches a
+# real account. That is the better pattern. This script issues a *named*
+# application password and revokes it in cleanup() rather than going that far --
+# it never changes the account's password, role or capabilities.
+ADMIN_LOGIN="${ADMIN_LOGIN:-admin}"
+APP_PASS_NAME='notifybay-mcp-pilot'
+
 # shellcheck source=/dev/null
 . "$KIT/tests/lib/assert.sh"
 # shellcheck source=/dev/null
@@ -46,11 +61,15 @@ echo "→ target: $MCP_BASE  (NotifyBay pilot)"
 # nb_ai holds wpab_mcp_access but deliberately NOT manage_notifybay: that is
 # the whole point of the capability-narrowing assertion further down.
 # ---------------------------------------------------------------------------
-cat > "$MCP_WORK/setup.php" <<'PHP'
+cat > "$MCP_WORK/setup.php" <<PHP
 <?php
-$out = [];
+\$admin_login    = '$ADMIN_LOGIN';
+\$app_pass_name  = '$APP_PASS_NAME';
+PHP
+cat >> "$MCP_WORK/setup.php" <<'PHP'
 
-foreach ( [ 'admin' => null, 'nb_ai' => [ 'wpab_mcp_access' ] ] as $login => $caps ) {
+// A null caps entry means "borrow this account, do not create or modify it".
+foreach ( [ $admin_login => null, 'nb_ai' => [ 'wpab_mcp_access' ] ] as $login => $caps ) {
 	$user = get_user_by( 'login', $login );
 
 	if ( ! $user && null !== $caps ) {
@@ -72,7 +91,7 @@ foreach ( [ 'admin' => null, 'nb_ai' => [ 'wpab_mcp_access' ] ] as $login => $ca
 	}
 
 	$created = WP_Application_Passwords::create_new_application_password(
-		$user->ID, [ 'name' => 'notifybay-mcp-pilot' ]
+		$user->ID, [ 'name' => $app_pass_name ]
 	);
 
 	// Spaces stripped: WordPress hands the secret back chunked and strips them
@@ -100,7 +119,7 @@ PHP
 
 setup="$( wp_php "$MCP_WORK/setup.php" )"
 _cred() { printf '%s:%s' "$1" "$( printf '%s' "$setup" | awk -v u="$1" '$1==u{print $2}' )"; }
-MCP_ADMIN="$( _cred admin )"
+MCP_ADMIN="$( _cred "$ADMIN_LOGIN" )"
 MCP_AI="$( _cred nb_ai )"
 LEAD_ID="$( printf '%s' "$setup" | awk '$1=="LEAD_ID"{print $2}' )"
 
@@ -121,11 +140,33 @@ cleanup() {
 <?php
 global \$wpdb;
 \$wpdb->delete( \$wpdb->prefix . 'notifybay_leads', [ 'id' => $LEAD_ID ] );
+
+// nb_ai is this script's own account, so deleting it takes its application
+// password with it. The administrator is NOT ours -- it existed before the run
+// and survives it -- so its password has to be revoked by name, or every run
+// leaves a live credential on a real admin account. The whole point of the
+// access ladder is that a leaked credential is bounded; leaking one that holds
+// manage_options is not bounded at all.
 \$u = get_user_by( 'login', 'nb_ai' );
 if ( \$u ) { require_once ABSPATH . 'wp-admin/includes/user.php'; wp_delete_user( \$u->ID ); }
-echo "cleaned\n";
+
+\$admin = get_user_by( 'login', '$ADMIN_LOGIN' );
+\$revoked = 0;
+if ( \$admin ) {
+	foreach ( WP_Application_Passwords::get_user_application_passwords( \$admin->ID ) as \$pw ) {
+		if ( '$APP_PASS_NAME' === \$pw['name'] ) {
+			WP_Application_Passwords::delete_application_password( \$admin->ID, \$pw['uuid'] );
+			\$revoked++;
+		}
+	}
+}
+printf( "revoked=%d\n", \$revoked );
 PHP
-	wp_php "$MCP_WORK/teardown.php" >/dev/null 2>&1
+	local out; out="$( wp_php "$MCP_WORK/teardown.php" 2>/dev/null )"
+	case "$out" in
+		*revoked=0*|"") printf '  !! could not revoke the %s application password on "%s" -- revoke it by hand\n' \
+			"$APP_PASS_NAME" "$ADMIN_LOGIN" >&2 ;;
+	esac
 	rm -rf "$MCP_WORK"
 }
 trap cleanup EXIT
