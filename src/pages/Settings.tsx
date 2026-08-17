@@ -16,10 +16,11 @@ import { EngineTab } from "../components/settings/tabs/EngineTab";
 import { EmailTab } from "../components/settings/tabs/EmailTab";
 import { StatusTab } from "../components/settings/tabs/StatusTab";
 import { AdvancedTab } from "../components/settings/tabs/AdvancedTab";
+import { McpTab } from "../components/settings/tabs/McpTab";
 import { ProPreviewSections } from "../components/settings/ProPreviewSections";
 
 const Settings: React.FC = () => {
-  const { is_pro: isPro } = useWpabStore();
+  const { is_pro: isPro, mcp } = useWpabStore();
   const [settings, setSettings] = useState<PluginSettings | null>(null);
   const [originalSettings, setOriginalSettings] =
     useState<PluginSettings | null>(null);
@@ -36,13 +37,20 @@ const Settings: React.FC = () => {
   // directly. Namespaced to avoid colliding with WooCommerce's own ?tab=/
   // ?section= params on the settings screen.
   const initialTab = (() => {
+    const fallback = dashboardWidgets ? "overview" : "general";
     try {
       const t = new URLSearchParams(window.location.search).get(
         "notifybay_tab",
       );
-      return t || (dashboardWidgets ? "overview" : "general");
+      // The MCP tab is absent for anyone without manage_options, and when the
+      // kit is not installed. Honouring ?notifybay_tab=mcp regardless would
+      // open a tab that has no entry in the nav and whose every request 403s.
+      if ("mcp" === t && !mcp) {
+        return fallback;
+      }
+      return t || fallback;
     } catch {
-      return dashboardWidgets ? "overview" : "general";
+      return fallback;
     }
   })();
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -221,6 +229,13 @@ const Settings: React.FC = () => {
     { id: "engine", label: __("Engine Logic", "notifybay-waitlist-and-stock-alert-woo") },
     { id: "email", label: __("Email Templates", "notifybay-waitlist-and-stock-alert-woo") },
     { id: "status", label: __("System Status", "notifybay-waitlist-and-stock-alert-woo") },
+    // Only when wpab/mcp-kit is installed and the user can manage_options --
+    // see Admin::get_mcp_localize(). It sits in the top-level sub-nav rather
+    // than inside Advanced because a store owner has no other way to find out
+    // the endpoint exists.
+    ...(mcp
+      ? [{ id: "mcp", label: __("AI Access", "notifybay-waitlist-and-stock-alert-woo") }]
+      : []),
     { id: "advanced", label: __("Advanced", "notifybay-waitlist-and-stock-alert-woo") },
   ];
 
@@ -296,6 +311,8 @@ const Settings: React.FC = () => {
             isLoadingStatus={isLoadingStatus}
           />
         )}
+
+        {activeTab === "mcp" && mcp && <McpTab mcp={mcp} />}
 
         {activeTab === "advanced" && (
           <AdvancedTab settings={settings} setSettings={setSettings} />

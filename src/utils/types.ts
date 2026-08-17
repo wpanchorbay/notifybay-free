@@ -83,6 +83,44 @@ export interface DashboardStats {
 }
 
 /**
+ * Where the MCP settings routes live, or `null` when the MCP tab must not
+ * render at all -- either `wpab/mcp-kit` is not installed, or the current user
+ * lacks the `manage_options` the kit gates those routes on. Set by
+ * Admin::get_mcp_localize().
+ */
+export interface McpLocalize {
+	product_key: string;
+	/** Base URL of the kit's settings routes, e.g. `.../wp-json/wpab/v1/notifybay`. */
+	rest_url: string;
+}
+
+/**
+ * One row of the kit's declarative settings list. The kit returns its settings
+ * this way so that adding a setting never requires a change here.
+ */
+export interface McpSettingField {
+	key: string;
+	label: string;
+	type: string;
+	value: boolean | string;
+	options?: string[];
+}
+
+/**
+ * The payload of `GET /wpab/v1/<product_key>/status`, which `POST .../settings`
+ * also returns so the panel always re-renders from server truth.
+ */
+export interface McpStatus {
+	product_key: string;
+	status: string;
+	endpoint: string;
+	tool_count: number;
+	available_access_levels: string[];
+	client_config: Record< string, unknown >;
+	settings: McpSettingField[];
+}
+
+/**
  * The main store type, matching the data passed by PHP's wp_localize_script().
  */
 export interface BoilerplateStore {
@@ -99,4 +137,5 @@ export interface BoilerplateStore {
 		code: string;
 		symbol: string;
 	};
+	mcp?: McpLocalize | null;
 }

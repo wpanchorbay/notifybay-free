@@ -4,7 +4,7 @@ Tags: woocommerce, waitlist, back-in-stock, stock-alert, inventory
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -94,13 +94,17 @@ To rebuild the compiled assets from source: run `npm install`, then `npm run bui
 
 == Changelog ==
 
+= 1.0.3 =
+* New: NotifyBay can be connected to an AI assistant over MCP (Model Context Protocol). It is off until you turn it on, under WooCommerce → Settings → Leads Settings → AI Access, where you also choose how much the assistant is allowed to do and copy the connection details.
+* New: four assistant tools — list leads, check system status, update a lead, and delete leads. Deleting is offered only at the "Full access" level, and only to an account that can manage NotifyBay.
+* Fix: removed a non-functional "Target Price" field and column from the Leads screen. The field wrote to a database column that does not exist, which made the whole save fail — discarding the email and status changes made alongside it — and reported only "Could not update lead."
+* Fix: a failed database write is now logged with the reason, instead of failing with no explanation anywhere.
+
 = 1.0.2 =
 * Fix: removed two per-product override fields ("Smart Transition", "Max Waitlist Size") that saved a value but never actually did anything.
 * Fix: Setup Wizard no longer tells users to use a Gutenberg block for manual placement unless NotifyBay Pro is active.
 * Fix: clearing a numeric setting (e.g. Minimum Restock Threshold) silently reverted to the old value while the UI still showed a "Saved" success message.
 * Fix: guest waitlist status checks failed silently on an expired security token; waitlist actions now refresh the token and retry automatically instead of failing with no recovery path.
-* Fix: removed a non-functional "Target Price" field and column from the Leads screen. The field wrote to a database column that does not exist, which made the whole save fail — discarding the email and status changes made alongside it — and reported only "Could not update lead."
-* Fix: a failed database write is now logged with the reason, instead of failing with no explanation anywhere.
 
 = 1.0.1 =
 * Fix: the `templates/` directory (required to render the Leads Settings admin screen, product-column lead counts, and per-product override meta box) was missing from the packaged release, leaving those screens blank. Packaging now includes it correctly.
@@ -110,8 +114,11 @@ To rebuild the compiled assets from source: run `npm install`, then `npm run bui
 
 == Upgrade Notice ==
 
+= 1.0.3 =
+Adds an optional AI assistant connection (MCP), off by default and configured under WooCommerce → Settings → Leads Settings → AI Access. Also removes a non-functional "Target Price" field on the Leads screen whose presence could make an otherwise valid lead edit fail.
+
 = 1.0.2 =
-Removes three non-functional fields, including a "Target Price" field on the Leads screen whose presence could make an otherwise valid lead edit fail. Also fixes wizard copy referencing a Free-tier block that no longer exists, fixes a settings field that silently reverted on save, and improves recovery from expired security tokens.
+Removes two non-functional per-product settings fields, fixes wizard copy referencing a Free-tier block that no longer exists, fixes a settings field that silently reverted on save, and improves recovery from expired security tokens.
 
 = 1.0.1 =
 Fixes a blank Leads Settings screen under WooCommerce → Settings caused by missing template files in the 1.0.0 package.

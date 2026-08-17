@@ -342,6 +342,7 @@ class Admin {
 					'code'   => get_woocommerce_currency(),
 					'symbol' => get_woocommerce_currency_symbol(),
 				),
+				'mcp'             => $this->get_mcp_localize(),
 			)
 		);
 
@@ -352,6 +353,42 @@ class Admin {
 			$handle,
 			'notifybay-waitlist-and-stock-alert-woo',
 			$path_to_check
+		);
+	}
+
+	/**
+	 * Data the MCP settings tab needs, or null to hide the tab entirely.
+	 *
+	 * Two conditions, and both matter:
+	 *
+	 * `class_exists()` mirrors the guard around `Kit::boot()` in the main
+	 * plugin file. If someone strips `vendor/`, NotifyBay keeps working and
+	 * simply has no MCP tab, rather than rendering a tab whose every request
+	 * 404s.
+	 *
+	 * `manage_options` mirrors the capability the kit gates its own settings
+	 * routes on, which is deliberately narrower than the `manage_woocommerce`
+	 * that reaches this screen. A shop manager can open WooCommerce settings
+	 * but cannot set MCP policy -- by design, since the whole point is that
+	 * the access ceiling is set by someone the AI account's own credential
+	 * cannot impersonate. Showing them the tab would only produce a panel
+	 * where every control 403s.
+	 *
+	 * @since 1.0.3
+	 * @access private
+	 * @return array|null Route base and product key, or null if the tab must not render.
+	 */
+	private function get_mcp_localize() {
+		if ( ! class_exists( '\WPAB\Mcp\Kit' ) || ! current_user_can( 'manage_options' ) ) {
+			return null;
+		}
+
+		// `notifybay` is declared permanent in config/mcp.php, which is the
+		// source of truth; it is repeated here rather than requiring that file
+		// on every admin screen load.
+		return array(
+			'product_key' => 'notifybay',
+			'rest_url'    => get_rest_url( null, 'wpab/v1/notifybay' ),
 		);
 	}
 
