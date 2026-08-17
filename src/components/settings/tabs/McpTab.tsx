@@ -250,9 +250,16 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
               "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
+              /*
+               * Deliberately still settable while the endpoint is off. The
+               * level is stored policy, not a live property of the running
+               * endpoint, and greying it out would force the owner to enable
+               * first and only then choose -- so the endpoint would briefly
+               * serve at whatever level happened to be stored.
+               */
               <fieldset
                 className="notifybay-flex notifybay-flex-col notifybay-gap-2"
-                disabled={isSaving || !isEnabled}
+                disabled={isSaving}
               >
                 {status.available_access_levels.map((level) => (
                   <label
@@ -266,7 +273,7 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                       name="mcp_access_level"
                       value={level}
                       checked={accessLevel === level}
-                      disabled={isSaving || !isEnabled}
+                      disabled={isSaving}
                       onChange={() => handleLevelChange(level)}
                       className="notifybay-mt-1"
                     />

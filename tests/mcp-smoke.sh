@@ -298,6 +298,40 @@ assert_contains "rows=1" "$( wp_php "$MCP_WORK/stillthere.php" )" \
 	"the refusal was fail-closed -- the row is still there"
 
 # ---------------------------------------------------------------------------
+case_start "The AI account cannot raise its own ceiling"
+
+# The whole access ladder rests on this. nb_ai reaches the endpoint, so if it
+# could also reach the settings route it could simply set itself to full and
+# the ladder would be decorative. The kit gates that route on manage_options,
+# which nb_ai does not hold.
+http "$MCP_AI" POST "/wp-json/wpab/v1/notifybay/settings" '{"access_level":"full"}'
+assert_eq 403 "$MCP_STATUS" "the AI account is refused the settings route"
+
+# ...and the admin tab that drives that route is hidden from it too. Asserted
+# here rather than left to a one-off manual check, because a tab rendered for
+# an account whose every request 403s is exactly the kind of regression a
+# later refactor introduces without noticing.
+cat > "$MCP_WORK/uigate.php" <<'PHP'
+<?php
+$rc = new ReflectionClass( 'NotifyBay\Admin\Admin' );
+$m  = $rc->getMethod( 'get_mcp_localize' );
+$m->setAccessible( true );
+$obj = $rc->newInstanceWithoutConstructor();
+
+foreach ( [ 'administrator', 'nb_ai' ] as $who ) {
+	$user = 'nb_ai' === $who
+		? get_user_by( 'login', 'nb_ai' )
+		: get_users( [ 'role' => 'administrator', 'number' => 1 ] )[0];
+
+	wp_set_current_user( $user->ID );
+	printf( "%s=%s\n", $who, null === $m->invoke( $obj ) ? 'hidden' : 'shown' );
+}
+PHP
+uigate="$( wp_php "$MCP_WORK/uigate.php" )"
+assert_contains "administrator=shown" "$uigate" "the MCP tab renders for an administrator"
+assert_contains "nb_ai=hidden"        "$uigate" "...and is hidden from the AI account"
+
+# ---------------------------------------------------------------------------
 case_start "Destructive tool, and the audit trail"
 
 mcp_tool "$MCP_ADMIN" notifybay notifybay-delete-leads "{\"ids\":[$LEAD_ID]}"
