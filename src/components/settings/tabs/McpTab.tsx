@@ -7,6 +7,7 @@ import { CopyToClipboard } from "../../common/CopyToClipboard";
 import { useToast } from "../../../store/toast/use-toast";
 import { McpLocalize, McpStatus } from "../../../utils/types";
 import { buildMcpSnippets } from "./mcpSnippets";
+import { McpAccounts } from "./McpAccounts";
 
 interface McpTabProps {
   mcp: McpLocalize;
@@ -316,6 +317,8 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
         ]}
       />
 
+      <McpAccounts mcp={mcp} />
+
       <ClassicSettingsTable
         title={__(
           "Connecting a client",
@@ -363,7 +366,7 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                     </a>
                     {" — "}
                     {__(
-                      "or create one for a separate, low-privilege account under Users.",
+                      "or create a dedicated account below, which is the safer option.",
                       "notifybay-waitlist-and-stock-alert-woo",
                     )}
                   </p>

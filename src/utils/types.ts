@@ -131,6 +131,30 @@ export interface McpStatus {
 }
 
 /**
+ * One Application Password issued by McpAccountController, as reported back.
+ * Never carries the secret -- that exists only in the create/rotate response.
+ */
+export interface McpAppPassword {
+	created: number;
+	last_used: string | null;
+	last_ip: string | null;
+}
+
+/** An account that can currently reach the MCP endpoint. */
+export interface McpAccount {
+	user_id: number;
+	user_login: string;
+	roles: string[];
+	/** True when the capability was granted per-user, which is what makes it revocable. */
+	granted_here: boolean;
+	is_administrator: boolean;
+	/** An administrator can POST to the kit's settings route and move itself up the ladder. */
+	can_raise_own_level: boolean;
+	can_delete_leads: boolean;
+	app_passwords: McpAppPassword[];
+}
+
+/**
  * The main store type, matching the data passed by PHP's wp_localize_script().
  */
 export interface BoilerplateStore {

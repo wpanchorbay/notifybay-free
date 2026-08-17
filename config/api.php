@@ -21,4 +21,9 @@ return array(
 	\NotifyBay\Api\SettingsController::class,
 	\NotifyBay\Api\FrontendController::class,
 	\NotifyBay\Api\AdminController::class,
+
+	// Provisions the low-privilege account an AI assistant connects as. Gated on
+	// manage_options rather than manage_notifybay, and unreachable with an
+	// Application Password -- see McpAccountController::mcp_admin_permissions_check().
+	\NotifyBay\Api\McpAccountController::class,
 );
