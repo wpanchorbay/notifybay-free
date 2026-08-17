@@ -9,6 +9,7 @@ class ComposerStaticInitNotifybayUniqueHash
     public static $prefixLengthsPsr4 = array (
         'W' => 
         array (
+            'WPAB\\Mcp\\' => 9,
             'WPAB\\DeactivationFeedback\\' => 26,
         ),
         'R' => 
@@ -22,6 +23,10 @@ class ComposerStaticInitNotifybayUniqueHash
     );
 
     public static $prefixDirsPsr4 = array (
+        'WPAB\\Mcp\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/wpab/mcp-kit/src',
+        ),
         'WPAB\\DeactivationFeedback\\' => 
         array (
             0 => __DIR__ . '/..' . '/deactivation-feedback/src',

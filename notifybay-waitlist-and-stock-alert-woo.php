@@ -41,8 +41,24 @@ if ( file_exists( NOTIFYBAY_PATH . 'vendor/autoload.php' ) ) {
 	require_once NOTIFYBAY_PATH . 'vendor/autoload.php';
 }
 
-
-
+/*
+ * MCP endpoint, served at /wp-json/wpab/notifybay/mcp when a store owner
+ * enables it. Off until then; see config/mcp.php for the tools it exposes.
+ *
+ * Called at FILE SCOPE on purpose, and not from notifybay_run() below.
+ * Kit::boot() registers the plugin's activation hook and adds its own
+ * `plugins_loaded` callback; notifybay_run() is itself a `plugins_loaded`
+ * callback, so calling this from there would add that hook after the action
+ * had already fired and nothing would ever run. The failure is silent.
+ *
+ * The class_exists() guard covers a checkout with no `composer install`.
+ * The kit does its own gating from there: it needs the WordPress Abilities
+ * API and wordpress/mcp-adapter, and renders an admin notice rather than
+ * fataling when they are absent.
+ */
+if ( class_exists( '\WPAB\Mcp\Kit' ) ) {
+	\WPAB\Mcp\Kit::boot( __FILE__, __DIR__ . '/config/mcp.php' );
+}
 
 require_once NOTIFYBAY_PATH . 'app/functions.php';
 

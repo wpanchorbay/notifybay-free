@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
-        'name' => 'sankarsan/notifybay',
+        'name' => 'sankarsan/notifybay-waitlist-and-stock-alert-woo',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '77d7c49a92947899463fac35fca79b586b3c5d99',
+        'reference' => '1c60ac68380d6df05a7c5685c112cee2a3c5e84a',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -19,10 +19,10 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-        'sankarsan/notifybay' => array(
+        'sankarsan/notifybay-waitlist-and-stock-alert-woo' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '77d7c49a92947899463fac35fca79b586b3c5d99',
+            'reference' => '1c60ac68380d6df05a7c5685c112cee2a3c5e84a',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -34,6 +34,15 @@
             'reference' => 'c58cdbab17651303d406cd3b22cf9d75c71c986c',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../woocommerce/action-scheduler',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'wpab/mcp-kit' => array(
+            'pretty_version' => 'v0.3.2',
+            'version' => '0.3.2.0',
+            'reference' => '8436e9f5634c0e2c3f4b95f3ad2415193c542b68',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../wpab/mcp-kit',
             'aliases' => array(),
             'dev_requirement' => false,
         ),

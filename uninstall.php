@@ -36,4 +36,23 @@ if ( $notifybay_deep_uninstall ) {
 	// Delete transients (covers both notifybay_* and notifybaypro_* prefixes).
 	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_notifybay%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_notifybay%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+	/*
+	 * The MCP endpoint's settings row. Inside the deep-uninstall branch to
+	 * match this file's existing convention that only a deep uninstall removes
+	 * options.
+	 *
+	 * Kit::uninstall() deletes this product's row and nothing else: never the
+	 * shared wpab_mcp_access capability (another WPAB plugin on the same site
+	 * may still need it), never another product's row, and never an
+	 * Application Password — those are the store owner's WordPress
+	 * credentials, not this plugin's data.
+	 */
+	if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+		require_once __DIR__ . '/vendor/autoload.php';
+
+		if ( class_exists( '\WPAB\Mcp\Kit' ) ) {
+			\WPAB\Mcp\Kit::uninstall( 'notifybay' );
+		}
+	}
 }

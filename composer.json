@@ -11,6 +11,7 @@
     ],
     "require": {
         "php": ">=7.4",
+        "wpab/mcp-kit": "^0.3",
         "rakit/validation": "^1.4",
         "woocommerce/action-scheduler": "^3.9"
     },
@@ -19,5 +20,11 @@
             "NotifyBay\\": "app/",
             "WPAB\\DeactivationFeedback\\": "vendor/deactivation-feedback/src/"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/wpanchorbay/mcp-kit"
+        }
+    ]
 }

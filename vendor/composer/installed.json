@@ -94,6 +94,71 @@
                 "source": "https://github.com/woocommerce/action-scheduler/tree/3.9.3"
             },
             "install-path": "../woocommerce/action-scheduler"
+        },
+        {
+            "name": "wpab/mcp-kit",
+            "version": "v0.3.2",
+            "version_normalized": "0.3.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wpanchorbay/mcp-kit.git",
+                "reference": "8436e9f5634c0e2c3f4b95f3ad2415193c542b68"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wpanchorbay/mcp-kit/zipball/8436e9f5634c0e2c3f4b95f3ad2415193c542b68",
+                "reference": "8436e9f5634c0e2c3f4b95f3ad2415193c542b68",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "humbug/php-scoper": "^0.18"
+            },
+            "time": "2026-08-17T07:50:48+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "WPAB\\Mcp\\": "src/"
+                }
+            },
+            "scripts": {
+                "lint": [
+                    "find src examples -name '*.php' -print0 | xargs -0 -n1 php -l"
+                ],
+                "cs": [
+                    "phpcs --standard=phpcs.xml.dist"
+                ],
+                "cbf": [
+                    "phpcbf --standard=phpcs.xml.dist"
+                ],
+                "compat": [
+                    "phpcs -p src scoper.inc.php examples --standard=PHPCompatibility --runtime-set testVersion 7.4-8.3 --extensions=php"
+                ],
+                "test": [
+                    "bash tests/run.sh"
+                ],
+                "lint:74": [
+                    "docker run --rm -v \"$PWD\":/app -w /app php:7.4-cli sh -c 'for f in src/*.php scoper.inc.php examples/config/mcp.php; do php -l \"$f\" >/dev/null || exit 1; done; echo ok'"
+                ]
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "WP Anchor Bay",
+                    "email": "wpanchorbay@gmail.com"
+                }
+            ],
+            "description": "Lets any WPAB WooCommerce plugin expose its own MCP endpoint on top of WordPress's Abilities API and wordpress/mcp-adapter.",
+            "support": {
+                "source": "https://github.com/wpanchorbay/mcp-kit/tree/v0.3.2",
+                "issues": "https://github.com/wpanchorbay/mcp-kit/issues"
+            },
+            "install-path": "../wpab/mcp-kit"
         }
     ],
     "dev": true,

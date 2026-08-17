@@ -1,0 +1,42 @@
+{
+    "name": "wpab/mcp-kit",
+    "description": "Lets any WPAB WooCommerce plugin expose its own MCP endpoint on top of WordPress's Abilities API and wordpress/mcp-adapter.",
+    "type": "library",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "WP Anchor Bay",
+            "email": "wpanchorbay@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "humbug/php-scoper": "^0.18"
+    },
+    "autoload": {
+        "psr-4": {
+            "WPAB\\Mcp\\": "src/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "scripts": {
+        "lint": "find src examples -name '*.php' -print0 | xargs -0 -n1 php -l",
+        "cs": "phpcs --standard=phpcs.xml.dist",
+        "cbf": "phpcbf --standard=phpcs.xml.dist",
+        "compat": "phpcs -p src scoper.inc.php examples --standard=PHPCompatibility --runtime-set testVersion 7.4-8.3 --extensions=php",
+        "test": "bash tests/run.sh",
+        "lint:74": "docker run --rm -v \"$PWD\":/app -w /app php:7.4-cli sh -c 'for f in src/*.php scoper.inc.php examples/config/mcp.php; do php -l \"$f\" >/dev/null || exit 1; done; echo ok'"
+    },
+    "scripts-descriptions": {
+        "lint": "php -l across the kit's own sources.",
+        "cs": "WordPress coding standards (D1 §8.4).",
+        "cbf": "Auto-fix what the standard can fix.",
+        "compat": "Static check against the PHP floor composer.json declares.",
+        "test": "The regression suite. Point it at a WordPress with WP_PATH and WP_URL; add --destructive against a throwaway install.",
+        "lint:74": "Parse every source on a real PHP 7.4, the floor composer.json declares."
+    }
+}
