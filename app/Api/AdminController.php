@@ -247,10 +247,20 @@ class AdminController extends ApiController {
 		if ( isset( $params['status'] ) ) {
 			$lead->status = sanitize_text_field( $params['status'] );
 		}
-		if ( isset( $params['target_price'] ) ) {
-			$lead->target_price = (float) $params['target_price'];
-		}
 
+		// There was a `target_price` branch here. `target_price` is not a column
+		// in {$wpdb->prefix}notifybay_leads and never has been, so the UPDATE was
+		// rejected outright with "Unknown column 'target_price' in 'field list'"
+		// -- taking the user_email and status changes in the same request down
+		// with it, because Model::save() writes every attribute at once. The
+		// caller saw a bare 500 "Could not update lead." naming nothing.
+		//
+		// Not replaced with price_at_subscription (the real column). Nothing
+		// reads a customer-set target: Pro's price-drop trigger compares the new
+		// price against price_at_subscription itself
+		// (ProDispatcher::get_price_drop_leads), and no code in Free or Pro ever
+		// wrote target_price. Making the field editable would be a new feature,
+		// not a fix.
 		if ( $lead->save() ) {
 			return rest_ensure_response( array( 'success' => true ) );
 		}

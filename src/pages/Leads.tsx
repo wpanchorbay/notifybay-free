@@ -155,7 +155,6 @@ const Leads: FC = () => {
       data: {
         user_email: editingLead.user_email,
         status: editingLead.status,
-        target_price: editingLead.target_price,
       },
     })
       .then(() => {
@@ -187,7 +186,6 @@ const Leads: FC = () => {
     { key: "user_email", className: "column-primary", label: __("Email", "notifybay-waitlist-and-stock-alert-woo") },
     { key: "product_name", label: __("Product", "notifybay-waitlist-and-stock-alert-woo") },
     { key: "type", label: __("Type", "notifybay-waitlist-and-stock-alert-woo") },
-    { key: "target_price", label: __("Target Price", "notifybay-waitlist-and-stock-alert-woo") },
     { key: "status", label: __("Status", "notifybay-waitlist-and-stock-alert-woo") },
     { key: "created_at", label: __("Date", "notifybay-waitlist-and-stock-alert-woo") },
   ];
@@ -397,26 +395,14 @@ const Leads: FC = () => {
                             />
                           ),
                         },
-                        ...(editingLead.price_at_subscription !== null
-                          ? [
-                              {
-                                id: "target_price",
-                                label: __("Target Price", "notifybay-waitlist-and-stock-alert-woo"),
-                                render: () => (
-                                  <ClassicInput
-                                    type="number"
-                                    value={(editingLead.price_at_subscription || "").toString()}
-                                    onChange={(e: any) =>
-                                      setEditingLead({
-                                        ...editingLead,
-                                        price_at_subscription: e.target.value ? parseFloat(e.target.value) : null,
-                                      })
-                                    }
-                                  />
-                                ),
-                              },
-                            ]
-                          : []),
+                        // A "Target Price" field lived here. It was wired to
+                        // price_at_subscription, but the save payload never sent
+                        // that key -- so typing in it changed nothing, silently,
+                        // while the dialog still reported "Lead updated
+                        // successfully." Removed rather than wired up: nothing
+                        // reads a customer-set target price, and Pro's
+                        // price-drop trigger compares against
+                        // price_at_subscription itself.
                       ]}
                     />
                     <div className="notifybay-flex notifybay-gap-[12px] notifybay-mt-[24px]">
@@ -529,19 +515,6 @@ const Leads: FC = () => {
                   {item.type === "waitlist"
                     ? "⏳ Waitlist"
                     : item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-                </span>
-              );
-            }
-            if (columnKey === "target_price") {
-              if (item.type === "waitlist" || !item.target_price) {
-                return <span className="notifybay-text-gray-300">-</span>;
-              }
-              return (
-                <span className="notifybay-text-[14px] notifybay-font-medium">
-                  {new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: item.user_currency || store.currency.code,
-                  }).format(item.target_price)}
                 </span>
               );
             }

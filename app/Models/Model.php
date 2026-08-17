@@ -144,7 +144,12 @@ abstract class Model {
 				array( $pk => $id )
 			);
 
-			return false === $result ? false : true;
+			if ( false === $result ) {
+				self::log_db_failure( 'update', $table, $data );
+				return false;
+			}
+
+			return true;
 		} else {
 			// Insert
 			$result = $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
@@ -156,8 +161,49 @@ abstract class Model {
 				$this->attributes[ $pk ] = $wpdb->insert_id;
 				return $this->attributes[ $pk ];
 			}
+
+			self::log_db_failure( 'insert', $table, $this->attributes );
 			return false;
 		}
+	}
+
+	/**
+	 * Record why a write failed.
+	 *
+	 * Previously save() returned a bare `false` and discarded $wpdb->last_error,
+	 * so a caller could only report something like "Could not update lead." with
+	 * no way to find out why. A real instance of that: an `Unknown column
+	 * 'target_price' in 'field list'` went unnoticed because the message never
+	 * reached anybody, and since save() writes every attribute in one statement,
+	 * the rejected column also discarded the legitimate changes beside it.
+	 *
+	 * The column list is logged, never the values -- a lead row holds an email
+	 * address and two tokens that let the bearer act as that customer.
+	 *
+	 * @since 1.0.3
+	 * @access private
+	 * @param string $operation Either `insert` or `update`.
+	 * @param string $table     The table written to.
+	 * @param array  $data      The data passed to $wpdb; only its keys are logged.
+	 * @return void
+	 */
+	private static function log_db_failure( $operation, $table, array $data ) {
+		global $wpdb;
+
+		if ( ! function_exists( 'notifybay_log' ) || '' === (string) $wpdb->last_error ) {
+			return;
+		}
+
+		notifybay_log(
+			sprintf(
+				'%s on %s failed: %s (columns: %s)',
+				$operation,
+				$table,
+				$wpdb->last_error,
+				implode( ', ', array_keys( $data ) )
+			),
+			'error'
+		);
 	}
 
 	/**

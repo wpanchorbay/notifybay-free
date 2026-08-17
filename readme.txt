@@ -99,6 +99,8 @@ To rebuild the compiled assets from source: run `npm install`, then `npm run bui
 * Fix: Setup Wizard no longer tells users to use a Gutenberg block for manual placement unless NotifyBay Pro is active.
 * Fix: clearing a numeric setting (e.g. Minimum Restock Threshold) silently reverted to the old value while the UI still showed a "Saved" success message.
 * Fix: guest waitlist status checks failed silently on an expired security token; waitlist actions now refresh the token and retry automatically instead of failing with no recovery path.
+* Fix: removed a non-functional "Target Price" field and column from the Leads screen. The field wrote to a database column that does not exist, which made the whole save fail — discarding the email and status changes made alongside it — and reported only "Could not update lead."
+* Fix: a failed database write is now logged with the reason, instead of failing with no explanation anywhere.
 
 = 1.0.1 =
 * Fix: the `templates/` directory (required to render the Leads Settings admin screen, product-column lead counts, and per-product override meta box) was missing from the packaged release, leaving those screens blank. Packaging now includes it correctly.
@@ -109,7 +111,7 @@ To rebuild the compiled assets from source: run `npm install`, then `npm run bui
 == Upgrade Notice ==
 
 = 1.0.2 =
-Removes two non-functional per-product settings fields, fixes wizard copy referencing a Free-tier block that no longer exists, fixes a settings field that silently reverted on save, and improves recovery from expired security tokens.
+Removes three non-functional fields, including a "Target Price" field on the Leads screen whose presence could make an otherwise valid lead edit fail. Also fixes wizard copy referencing a Free-tier block that no longer exists, fixes a settings field that silently reverted on save, and improves recovery from expired security tokens.
 
 = 1.0.1 =
 Fixes a blank Leads Settings screen under WooCommerce → Settings caused by missing template files in the 1.0.0 package.
