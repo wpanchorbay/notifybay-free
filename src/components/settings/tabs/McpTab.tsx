@@ -6,6 +6,7 @@ import { ConfirmationModal } from "../../common/ConfirmationModal";
 import { CopyToClipboard } from "../../common/CopyToClipboard";
 import { useToast } from "../../../store/toast/use-toast";
 import { McpLocalize, McpStatus } from "../../../utils/types";
+import { buildMcpSnippets } from "./mcpSnippets";
 
 interface McpTabProps {
   mcp: McpLocalize;
@@ -63,6 +64,7 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [pendingLevel, setPendingLevel] = useState<string | null>(null);
+  const [activeClient, setActiveClient] = useState("claude-code");
   const { addToast } = useToast();
 
   useEffect(() => {
@@ -196,7 +198,12 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
     );
   }
 
-  const clientConfig = JSON.stringify(status.client_config, null, 2);
+  const snippets = buildMcpSnippets({
+    endpoint: status.endpoint,
+    username: mcp.current_user_login,
+    offerTlsBypass: mcp.offer_tls_bypass,
+  });
+  const snippet = snippets.find((s) => s.id === activeClient) || snippets[0];
 
   return (
     <div className="notifybay-flex notifybay-flex-col notifybay-gap-6">
@@ -315,7 +322,7 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
           "notifybay-waitlist-and-stock-alert-woo",
         )}
         description={__(
-          "Your assistant signs in as a WordPress user using an Application Password, which you create under Users. Its own role still limits what it can reach, on top of the access level above.",
+          "Your assistant signs in as an ordinary WordPress user with an Application Password. Its own role still limits what it can reach, on top of the access level above.",
           "notifybay-waitlist-and-stock-alert-woo",
         )}
         fields={[
@@ -335,22 +342,101 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
             ),
           },
           {
+            id: "mcp_app_password",
+            label: __(
+              "Application Password",
+              "notifybay-waitlist-and-stock-alert-woo",
+            ),
+            tooltip: __(
+              "A revocable, per-application credential. It cannot be used to sign in to the dashboard, and revoking it does not change the account's own password.",
+              "notifybay-waitlist-and-stock-alert-woo",
+            ),
+            render: () => (
+              <div className="notifybay-flex notifybay-flex-col notifybay-gap-2">
+                {mcp.app_passwords_available ? (
+                  <p className="description notifybay-m-0">
+                    <a href={mcp.app_passwords_url}>
+                      {__(
+                        "Create one on your profile",
+                        "notifybay-waitlist-and-stock-alert-woo",
+                      )}
+                    </a>
+                    {" — "}
+                    {__(
+                      "or create one for a separate, low-privilege account under Users.",
+                      "notifybay-waitlist-and-stock-alert-woo",
+                    )}
+                  </p>
+                ) : (
+                  /*
+                   * Without this the adopter gets an unexplained 401 and no
+                   * hint that the transport is the problem: WordPress refuses
+                   * Application Passwords entirely over plain http, and an MCP
+                   * client has no other way to authenticate.
+                   */
+                  <p className="notifybay-m-0 notifybay-text-sm notifybay-text-red-700">
+                    {__(
+                      "WordPress is refusing Application Passwords on this site, which usually means it is served over plain http. No MCP client can authenticate until the site uses https.",
+                      "notifybay-waitlist-and-stock-alert-woo",
+                    )}
+                  </p>
+                )}
+              </div>
+            ),
+          },
+          {
             id: "mcp_client_config",
             label: __(
               "Client configuration",
               "notifybay-waitlist-and-stock-alert-woo",
             ),
             tooltip: __(
-              "Paste this into your MCP client, then fill in the username and Application Password.",
+              "Pick your client, paste the snippet, then substitute the credential. Nothing here contains a real password.",
               "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <div className="notifybay-flex notifybay-flex-col notifybay-gap-2">
+                <ul className="subsubsub !notifybay-m-0 !notifybay-p-0 notifybay-list-none">
+                  {snippets.map((s, index) => (
+                    <li
+                      key={s.id}
+                      className="notifybay-inline-block !notifybay-m-0"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setActiveClient(s.id)}
+                        className={`notifybay-p-0 notifybay-bg-transparent notifybay-border-0 notifybay-cursor-pointer notifybay-text-[13px] ${
+                          activeClient === s.id
+                            ? "notifybay-text-black notifybay-font-bold"
+                            : "notifybay-text-[#2271b1] hover:notifybay-text-[#135e96]"
+                        }`}
+                      >
+                        {s.label}
+                      </button>
+                      {index < snippets.length - 1 && (
+                        <span className="notifybay-mx-1 notifybay-text-[#c3c4c7]">
+                          |
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="description notifybay-m-0">
+                  {snippet.instructions}
+                </p>
+
+                {snippet.warning && (
+                  <p className="notifybay-m-0 notifybay-text-sm notifybay-text-red-700">
+                    {snippet.warning}
+                  </p>
+                )}
+
                 <div className="notifybay-flex notifybay-justify-end">
-                  <CopyToClipboard text={clientConfig} />
+                  <CopyToClipboard text={snippet.snippet} />
                 </div>
                 <pre className="notifybay-bg-gray-50 notifybay-border notifybay-border-gray-200 notifybay-p-3 notifybay-rounded-lg notifybay-text-xs notifybay-overflow-x-auto notifybay-m-0">
-                  {clientConfig}
+                  {snippet.snippet}
                 </pre>
               </div>
             ),

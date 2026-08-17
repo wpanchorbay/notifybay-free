@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-17T12:15:51+00:00\n"
+"POT-Creation-Date: 2026-08-17T13:23:47+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: notifybay-waitlist-and-stock-alert-woo\n"
@@ -1350,6 +1350,50 @@ msgid "Loading MCP settings…"
 msgstr ""
 
 #: build/settings.js:1
+msgid "Claude Code"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Run this in a terminal where Claude Code is installed, replacing the placeholder with base64 of \"username:application-password\"."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Claude Desktop"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Add this to your Claude Desktop config (Settings → Developer → Edit Config), fill in the application password, then restart Claude Desktop."
+msgstr ""
+
+#: build/settings.js:1
+msgid "NODE_TLS_REJECT_UNAUTHORIZED=0 turns off certificate checking for the proxy. It is included because this looks like a development site with a self-signed certificate. Never keep it on a live store — trust the certificate authority instead."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Cursor"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Add this to Cursor's mcp.json, replacing the placeholder with base64 of \"username:application-password\". No proxy is needed."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Codex"
+msgstr ""
+
+#: build/settings.js:1
+msgid "In Codex, add a custom MCP server with Streamable HTTP transport and the Authorization header above."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Anything else"
+msgstr ""
+
+#: build/settings.js:1
+msgid "Any MCP client that speaks Streamable HTTP can connect with this URL and a Basic auth header."
+msgstr ""
+
+#: build/settings.js:1
 msgid "AI assistant access (MCP)"
 msgstr ""
 
@@ -1390,7 +1434,7 @@ msgid "Connecting a client"
 msgstr ""
 
 #: build/settings.js:1
-msgid "Your assistant signs in as a WordPress user using an Application Password, which you create under Users. Its own role still limits what it can reach, on top of the access level above."
+msgid "Your assistant signs in as an ordinary WordPress user with an Application Password. Its own role still limits what it can reach, on top of the access level above."
 msgstr ""
 
 #: build/settings.js:1
@@ -1398,11 +1442,31 @@ msgid "Endpoint URL"
 msgstr ""
 
 #: build/settings.js:1
+msgid "Application Password"
+msgstr ""
+
+#: build/settings.js:1
+msgid "A revocable, per-application credential. It cannot be used to sign in to the dashboard, and revoking it does not change the account's own password."
+msgstr ""
+
+#: build/settings.js:1
+msgid "Create one on your profile"
+msgstr ""
+
+#: build/settings.js:1
+msgid "or create one for a separate, low-privilege account under Users."
+msgstr ""
+
+#: build/settings.js:1
+msgid "WordPress is refusing Application Passwords on this site, which usually means it is served over plain http. No MCP client can authenticate until the site uses https."
+msgstr ""
+
+#: build/settings.js:1
 msgid "Client configuration"
 msgstr ""
 
 #: build/settings.js:1
-msgid "Paste this into your MCP client, then fill in the username and Application Password."
+msgid "Pick your client, paste the snippet, then substitute the credential. Nothing here contains a real password."
 msgstr ""
 
 #: build/settings.js:1

@@ -383,13 +383,73 @@ class Admin {
 			return null;
 		}
 
+		$user = wp_get_current_user();
+
 		// `notifybay` is declared permanent in config/mcp.php, which is the
 		// source of truth; it is repeated here rather than requiring that file
 		// on every admin screen load.
 		return array(
-			'product_key' => 'notifybay',
-			'rest_url'    => get_rest_url( null, 'wpab/v1/notifybay' ),
+			'product_key'             => 'notifybay',
+			'rest_url'                => get_rest_url( null, 'wpab/v1/notifybay' ),
+			'admin_rest_url'          => get_rest_url( null, \NOTIFYBAY_TEXT_DOMAIN . '/v1/admin' ),
+			'app_passwords_url'       => admin_url( 'profile.php#application-passwords-section' ),
+			'users_url'               => admin_url( 'users.php' ),
+			'current_user_login'      => $user && $user->exists() ? $user->user_login : '',
+
+			/*
+			 * WordPress refuses Application Passwords over plain http, and an
+			 * MCP client has no other way in. Without this the adopter sees an
+			 * unexplained 401 and no hint that the transport is the problem.
+			 */
+			'app_passwords_available' => wp_is_application_passwords_available(),
+			'is_local_dev'            => self::is_local_dev(),
+
+			/*
+			 * Whether to offer the npx proxy's NODE_TLS_REJECT_UNAUTHORIZED=0
+			 * escape hatch, which disables certificate verification and is
+			 * therefore offered as narrowly as possible: only on a development
+			 * host that is actually served over https, where a self-signed
+			 * certificate is the plausible reason the proxy cannot connect. On
+			 * plain http there is no TLS to verify, so including it there would
+			 * teach the habit without ever being the fix.
+			 */
+			'offer_tls_bypass'        => self::is_local_dev()
+				&& 'https' === strtolower( (string) wp_parse_url( home_url(), PHP_URL_SCHEME ) ),
 		);
+	}
+
+	/**
+	 * Whether this looks like a development host.
+	 *
+	 * Used only to decide whether the connection snippet should carry
+	 * `NODE_TLS_REJECT_UNAUTHORIZED=0`, which the npx proxy needs to talk to a
+	 * self-signed certificate. It must never be used to relax a security
+	 * decision.
+	 *
+	 * @since 1.0.3
+	 * @access private
+	 * @return bool
+	 */
+	private static function is_local_dev() {
+		$host = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
+
+		$is_local = in_array( $host, array( 'localhost', '127.0.0.1', '::1' ), true );
+
+		if ( ! $is_local ) {
+			foreach ( array( '.test', '.local', '.localhost', '.lab', '.docker' ) as $tld ) {
+				if ( substr( $host, -strlen( $tld ) ) === $tld ) {
+					$is_local = true;
+					break;
+				}
+			}
+		}
+
+		// A private or reserved IP address is a development host too.
+		if ( ! $is_local && filter_var( $host, FILTER_VALIDATE_IP ) ) {
+			$is_local = ! filter_var( $host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE );
+		}
+
+		return (bool) apply_filters( 'notifybay_mcp_is_local_dev', $is_local, $host );
 	}
 
 	/**

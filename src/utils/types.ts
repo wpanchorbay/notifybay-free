@@ -92,6 +92,16 @@ export interface McpLocalize {
 	product_key: string;
 	/** Base URL of the kit's settings routes, e.g. `.../wp-json/wpab/v1/notifybay`. */
 	rest_url: string;
+	/** Base URL of NotifyBay's own admin routes, used for account provisioning. */
+	admin_rest_url: string;
+	app_passwords_url: string;
+	users_url: string;
+	current_user_login: string;
+	/** False when WordPress refuses Application Passwords, e.g. over plain http. */
+	app_passwords_available: boolean;
+	is_local_dev: boolean;
+	/** Only true on an https development host, where a self-signed cert is plausible. */
+	offer_tls_bypass: boolean;
 }
 
 /**
