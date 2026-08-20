@@ -33,12 +33,17 @@ interface McpAppPasswordsProps {
  * user_id in any request this component makes, so there is no target to
  * tamper with.
  *
- * One honest limitation in the two-step form below. WordPress mints the secret
- * itself, inside the call that stores it -- there is no way to produce a
- * password locally and save it afterwards. So Generate is what creates the
- * credential, and it works from that moment. Save applies any edit to the name
- * and closes the form, after making sure the secret has been copied, because
- * that is the step people lose things at.
+ * There is one button that does anything, and it is Generate. WordPress mints
+ * the secret inside the call that stores it, so the credential exists and works
+ * from that moment -- there is no later step to commit. This form briefly had a
+ * Save button after Generate, which was a lie: nothing was unsaved, and all it
+ * could do was rename something already created.
+ *
+ * What is real is the risk of losing the secret, since it is displayed once and
+ * only a hash is kept. So Done confirms it has been copied before clearing the
+ * screen, and the name locks once used -- an editable field that no longer
+ * affects anything is the same lie in a smaller form. Renaming afterwards is
+ * what the list is for.
  *
  * @param root0
  * @param root0.endpoint
@@ -57,9 +62,6 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
   // thing that tells two rows apart when deciding which to revoke.
   const [name, setName] = useState("");
   const [secret, setSecret] = useState<string | null>(null);
-  const [issued, setIssued] = useState<{ uuid: string; name: string } | null>(
-    null,
-  );
   const [confirming, setConfirming] = useState(false);
 
   /*
@@ -119,7 +121,6 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
       const value = response.password.replace(/\s/g, "");
 
       setSecret(value);
-      setIssued({ uuid: response.uuid, name: trimmed });
       onSecretChange(value);
       await load();
     } catch (error) {
@@ -143,41 +144,14 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
     });
   };
 
-  // Reached only through the confirmation, which is the point of it.
-  const save = async () => {
+  // Reached only through the confirmation, which is the whole point of it.
+  // Nothing is written here -- the credential was stored by Generate. This
+  // clears the one copy of the secret off the screen.
+  const dismiss = () => {
     setConfirming(false);
-    setIsBusy(true);
-
-    try {
-      const trimmed = name.trim();
-
-      // The name is editable after generating, so a change made in between
-      // still has to land somewhere.
-      if (issued && trimmed && trimmed !== issued.name) {
-        await rename(issued.uuid, trimmed);
-      }
-
-      setSecret(null);
-      setIssued(null);
-      setName("");
-      onSecretChange(null);
-      await load();
-
-      addToast(
-        __("Saved.", "notifybay-waitlist-and-stock-alert-woo"),
-        "success",
-      );
-    } catch (error) {
-      failed(
-        error,
-        __(
-          "The password works, but the name could not be updated.",
-          "notifybay-waitlist-and-stock-alert-woo",
-        ),
-      );
-    } finally {
-      setIsBusy(false);
-    }
+    setSecret(null);
+    setName("");
+    onSecretChange(null);
   };
 
   const commitRename = async () => {
@@ -250,7 +224,7 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
               "e.g. Claude on my laptop",
               "notifybay-waitlist-and-stock-alert-woo",
             )}
-            disabled={isBusy}
+            disabled={isBusy || null !== secret}
           />
         </div>
 
@@ -283,25 +257,16 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
         </div>
 
         <div className="notifybay-flex notifybay-items-center notifybay-gap-2 notifybay-pl-[6.5rem]">
-          <ClassicButton
-            variant={secret ? "secondary" : "primary"}
-            onClick={generate}
-            disabled={isBusy}
-          >
-            {secret
-              ? __(
-                  "Generate another",
-                  "notifybay-waitlist-and-stock-alert-woo",
-                )
-              : __(
-                  "Generate password",
-                  "notifybay-waitlist-and-stock-alert-woo",
-                )}
-          </ClassicButton>
-
-          {secret && (
+          {secret ? (
             <ClassicButton onClick={() => setConfirming(true)} disabled={isBusy}>
-              {__("Save", "notifybay-waitlist-and-stock-alert-woo")}
+              {__("Done", "notifybay-waitlist-and-stock-alert-woo")}
+            </ClassicButton>
+          ) : (
+            <ClassicButton onClick={generate} disabled={isBusy}>
+              {__(
+                "Generate password",
+                "notifybay-waitlist-and-stock-alert-woo",
+              )}
             </ClassicButton>
           )}
         </div>
@@ -309,7 +274,7 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
         {secret && (
           <p className="notifybay-m-0 notifybay-rounded-md notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50 notifybay-p-2 notifybay-text-sm">
             {__(
-              "Copy this password now. It is the only time it can be shown, and saving clears it.",
+              "This credential is already active. Copy the password now — it is the only time it can be shown.",
               "notifybay-waitlist-and-stock-alert-woo",
             )}
           </p>
@@ -380,11 +345,11 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
           "notifybay-waitlist-and-stock-alert-woo",
         )}
         message={__(
-          "Saving clears it from the screen, and WordPress cannot show it again — it stores only a hash. If you have not copied it, cancel, copy it, then save. Losing it costs nothing but a new password: revoke this one and generate another.",
+          "The credential is already saved and working — this only clears the password from the screen. WordPress cannot show it again, because it stores only a hash. If you have not copied it, choose Not yet. Losing it costs nothing but a replacement: revoke this credential and generate another.",
           "notifybay-waitlist-and-stock-alert-woo",
         )}
         confirmLabel={__(
-          "I have copied it — save",
+          "I have copied it",
           "notifybay-waitlist-and-stock-alert-woo",
         )}
         cancelLabel={__(
@@ -399,7 +364,7 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
          */
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus="cancel"
-        onConfirm={save}
+        onConfirm={dismiss}
         onCancel={() => setConfirming(false)}
       />
     </div>
