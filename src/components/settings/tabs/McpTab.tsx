@@ -416,7 +416,6 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                   <>
                     <McpAppPasswords
                       endpoint={mcp.app_passwords_rest_url}
-                      suggestedName={`NotifyBay MCP - ${snippet.label}`}
                       onSecretChange={setLiveSecret}
                     />
                     {/*

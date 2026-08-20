@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { __, sprintf } from "@wordpress/i18n";
 import apiFetch from "../../../utils/apiFetch";
 import { ClassicInput, ClassicButton } from "../../classics";
+import { ConfirmationModal } from "../../common/ConfirmationModal";
 import { CopyToClipboard } from "../../common/CopyToClipboard";
 import { useToast } from "../../../store/toast/use-toast";
 import { McpAppPassword } from "../../../utils/types";
@@ -9,12 +10,10 @@ import { McpAppPassword } from "../../../utils/types";
 interface McpAppPasswordsProps {
   /** Absolute URL of core's `wp/v2/users/me/application-passwords` route. */
   endpoint: string;
-  /** Seeds the label field, so the credential and the snippet agree. */
-  suggestedName: string;
   /**
    * Reports the live secret upwards while it is on screen, so the connection
    * snippets can be shown complete instead of asking the reader to base64 a
-   * credential by hand. Called with null the moment it is dismissed.
+   * credential by hand. Called with null the moment the form is cleared.
    */
   onSecretChange: (secret: string | null) => void;
 }
@@ -34,43 +33,42 @@ interface McpAppPasswordsProps {
  * user_id in any request this component makes, so there is no target to
  * tamper with.
  *
+ * One honest limitation in the two-step form below. WordPress mints the secret
+ * itself, inside the call that stores it -- there is no way to produce a
+ * password locally and save it afterwards. So Generate is what creates the
+ * credential, and it works from that moment. Save applies any edit to the name
+ * and closes the form, after making sure the secret has been copied, because
+ * that is the step people lose things at.
+ *
  * @param root0
  * @param root0.endpoint
- * @param root0.suggestedName
+ * @param root0.onSecretChange
  */
 export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
   endpoint,
-  suggestedName,
   onSecretChange,
 }) => {
   const [items, setItems] = useState<McpAppPassword[] | null>(null);
-  const [name, setName] = useState(suggestedName);
   const [isBusy, setIsBusy] = useState(false);
+  const { addToast } = useToast();
+
+  // The new credential being set up. `name` starts empty on purpose: a
+  // prefilled one gets accepted without being read, and the name is the only
+  // thing that tells two rows apart when deciding which to revoke.
+  const [name, setName] = useState("");
+  const [secret, setSecret] = useState<string | null>(null);
+  const [issued, setIssued] = useState<{ uuid: string; name: string } | null>(
+    null,
+  );
+  const [confirming, setConfirming] = useState(false);
 
   /*
-   * The label is what tells one credential from another when revoking, so a
-   * generated one must not be a label the reader is stuck with. Core exposes
-   * PUT on the same route (verified: HTTP 200, name updated), so renaming
-   * needs no more than the uuid already in hand.
+   * Renaming an existing row. Core exposes PUT on the same route (verified:
+   * HTTP 200, name updated), so it needs no more than the uuid already in hand.
    */
   const [editing, setEditing] = useState<{ uuid: string; name: string } | null>(
     null,
   );
-  const { addToast } = useToast();
-
-  /*
-   * Shown once and never again. Core returns the value space-chunked for
-   * readability; the spaces are stripped because this string gets pasted into
-   * shell commands and JSON config where a space breaks it. WordPress strips
-   * whitespace before comparing, so both forms authenticate.
-   *
-   * The box below is styled with the plugin's own utilities rather than
-   * WordPress's `notice` class, which would be invisible here:
-   * `#wpcontent:has(#notifybay) .notice { display: none }` in index.scss:639
-   * suppresses admin nags on this plugin's screens, and it cannot tell an
-   * unwanted nag from the one thing on the page the reader must not miss.
-   */
-  const [secret, setSecret] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -86,27 +84,17 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /*
-   * The field follows the client picker until the reader edits it. Core
-   * permits two passwords with the same name (verified: both creates return
-   * ok), so nothing stops a duplicate -- but the label is the only thing
-   * distinguishing one row from another when revoking, which is exactly why
-   * the reader writes it rather than the machine.
-   */
-  useEffect(() => {
-    setName((current) =>
-      "" === current || current.startsWith("NotifyBay MCP")
-        ? suggestedName
-        : current,
-    );
-  }, [suggestedName]);
+  const failed = (error: any, fallback: string) => {
+    addToast(error?.message || fallback, "error");
+  };
 
-  const create = async () => {
+  const generate = async () => {
     const trimmed = name.trim();
+
     if (!trimmed) {
       addToast(
         __(
-          "Give the password a name first, so you can tell it apart later.",
+          "Name it first, so you can tell it apart from other credentials later.",
           "notifybay-waitlist-and-stock-alert-woo",
         ),
         "error",
@@ -122,25 +110,77 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
         data: { name: trimmed },
       })) as McpAppPassword & { password: string };
 
-      const issued = response.password.replace(/\s/g, "");
-      setSecret(issued);
-      onSecretChange(issued);
+      /*
+       * Core returns the value space-chunked for readability. The spaces are
+       * stripped because this gets pasted into shell commands and JSON config,
+       * where one breaks it. WordPress strips whitespace before comparing, so
+       * both forms authenticate.
+       */
+      const value = response.password.replace(/\s/g, "");
+
+      setSecret(value);
+      setIssued({ uuid: response.uuid, name: trimmed });
+      onSecretChange(value);
       await load();
-    } catch (error: any) {
-      addToast(
-        error?.message ||
-          __(
-            "Could not create the application password.",
-            "notifybay-waitlist-and-stock-alert-woo",
-          ),
-        "error",
+    } catch (error) {
+      failed(
+        error,
+        __(
+          "Could not generate the password.",
+          "notifybay-waitlist-and-stock-alert-woo",
+        ),
       );
     } finally {
       setIsBusy(false);
     }
   };
 
-  const rename = async () => {
+  const rename = async (uuid: string, next: string) => {
+    await apiFetch({
+      url: `${endpoint}/${uuid}`,
+      method: "PUT",
+      data: { name: next },
+    });
+  };
+
+  // Reached only through the confirmation, which is the point of it.
+  const save = async () => {
+    setConfirming(false);
+    setIsBusy(true);
+
+    try {
+      const trimmed = name.trim();
+
+      // The name is editable after generating, so a change made in between
+      // still has to land somewhere.
+      if (issued && trimmed && trimmed !== issued.name) {
+        await rename(issued.uuid, trimmed);
+      }
+
+      setSecret(null);
+      setIssued(null);
+      setName("");
+      onSecretChange(null);
+      await load();
+
+      addToast(
+        __("Saved.", "notifybay-waitlist-and-stock-alert-woo"),
+        "success",
+      );
+    } catch (error) {
+      failed(
+        error,
+        __(
+          "The password works, but the name could not be updated.",
+          "notifybay-waitlist-and-stock-alert-woo",
+        ),
+      );
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const commitRename = async () => {
     if (!editing || !editing.name.trim()) {
       setEditing(null);
       return;
@@ -148,18 +188,13 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
 
     setIsBusy(true);
     try {
-      await apiFetch({
-        url: `${endpoint}/${editing.uuid}`,
-        method: "PUT",
-        data: { name: editing.name.trim() },
-      });
+      await rename(editing.uuid, editing.name.trim());
       setEditing(null);
       await load();
-    } catch (error: any) {
-      addToast(
-        error?.message ||
-          __("Could not rename it.", "notifybay-waitlist-and-stock-alert-woo"),
-        "error",
+    } catch (error) {
+      failed(
+        error,
+        __("Could not rename it.", "notifybay-waitlist-and-stock-alert-woo"),
       );
     } finally {
       setIsBusy(false);
@@ -178,11 +213,10 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
         "success",
       );
       await load();
-    } catch (error: any) {
-      addToast(
-        error?.message ||
-          __("Could not revoke it.", "notifybay-waitlist-and-stock-alert-woo"),
-        "error",
+    } catch (error) {
+      failed(
+        error,
+        __("Could not revoke it.", "notifybay-waitlist-and-stock-alert-woo"),
       );
     } finally {
       setIsBusy(false);
@@ -200,53 +234,87 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
 
   return (
     <div className="notifybay-flex notifybay-flex-col notifybay-gap-3">
-      <div className="notifybay-flex notifybay-items-center notifybay-gap-2">
-        <ClassicInput
-          id="mcp_app_password_name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={__(
-            "e.g. NotifyBay MCP",
-            "notifybay-waitlist-and-stock-alert-woo",
-          )}
-          disabled={isBusy}
-        />
-        <ClassicButton onClick={create} disabled={isBusy}>
-          {__("Generate password", "notifybay-waitlist-and-stock-alert-woo")}
-        </ClassicButton>
-      </div>
-
-      {secret && (
-        <div className="notifybay-flex notifybay-flex-col notifybay-gap-2 notifybay-p-3 notifybay-m-0 notifybay-max-w-2xl notifybay-rounded-lg notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50 notifybay-text-amber-900">
-          <p className="notifybay-mt-0 notifybay-font-semibold">
-            {__(
-              "Copy it now — this is the only time it can be shown.",
-              "notifybay-waitlist-and-stock-alert-woo",
-            )}
-          </p>
-          <p className="notifybay-m-0 notifybay-text-sm">
-            {__(
-              "The connection snippets below now include it, ready to paste. They go back to placeholders once you press Done.",
-              "notifybay-waitlist-and-stock-alert-woo",
-            )}
-          </p>
-          <div className="notifybay-flex notifybay-items-center notifybay-gap-2 notifybay-max-w-2xl">
-            <code className="notifybay-flex-1 notifybay-rounded-md notifybay-border notifybay-border-amber-300 notifybay-bg-white notifybay-px-3 notifybay-py-2 notifybay-text-base notifybay-tracking-wide notifybay-break-all">
-              {secret}
-            </code>
-            <CopyToClipboard text={secret} />
-          </div>
-          <ClassicButton
-            variant="secondary"
-            onClick={() => {
-              setSecret(null);
-              onSecretChange(null);
-            }}
+      <div className="notifybay-flex notifybay-flex-col notifybay-gap-2 notifybay-max-w-2xl">
+        <div className="notifybay-flex notifybay-items-center notifybay-gap-2">
+          <label
+            htmlFor="mcp_app_password_name"
+            className="notifybay-w-24 notifybay-text-sm notifybay-shrink-0"
           >
-            {__("Done", "notifybay-waitlist-and-stock-alert-woo")}
-          </ClassicButton>
+            {__("Name", "notifybay-waitlist-and-stock-alert-woo")}
+          </label>
+          <ClassicInput
+            id="mcp_app_password_name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={__(
+              "e.g. Claude on my laptop",
+              "notifybay-waitlist-and-stock-alert-woo",
+            )}
+            disabled={isBusy}
+          />
         </div>
-      )}
+
+        <div className="notifybay-flex notifybay-items-center notifybay-gap-2">
+          <label
+            htmlFor="mcp_app_password_value"
+            className="notifybay-w-24 notifybay-text-sm notifybay-shrink-0"
+          >
+            {__("Password", "notifybay-waitlist-and-stock-alert-woo")}
+          </label>
+
+          {/*
+            Readonly rather than disabled: WordPress generates the value, so it
+            is never typed -- but a disabled field cannot be selected, and
+            selecting it by hand is a fair way to copy.
+          */}
+          <input
+            type="text"
+            id="mcp_app_password_value"
+            className="regular-text notifybay-font-mono"
+            value={secret || ""}
+            readOnly
+            placeholder={__(
+              "generated for you",
+              "notifybay-waitlist-and-stock-alert-woo",
+            )}
+          />
+
+          {secret && <CopyToClipboard text={secret} />}
+        </div>
+
+        <div className="notifybay-flex notifybay-items-center notifybay-gap-2 notifybay-pl-[6.5rem]">
+          <ClassicButton
+            variant={secret ? "secondary" : "primary"}
+            onClick={generate}
+            disabled={isBusy}
+          >
+            {secret
+              ? __(
+                  "Generate another",
+                  "notifybay-waitlist-and-stock-alert-woo",
+                )
+              : __(
+                  "Generate password",
+                  "notifybay-waitlist-and-stock-alert-woo",
+                )}
+          </ClassicButton>
+
+          {secret && (
+            <ClassicButton onClick={() => setConfirming(true)} disabled={isBusy}>
+              {__("Save", "notifybay-waitlist-and-stock-alert-woo")}
+            </ClassicButton>
+          )}
+        </div>
+
+        {secret && (
+          <p className="notifybay-m-0 notifybay-rounded-md notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50 notifybay-p-2 notifybay-text-sm">
+            {__(
+              "Copy this password now. It is the only time it can be shown, and saving clears it.",
+              "notifybay-waitlist-and-stock-alert-woo",
+            )}
+          </p>
+        )}
+      </div>
 
       {null !== items && items.length > 0 && (
         <table className="widefat striped notifybay-w-full notifybay-max-w-2xl notifybay-rounded-lg notifybay-overflow-hidden">
@@ -261,10 +329,10 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
                       onChange={(e) =>
                         setEditing({ uuid: item.uuid, name: e.target.value })
                       }
-                      onBlur={rename}
+                      onBlur={commitRename}
                       onKeyDown={(e) => {
                         if ("Enter" === e.key) {
-                          rename();
+                          commitRename();
                         }
                         if ("Escape" === e.key) {
                           setEditing(null);
@@ -304,6 +372,36 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
           </tbody>
         </table>
       )}
+
+      <ConfirmationModal
+        isOpen={confirming}
+        title={__(
+          "Have you copied the password?",
+          "notifybay-waitlist-and-stock-alert-woo",
+        )}
+        message={__(
+          "Saving clears it from the screen, and WordPress cannot show it again — it stores only a hash. If you have not copied it, cancel, copy it, then save. Losing it costs nothing but a new password: revoke this one and generate another.",
+          "notifybay-waitlist-and-stock-alert-woo",
+        )}
+        confirmLabel={__(
+          "I have copied it — save",
+          "notifybay-waitlist-and-stock-alert-woo",
+        )}
+        cancelLabel={__(
+          "Not yet",
+          "notifybay-waitlist-and-stock-alert-woo",
+        )}
+        /*
+         * ConfirmationModal's own prop, not the DOM attribute the a11y rule is
+         * aimed at. It focuses the confirm button by default, so without this,
+         * opening the dialog and pressing Enter would dismiss the one warning
+         * standing between the reader and a lost secret.
+         */
+        // eslint-disable-next-line jsx-a11y/no-autofocus
+        autoFocus="cancel"
+        onConfirm={save}
+        onCancel={() => setConfirming(false)}
+      />
     </div>
   );
 };
