@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import apiFetch from "../../../utils/apiFetch";
 import { ClassicSettingsTable, ClassicToggle } from "../../classics";
 import { ConfirmationModal } from "../../common/ConfirmationModal";
@@ -524,6 +524,25 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                   <div className="notifybay-flex notifybay-items-center notifybay-justify-between notifybay-border-b notifybay-border-gray-200 notifybay-bg-gray-100 notifybay-px-3 notifybay-py-1.5">
                     <span className="notifybay-text-xs notifybay-font-semibold notifybay-text-gray-600">
                       {snippet.label}
+                      {/*
+                        Basic auth carries the username inside the base64, so
+                        three of these five snippets never show which account
+                        they are for. Naming it here fixes that without putting
+                        a comment inside a JSON file, which Cursor's mcp.json
+                        would reject.
+                      */}
+                      {mcp.current_user_login && (
+                        <span className="notifybay-font-normal notifybay-text-gray-500">
+                          {sprintf(
+                            /* translators: %s: the WordPress username the snippet authenticates as. */
+                            __(
+                              " · connects as %s",
+                              "notifybay-waitlist-and-stock-alert-woo",
+                            ),
+                            mcp.current_user_login,
+                          )}
+                        </span>
+                      )}
                     </span>
                     <CopyToClipboard text={snippet.snippet} />
                   </div>

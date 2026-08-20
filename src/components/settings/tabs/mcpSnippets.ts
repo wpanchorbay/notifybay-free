@@ -94,6 +94,7 @@ export function buildMcpSnippets({
       label: __("Claude Code", "notifybay-waitlist-and-stock-alert-woo"),
       kind: "shell",
       snippet: [
+        `# Connects as ${user}. Basic auth carries the username in the base64.`,
         "claude mcp add \\",
         "  --transport http \\",
         `  notifybay ${endpoint} \\`,
@@ -164,6 +165,7 @@ export function buildMcpSnippets({
         "Name:       notifybay",
         "Transport:  Streamable HTTP",
         `URL:        ${endpoint}`,
+        `Signs in as: ${user}`,
         "",
         "Header:",
         "  Key:    Authorization",

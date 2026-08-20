@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-20T07:14:02+00:00\n"
+"POT-Creation-Date: 2026-08-20T07:32:05+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: notifybay-waitlist-and-stock-alert-woo\n"
@@ -453,7 +453,7 @@ msgstr ""
 
 #: notifybay-waitlist-and-stock-alert-woo.php:144
 #: build/admin.js:1
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Cancel"
 msgstr ""
 
@@ -562,13 +562,13 @@ msgid "Disable Wishlist"
 msgstr ""
 
 #: templates/admin/meta-box-overrides.php:49
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Pro"
 msgstr ""
 
 #: templates/admin/meta-box-overrides.php:54
 #: build/admin.js:1
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Unlock with Pro"
 msgstr ""
 
@@ -753,12 +753,12 @@ msgid "Unlock with Pro ✦"
 msgstr ""
 
 #: build/admin.js:1
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Upgrade to unlock"
 msgstr ""
 
 #: build/admin.js:1
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Buy Pro"
 msgstr ""
 
@@ -1073,7 +1073,7 @@ msgid "Customize how the 'Notify Me' button and social proof elements appear on 
 msgstr ""
 
 #: build/settings.js:1
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Button Text"
 msgstr ""
 
@@ -1082,7 +1082,7 @@ msgid "The text shown on the 'Notify Me' button."
 msgstr ""
 
 #: build/settings.js:1
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Button CSS Class"
 msgstr ""
 
@@ -1095,7 +1095,7 @@ msgid "e.g. my-custom-btn"
 msgstr ""
 
 #: build/settings.js:1
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Success Message"
 msgstr ""
 
@@ -1565,190 +1565,196 @@ msgstr ""
 msgid "Pick your client, paste the snippet, then substitute the credential. Nothing here contains a real password."
 msgstr ""
 
-#: build/settings.js:2
+#. translators: %s: the WordPress username the snippet authenticates as.
+#: build/settings.js:3
+#, js-format
+msgid " · connects as %s"
+msgstr ""
+
+#: build/settings.js:3
 msgid "Allow the assistant to delete?"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Full access lets the assistant permanently delete leads. Deleted leads cannot be recovered. Only grant this if you trust the assistant and the account it connects with."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Grant full access"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Wishlist"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Enable wishlist functionality (price-drop notifications) across the store."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Enable Wishlist"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Enable Wishlist features"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Social Proof (FOMO)"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Show how many other people are waiting for this product."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Enable FOMO Banner"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Show waiting count on product page"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Use {count} as a placeholder."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Only show if count is equal or higher than this."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Wishlist Display"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Optional extra CSS class(es) added to the wishlist button."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Shown after a product is added to the wishlist."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Archive Visibility"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Show on shop archives"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Fair-Play Restock"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Prevents customer frustration by only notifying a number of people equal to the actual units restocked."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Fair-Play"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Only notify leads equal to available stock"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Notification multiplier per unit restocked."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Reservation window, in hours."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Sales Attribution"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Conversion Window (Days)"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Urgency Alerts"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Hurry Logic"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Enable follow-up urgency alerts"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Trigger alert when stock falls below this level."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Minimum hours after restock before the hurry alert fires."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Failed to load system status."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Failed to load settings."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Settings saved successfully."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Failed to save settings."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Overview"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "General"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Display"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Engine Logic"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Email Templates"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "System Status"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "AI Access"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Advanced"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Unsaved Changes"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "You have unsaved changes. Would you like to save them before switching tabs?"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Save"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:3
 msgid "Discard"
 msgstr ""
