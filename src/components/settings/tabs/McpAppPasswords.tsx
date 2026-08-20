@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { __, sprintf } from "@wordpress/i18n";
 import apiFetch from "../../../utils/apiFetch";
-import { ClassicInput, ClassicButton } from "../../classics";
+import { ClassicButton } from "../../classics";
 import { CopyToClipboard } from "../../common/CopyToClipboard";
 import { useToast } from "../../../store/toast/use-toast";
 import { McpAppPassword } from "../../../utils/types";
@@ -9,8 +9,8 @@ import { McpAppPassword } from "../../../utils/types";
 interface McpAppPasswordsProps {
   /** Absolute URL of core's `wp/v2/users/me/application-passwords` route. */
   endpoint: string;
-  /** Seeds the name field, so the credential and the snippet agree. */
-  suggestedName: string;
+  /** Base label for the generated credential, so it and the snippet agree. */
+  baseName: string;
 }
 
 /**
@@ -34,10 +34,9 @@ interface McpAppPasswordsProps {
  */
 export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
   endpoint,
-  suggestedName,
+  baseName,
 }) => {
   const [items, setItems] = useState<McpAppPassword[] | null>(null);
-  const [name, setName] = useState(suggestedName);
   const [isBusy, setIsBusy] = useState(false);
   const { addToast } = useToast();
 
@@ -63,22 +62,27 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Keep following the client picker until the reader types their own name.
-  useEffect(() => {
-    setName((current) =>
-      current === "" || current.startsWith("NotifyBay MCP") ? suggestedName : current,
-    );
-  }, [suggestedName]);
+  /*
+   * Core requires a name and offers no default, but it is a label for the
+   * reader rather than anything the protocol reads -- so it is derived here
+   * instead of being asked for. Core permits two passwords with the same name
+   * (verified: both creates return ok), which would leave the reader guessing
+   * which row to revoke, so a repeat of the same client is suffixed.
+   */
+  const nextName = () => {
+    const taken = new Set((items || []).map((i) => i.name));
+    if (!taken.has(baseName)) {
+      return baseName;
+    }
+    let n = 2;
+    while (taken.has(`${baseName} (${n})`)) {
+      n++;
+    }
+    return `${baseName} (${n})`;
+  };
 
   const create = async () => {
-    const trimmed = name.trim();
-    if (!trimmed) {
-      addToast(
-        __("Give the password a name first.", "notifybay-waitlist-and-stock-alert-woo"),
-        "error",
-      );
-      return;
-    }
+    const trimmed = nextName();
 
     setIsBusy(true);
     try {
@@ -138,20 +142,17 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
 
   return (
     <div className="notifybay-flex notifybay-flex-col notifybay-gap-3">
-      <div className="notifybay-flex notifybay-items-center notifybay-gap-2">
-        <ClassicInput
-          id="mcp_app_password_name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={__(
-            "e.g. NotifyBay MCP",
-            "notifybay-waitlist-and-stock-alert-woo",
-          )}
-          disabled={isBusy}
-        />
+      <div className="notifybay-flex notifybay-items-center notifybay-gap-3">
         <ClassicButton onClick={create} disabled={isBusy}>
-          {__("Create password", "notifybay-waitlist-and-stock-alert-woo")}
+          {__("Generate password", "notifybay-waitlist-and-stock-alert-woo")}
         </ClassicButton>
+        <span className="notifybay-text-sm notifybay-text-gray-600">
+          {sprintf(
+            /* translators: %s: the label the new credential will be filed under. */
+            __("will be labelled “%s”", "notifybay-waitlist-and-stock-alert-woo"),
+            nextName(),
+          )}
+        </span>
       </div>
 
       {secret && (

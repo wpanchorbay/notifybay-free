@@ -97,7 +97,7 @@ To rebuild the compiled assets from source: run `npm install`, then `npm run bui
 = 1.0.3 =
 * New: NotifyBay can be connected to an AI assistant over MCP (Model Context Protocol). It is off until you turn it on, under WooCommerce → Settings → Leads Settings → AI Access, where you also choose how much the assistant is allowed to do and copy the connection details.
 * New: four assistant tools — list leads, check system status, update a lead, and delete leads. Deleting is offered only at the "Full access" level, and only to an account that can manage NotifyBay.
-* New: create and revoke the Application Password the assistant connects with directly on the AI Access screen, without visiting your profile. The screen also shows the endpoint address and the account to connect as.
+* New: generate and revoke the Application Password the assistant connects with directly on the AI Access screen, without visiting your profile. One button generates it and labels it after the client you picked. The screen also shows the endpoint address and the account to connect as.
 * New: ready-to-paste connection details for Claude Code, Claude Desktop, Cursor, Codex, and any other client that speaks MCP over HTTP.
 * Fix: removed a non-functional "Target Price" field and column from the Leads screen. The field wrote to a database column that does not exist, which made the whole save fail — discarding the email and status changes made alongside it — and reported only "Could not update lead."
 * Fix: a failed database write is now logged with the reason, instead of failing with no explanation anywhere.
