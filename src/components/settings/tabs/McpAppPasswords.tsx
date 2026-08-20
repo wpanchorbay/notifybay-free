@@ -56,6 +56,12 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
    * readability; the spaces are stripped because this string gets pasted into
    * shell commands and JSON config where a space breaks it. WordPress strips
    * whitespace before comparing, so both forms authenticate.
+   *
+   * The box below is styled with the plugin's own utilities rather than
+   * WordPress's `notice` class, which would be invisible here:
+   * `#wpcontent:has(#notifybay) .notice { display: none }` in index.scss:639
+   * suppresses admin nags on this plugin's screens, and it cannot tell an
+   * unwanted nag from the one thing on the page the reader must not miss.
    */
   const [secret, setSecret] = useState<string | null>(null);
 
@@ -202,7 +208,7 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
       </div>
 
       {secret && (
-        <div className="notice notice-warning notifybay-p-3 notifybay-m-0">
+        <div className="notifybay-flex notifybay-flex-col notifybay-gap-2 notifybay-p-3 notifybay-m-0 notifybay-rounded-lg notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50">
           <p className="notifybay-mt-0 notifybay-font-semibold">
             {__(
               "Copy it now — this is the only time it can be shown.",
