@@ -55,6 +55,18 @@ wp_php() { local r="$MCP_WORK/$( basename "$1" )"; cp "$1" "/tmp/pilot-$( basena
 
 echo "→ target: $MCP_BASE  (NotifyBay pilot)"
 
+# The vendored kit is deliberately ahead of what composer.lock pins: the lock
+# still resolves wpab/mcp-kit to the published v0.3.2, which predates the
+# settings-route nonce. A `composer install` from a clean checkout therefore
+# reverts it and silently reopens the escalation this suite exists to prove
+# closed. Checked here rather than left to a confusing 200-instead-of-403
+# twenty cases later.
+if ! grep -q 'rest_nonce_invalid' vendor/wpab/mcp-kit/src/AdminApi.php 2>/dev/null; then
+	echo "vendor/wpab/mcp-kit predates the settings-route nonce -- composer.lock" >&2
+	echo "has reverted it. Re-sync the kit before trusting anything below." >&2
+	exit 1
+fi
+
 # ---------------------------------------------------------------------------
 # Accounts and a lead to operate on.
 #

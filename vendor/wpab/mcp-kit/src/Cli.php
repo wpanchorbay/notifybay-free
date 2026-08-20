@@ -47,6 +47,25 @@ final class Cli {
 			return;
 		}
 
+		// Kit::boot() runs once per kit-bearing plugin, so this fires once per
+		// adopter and the last registration silently wins -- meaning
+		// `wp wpab-mcp account` would be answered by whichever plugin happened
+		// to load last. Observed with three fixtures active: FixtureTwo's
+		// scoped copy took the command.
+		//
+		// A static flag cannot fix that. PHP-Scoper gives each plugin its own
+		// prefixed class with its own statics, so all of them see an unset
+		// one. A constant is process-global and shared across every copy.
+		//
+		// Which copy wins does not matter, only that one does: the command
+		// operates on WordPress users and the shared wpab_mcp_access
+		// capability, neither of which is per-product.
+		if ( defined( 'WPAB_MCP_CLI_REGISTERED' ) ) {
+			return;
+		}
+
+		define( 'WPAB_MCP_CLI_REGISTERED', true );
+
 		\WP_CLI::add_command( 'wpab-mcp account', self::class );
 	}
 
@@ -173,7 +192,19 @@ final class Cli {
 			return;
 		}
 
-		\WP_CLI\Utils\format_items( 'table', $rows, [ 'login', 'roles', 'grant', 'note' ] );
+		// Deliberately not WP_CLI\Utils\format_items(). PHP-Scoper rewrites a
+		// namespaced function call in a vendored copy -- it became
+		// FixtureTwo\Vendor\WP_CLI\Utils\format_items() and fatalled. The
+		// WP_CLI class itself is left alone by every scoper config the kit
+		// ships with, so static calls on it are safe where namespaced
+		// functions are not.
+		\WP_CLI::log( sprintf( '%-20s %-16s %-9s %s', 'LOGIN', 'ROLES', 'GRANT', 'NOTE' ) );
+
+		foreach ( $rows as $row ) {
+			\WP_CLI::log(
+				sprintf( '%-20s %-16s %-9s %s', $row['login'], $row['roles'], $row['grant'], $row['note'] )
+			);
+		}
 	}
 
 	/**
