@@ -11,6 +11,12 @@ interface McpAppPasswordsProps {
   endpoint: string;
   /** Seeds the label field, so the credential and the snippet agree. */
   suggestedName: string;
+  /**
+   * Reports the live secret upwards while it is on screen, so the connection
+   * snippets can be shown complete instead of asking the reader to base64 a
+   * credential by hand. Called with null the moment it is dismissed.
+   */
+  onSecretChange: (secret: string | null) => void;
 }
 
 /**
@@ -35,6 +41,7 @@ interface McpAppPasswordsProps {
 export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
   endpoint,
   suggestedName,
+  onSecretChange,
 }) => {
   const [items, setItems] = useState<McpAppPassword[] | null>(null);
   const [name, setName] = useState(suggestedName);
@@ -115,7 +122,9 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
         data: { name: trimmed },
       })) as McpAppPassword & { password: string };
 
-      setSecret(response.password.replace(/\s/g, ""));
+      const issued = response.password.replace(/\s/g, "");
+      setSecret(issued);
+      onSecretChange(issued);
       await load();
     } catch (error: any) {
       addToast(
@@ -215,18 +224,32 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
               "notifybay-waitlist-and-stock-alert-woo",
             )}
           </p>
-          <div className="notifybay-flex notifybay-items-center notifybay-gap-2">
-            <code className="notifybay-text-sm notifybay-break-all">{secret}</code>
+          <p className="notifybay-m-0 notifybay-text-sm">
+            {__(
+              "The connection snippets below now include it, ready to paste. They go back to placeholders once you press Done.",
+              "notifybay-waitlist-and-stock-alert-woo",
+            )}
+          </p>
+          <div className="notifybay-flex notifybay-items-center notifybay-gap-2 notifybay-max-w-2xl">
+            <code className="notifybay-flex-1 notifybay-rounded-md notifybay-border notifybay-border-amber-300 notifybay-bg-white notifybay-px-3 notifybay-py-2 notifybay-text-base notifybay-tracking-wide notifybay-break-all">
+              {secret}
+            </code>
             <CopyToClipboard text={secret} />
           </div>
-          <ClassicButton variant="secondary" onClick={() => setSecret(null)}>
+          <ClassicButton
+            variant="secondary"
+            onClick={() => {
+              setSecret(null);
+              onSecretChange(null);
+            }}
+          >
             {__("Done", "notifybay-waitlist-and-stock-alert-woo")}
           </ClassicButton>
         </div>
       )}
 
       {null !== items && items.length > 0 && (
-        <table className="widefat striped notifybay-w-full">
+        <table className="widefat striped notifybay-w-full notifybay-max-w-2xl notifybay-rounded-lg notifybay-overflow-hidden">
           <tbody>
             {items.map((item) => (
               <tr key={item.uuid}>
@@ -252,7 +275,7 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
                   ) : (
                     <strong>{item.name}</strong>
                   )}
-                  <span className="notifybay-block notifybay-text-xs notifybay-text-gray-500">
+                  <span className="notifybay-mt-0.5 notifybay-block notifybay-text-xs notifybay-text-gray-500">
                     {when(item)}
                   </span>
                 </td>

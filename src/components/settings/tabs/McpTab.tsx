@@ -26,6 +26,29 @@ const LEVEL_LABELS: Record<string, string> = {
   full: __("Full access", "notifybay-waitlist-and-stock-alert-woo"),
 };
 
+/**
+ * What each rung actually risks, as a badge. Keyed by raw value like the
+ * labels, so a level the kit adds later renders without one rather than
+ * inheriting a wrong colour.
+ */
+const LEVEL_BADGES: Record<string, { text: string; className: string }> = {
+  read: {
+    text: __("READ ONLY", "notifybay-waitlist-and-stock-alert-woo"),
+    className:
+      "notifybay-bg-gray-100 notifybay-text-gray-600 notifybay-border-gray-200",
+  },
+  "read+modify": {
+    text: __("WRITES", "notifybay-waitlist-and-stock-alert-woo"),
+    className:
+      "notifybay-bg-amber-50 notifybay-text-amber-800 notifybay-border-amber-200",
+  },
+  full: {
+    text: __("CAN DELETE", "notifybay-waitlist-and-stock-alert-woo"),
+    className:
+      "notifybay-bg-red-50 notifybay-text-red-700 notifybay-border-red-200",
+  },
+};
+
 const LEVEL_DESCRIPTIONS: Record<string, string> = {
   read: __(
     "The assistant can list leads and read system status. It cannot change anything.",
@@ -66,6 +89,13 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [pendingLevel, setPendingLevel] = useState<string | null>(null);
   const [activeClient, setActiveClient] = useState("claude-code");
+
+  /*
+   * Held here rather than in McpAppPasswords because the snippets need it: a
+   * connection command with "<base64(username:application-password)>" in it is
+   * not a command, it is homework. Lives only as long as the one-time display.
+   */
+  const [liveSecret, setLiveSecret] = useState<string | null>(null);
   const { addToast } = useToast();
 
   useEffect(() => {
@@ -203,6 +233,7 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
     endpoint: status.endpoint,
     username: mcp.current_user_login,
     offerTlsBypass: mcp.offer_tls_bypass,
+    password: liveSecret,
   });
   const snippet = snippets.find((s) => s.id === activeClient) || snippets[0];
 
@@ -233,16 +264,21 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                   disabled={isSaving}
                   onChange={(checked) => save({ enabled: checked })}
                 />
-                <span className="notifybay-text-sm notifybay-text-gray-600">
+                <span
+                  className={`notifybay-inline-flex notifybay-items-center notifybay-gap-1.5 notifybay-rounded-full notifybay-border notifybay-px-2.5 notifybay-py-0.5 notifybay-text-xs notifybay-font-semibold ${
+                    isEnabled
+                      ? "notifybay-bg-green-50 notifybay-text-green-700 notifybay-border-green-200"
+                      : "notifybay-bg-gray-100 notifybay-text-gray-600 notifybay-border-gray-200"
+                  }`}
+                >
+                  <span
+                    className={`notifybay-h-1.5 notifybay-w-1.5 notifybay-rounded-full ${
+                      isEnabled ? "notifybay-bg-green-500" : "notifybay-bg-gray-400"
+                    }`}
+                  />
                   {isEnabled
-                    ? __(
-                        "Active",
-                        "notifybay-waitlist-and-stock-alert-woo",
-                      )
-                    : __(
-                        "Off",
-                        "notifybay-waitlist-and-stock-alert-woo",
-                      )}
+                    ? __("Live", "notifybay-waitlist-and-stock-alert-woo")
+                    : __("Off", "notifybay-waitlist-and-stock-alert-woo")}
                 </span>
               </div>
             ),
@@ -269,34 +305,52 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                 className="notifybay-flex notifybay-flex-col notifybay-gap-2"
                 disabled={isSaving}
               >
-                {status.available_access_levels.map((level) => (
-                  <label
-                    key={level}
-                    htmlFor={`mcp_level_${level}`}
-                    className="notifybay-flex notifybay-items-start notifybay-gap-2 notifybay-cursor-pointer"
-                  >
-                    <input
-                      type="radio"
-                      id={`mcp_level_${level}`}
-                      name="mcp_access_level"
-                      value={level}
-                      checked={accessLevel === level}
-                      disabled={isSaving}
-                      onChange={() => handleLevelChange(level)}
-                      className="notifybay-mt-1"
-                    />
-                    <span>
-                      <span className="notifybay-font-semibold">
-                        {LEVEL_LABELS[level] || level}
-                      </span>
-                      {LEVEL_DESCRIPTIONS[level] && (
-                        <span className="notifybay-block notifybay-text-sm notifybay-text-gray-600">
-                          {LEVEL_DESCRIPTIONS[level]}
+                {status.available_access_levels.map((level) => {
+                  const selected = accessLevel === level;
+                  const badge = LEVEL_BADGES[level];
+
+                  return (
+                    <label
+                      key={level}
+                      htmlFor={`mcp_level_${level}`}
+                      className={`notifybay-flex notifybay-items-start notifybay-gap-3 notifybay-cursor-pointer notifybay-rounded-lg notifybay-border notifybay-p-3 notifybay-max-w-2xl ${
+                        selected
+                          ? "notifybay-border-blue-400 notifybay-bg-blue-50"
+                          : "notifybay-border-gray-200 notifybay-bg-white hover:notifybay-border-gray-400"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        id={`mcp_level_${level}`}
+                        name="mcp_access_level"
+                        value={level}
+                        checked={selected}
+                        disabled={isSaving}
+                        onChange={() => handleLevelChange(level)}
+                        className="notifybay-mt-1"
+                      />
+                      <span className="notifybay-w-full">
+                        <span className="notifybay-flex notifybay-items-center notifybay-gap-2">
+                          <span className="notifybay-font-semibold">
+                            {LEVEL_LABELS[level] || level}
+                          </span>
+                          {badge && (
+                            <span
+                              className={`notifybay-rounded notifybay-border notifybay-px-1.5 notifybay-py-0.5 notifybay-text-[10px] notifybay-font-bold notifybay-tracking-wide ${badge.className}`}
+                            >
+                              {badge.text}
+                            </span>
+                          )}
                         </span>
-                      )}
-                    </span>
-                  </label>
-                ))}
+                        {LEVEL_DESCRIPTIONS[level] && (
+                          <span className="notifybay-block notifybay-text-sm notifybay-text-gray-600 notifybay-mt-0.5">
+                            {LEVEL_DESCRIPTIONS[level]}
+                          </span>
+                        )}
+                      </span>
+                    </label>
+                  );
+                })}
               </fieldset>
             ),
           },
@@ -311,7 +365,9 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
               "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
-              <span className="notifybay-text-sm">{status.tool_count}</span>
+              <span className="notifybay-inline-block notifybay-rounded-lg notifybay-border notifybay-border-gray-200 notifybay-bg-gray-50 notifybay-px-4 notifybay-py-2 notifybay-text-xl notifybay-font-bold">
+                {status.tool_count}
+              </span>
             ),
           },
         ]}
@@ -334,8 +390,8 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
               "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
-              <div className="notifybay-flex notifybay-items-center notifybay-gap-2">
-                <code className="notifybay-text-xs notifybay-break-all">
+              <div className="notifybay-flex notifybay-items-center notifybay-gap-2 notifybay-max-w-2xl">
+                <code className="notifybay-flex-1 notifybay-rounded-md notifybay-border notifybay-border-gray-200 notifybay-bg-gray-50 notifybay-px-2 notifybay-py-1.5 notifybay-text-xs notifybay-break-all">
                   {status.endpoint}
                 </code>
                 <CopyToClipboard text={status.endpoint} />
@@ -353,8 +409,8 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
               "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
-              <div className="notifybay-flex notifybay-items-center notifybay-gap-2">
-                <code className="notifybay-text-xs">
+              <div className="notifybay-flex notifybay-items-center notifybay-gap-2 notifybay-max-w-2xl">
+                <code className="notifybay-flex-1 notifybay-rounded-md notifybay-border notifybay-border-gray-200 notifybay-bg-gray-50 notifybay-px-2 notifybay-py-1.5 notifybay-text-xs notifybay-break-all">
                   {mcp.current_user_login}
                 </code>
                 <CopyToClipboard text={mcp.current_user_login} />
@@ -378,6 +434,7 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                     <McpAppPasswords
                       endpoint={mcp.app_passwords_rest_url}
                       suggestedName={`NotifyBay MCP - ${snippet.label}`}
+                      onSecretChange={setLiveSecret}
                     />
                     {/*
                       Verified against this site, not inferred: an assistant
@@ -431,48 +488,49 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
             ),
             render: () => (
               <div className="notifybay-flex notifybay-flex-col notifybay-gap-2">
-                <ul className="subsubsub !notifybay-m-0 !notifybay-p-0 notifybay-list-none">
-                  {snippets.map((s, index) => (
-                    <li
+                <div className="notifybay-flex notifybay-flex-wrap notifybay-gap-1.5">
+                  {snippets.map((s) => (
+                    <button
                       key={s.id}
-                      className="notifybay-inline-block !notifybay-m-0"
+                      type="button"
+                      onClick={() => setActiveClient(s.id)}
+                      className={`notifybay-cursor-pointer notifybay-rounded-full notifybay-border notifybay-px-3 notifybay-py-1 notifybay-text-xs notifybay-font-medium ${
+                        activeClient === s.id
+                          ? "notifybay-border-blue-600 notifybay-bg-blue-600 notifybay-text-white"
+                          : "notifybay-border-gray-300 notifybay-bg-white notifybay-text-gray-700 hover:notifybay-border-gray-500"
+                      }`}
                     >
-                      <button
-                        type="button"
-                        onClick={() => setActiveClient(s.id)}
-                        className={`notifybay-p-0 notifybay-bg-transparent notifybay-border-0 notifybay-cursor-pointer notifybay-text-[13px] ${
-                          activeClient === s.id
-                            ? "notifybay-text-black notifybay-font-bold"
-                            : "notifybay-text-[#2271b1] hover:notifybay-text-[#135e96]"
-                        }`}
-                      >
-                        {s.label}
-                      </button>
-                      {index < snippets.length - 1 && (
-                        <span className="notifybay-mx-1 notifybay-text-[#c3c4c7]">
-                          |
-                        </span>
-                      )}
-                    </li>
+                      {s.label}
+                    </button>
                   ))}
-                </ul>
+                </div>
 
                 <p className="description notifybay-m-0">
                   {snippet.instructions}
                 </p>
 
                 {snippet.warning && (
-                  <p className="notifybay-m-0 notifybay-text-sm notifybay-text-red-700">
+                  <p className="notifybay-m-0 notifybay-rounded-md notifybay-border notifybay-border-red-200 notifybay-bg-red-50 notifybay-p-2 notifybay-text-sm notifybay-text-red-800">
                     {snippet.warning}
                   </p>
                 )}
 
-                <div className="notifybay-flex notifybay-justify-end">
-                  <CopyToClipboard text={snippet.snippet} />
+                {/*
+                  The copy button belongs in the block's own header rather than
+                  floating above it -- this screen has four copyable things and
+                  a detached button does not say which one it takes.
+                */}
+                <div className="notifybay-max-w-3xl notifybay-overflow-hidden notifybay-rounded-lg notifybay-border notifybay-border-gray-200">
+                  <div className="notifybay-flex notifybay-items-center notifybay-justify-between notifybay-border-b notifybay-border-gray-200 notifybay-bg-gray-100 notifybay-px-3 notifybay-py-1.5">
+                    <span className="notifybay-text-xs notifybay-font-semibold notifybay-text-gray-600">
+                      {snippet.label}
+                    </span>
+                    <CopyToClipboard text={snippet.snippet} />
+                  </div>
+                  <pre className="notifybay-m-0 notifybay-overflow-x-auto notifybay-bg-gray-50 notifybay-p-3 notifybay-text-xs">
+                    {snippet.snippet}
+                  </pre>
                 </div>
-                <pre className="notifybay-bg-gray-50 notifybay-border notifybay-border-gray-200 notifybay-p-3 notifybay-rounded-lg notifybay-text-xs notifybay-overflow-x-auto notifybay-m-0">
-                  {snippet.snippet}
-                </pre>
               </div>
             ),
           },

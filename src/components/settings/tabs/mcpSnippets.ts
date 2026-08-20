@@ -10,9 +10,12 @@ import { __ } from "@wordpress/i18n";
  * Streamable HTTP talk to the endpoint directly and authenticate with an
  * ordinary Basic header, no proxy involved.
  *
- * Every snippet carries a placeholder rather than a real secret. Nothing here
- * ever receives an actual Application Password -- the value is substituted by
- * the person pasting it.
+ * A snippet is only useful if it can be pasted as-is. When a password has just
+ * been generated, the real credential is substituted -- including the base64 of
+ * `username:password` that Basic auth requires, which the reader would
+ * otherwise have to compute by hand before the command would run. Once the
+ * one-time display is dismissed the snippets revert to placeholders, because
+ * the secret is genuinely gone by then and cannot be re-derived.
  */
 export interface McpSnippet {
   id: string;
@@ -31,17 +34,46 @@ interface BuildOptions {
   username: string;
   /** Only ever true on an https development host -- see Admin::get_mcp_localize(). */
   offerTlsBypass: boolean;
+  /**
+   * The just-generated Application Password, while it is still on screen.
+   * Absent at every other time, which is the only reason the placeholders
+   * below still exist.
+   */
+  password?: string | null;
 }
 
-const BASIC = "<base64(username:application-password)>";
-const PASS = "<your-application-password>";
+const BASIC_PLACEHOLDER = "<base64(username:application-password)>";
+const PASS_PLACEHOLDER = "<your-application-password>";
 
 export function buildMcpSnippets({
   endpoint,
   username,
   offerTlsBypass,
+  password,
 }: BuildOptions): McpSnippet[] {
   const user = username || "<your-username>";
+  const hasSecret = Boolean(password);
+
+  const PASS = password || PASS_PLACEHOLDER;
+
+  /*
+   * btoa is the browser's own base64, and it is correct here because both
+   * halves of an HTTP Basic credential are ASCII: a WordPress user_login is
+   * sanitised to a restricted set, and core generates the password from
+   * [A-Za-z0-9]. A multi-byte character would throw, which is why this is not
+   * a general-purpose encoder.
+   */
+  const BASIC = hasSecret
+    ? window.btoa(`${user}:${password}`)
+    : BASIC_PLACEHOLDER;
+
+  /*
+   * Half of each instruction was telling the reader to substitute a
+   * credential. When the credential is already in the snippet that sentence is
+   * not merely redundant, it sends them looking for work that does not exist.
+   */
+  const ready = (whenReady: string, whenPlaceholder: string) =>
+    hasSecret ? whenReady : whenPlaceholder;
 
   const desktopEnv: Record<string, string> = {
     WP_API_URL: endpoint,
@@ -67,9 +99,15 @@ export function buildMcpSnippets({
         `  notifybay ${endpoint} \\`,
         `  --header "Authorization: Basic ${BASIC}"`,
       ].join("\n"),
-      instructions: __(
-        'Run this in a terminal where Claude Code is installed, replacing the placeholder with base64 of "username:application-password".',
-        "notifybay-waitlist-and-stock-alert-woo",
+      instructions: ready(
+        __(
+          "Ready to paste. Run it in a terminal where Claude Code is installed — your new password is already encoded into the header.",
+          "notifybay-waitlist-and-stock-alert-woo",
+        ),
+        __(
+          'Generate a password above and this becomes ready to paste. Otherwise, replace the placeholder with base64 of "username:application-password".',
+          "notifybay-waitlist-and-stock-alert-woo",
+        ),
       ),
     },
     {
@@ -81,9 +119,15 @@ export function buildMcpSnippets({
         null,
         2,
       ),
-      instructions: __(
-        "Add this to your Claude Desktop config (Settings → Developer → Edit Config), fill in the application password, then restart Claude Desktop.",
-        "notifybay-waitlist-and-stock-alert-woo",
+      instructions: ready(
+        __(
+          "Add this to your Claude Desktop config (Settings → Developer → Edit Config), then restart Claude Desktop. Your new password is already filled in.",
+          "notifybay-waitlist-and-stock-alert-woo",
+        ),
+        __(
+          "Add this to your Claude Desktop config (Settings → Developer → Edit Config), fill in the application password, then restart Claude Desktop.",
+          "notifybay-waitlist-and-stock-alert-woo",
+        ),
       ),
       warning: offerTlsBypass
         ? __(
@@ -101,9 +145,15 @@ export function buildMcpSnippets({
         null,
         2,
       ),
-      instructions: __(
-        'Add this to Cursor\'s mcp.json, replacing the placeholder with base64 of "username:application-password". No proxy is needed.',
-        "notifybay-waitlist-and-stock-alert-woo",
+      instructions: ready(
+        __(
+          "Add this to Cursor's mcp.json. It is complete as shown — no proxy, nothing to substitute.",
+          "notifybay-waitlist-and-stock-alert-woo",
+        ),
+        __(
+          'Add this to Cursor\'s mcp.json, replacing the placeholder with base64 of "username:application-password". No proxy is needed.',
+          "notifybay-waitlist-and-stock-alert-woo",
+        ),
       ),
     },
     {
