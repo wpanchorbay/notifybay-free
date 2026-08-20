@@ -8,6 +8,14 @@ import { useToast } from "../../../store/toast/use-toast";
 import { McpLocalize, McpStatus } from "../../../utils/types";
 import { buildMcpSnippets } from "./mcpSnippets";
 import { McpAppPasswords } from "./McpAppPasswords";
+import {
+  TONE,
+  IDLE_CARD,
+  IDLE_BADGE,
+  LEVEL_TONE,
+  levelBadge,
+  endpointState,
+} from "./mcpTone";
 
 interface McpTabProps {
   mcp: McpLocalize;
@@ -24,29 +32,6 @@ const LEVEL_LABELS: Record<string, string> = {
   read: __("Read only", "notifybay-waitlist-and-stock-alert-woo"),
   "read+modify": __("Read and modify", "notifybay-waitlist-and-stock-alert-woo"),
   full: __("Full access", "notifybay-waitlist-and-stock-alert-woo"),
-};
-
-/**
- * What each rung actually risks, as a badge. Keyed by raw value like the
- * labels, so a level the kit adds later renders without one rather than
- * inheriting a wrong colour.
- */
-const LEVEL_BADGES: Record<string, { text: string; className: string }> = {
-  read: {
-    text: __("READ ONLY", "notifybay-waitlist-and-stock-alert-woo"),
-    className:
-      "notifybay-bg-gray-100 notifybay-text-gray-600 notifybay-border-gray-200",
-  },
-  "read+modify": {
-    text: __("WRITES", "notifybay-waitlist-and-stock-alert-woo"),
-    className:
-      "notifybay-bg-amber-50 notifybay-text-amber-800 notifybay-border-amber-200",
-  },
-  full: {
-    text: __("CAN DELETE", "notifybay-waitlist-and-stock-alert-woo"),
-    className:
-      "notifybay-bg-red-50 notifybay-text-red-700 notifybay-border-red-200",
-  },
 };
 
 const LEVEL_DESCRIPTIONS: Record<string, string> = {
@@ -136,6 +121,7 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
 
   const isEnabled = Boolean(field("enabled")?.value);
   const accessLevel = String(field("access_level")?.value ?? "read");
+  const state = endpointState(isEnabled, accessLevel);
 
   const save = async (payload: Record<string, unknown>) => {
     setIsSaving(true);
@@ -266,19 +252,15 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                 />
                 <span
                   className={`notifybay-inline-flex notifybay-items-center notifybay-gap-1.5 notifybay-rounded-full notifybay-border notifybay-px-2.5 notifybay-py-0.5 notifybay-text-xs notifybay-font-semibold ${
-                    isEnabled
-                      ? "notifybay-bg-green-50 notifybay-text-green-700 notifybay-border-green-200"
-                      : "notifybay-bg-gray-100 notifybay-text-gray-600 notifybay-border-gray-200"
+                    TONE[state.tone].pill
                   }`}
                 >
                   <span
                     className={`notifybay-h-1.5 notifybay-w-1.5 notifybay-rounded-full ${
-                      isEnabled ? "notifybay-bg-green-500" : "notifybay-bg-gray-400"
+                      TONE[state.tone].dot
                     }`}
                   />
-                  {isEnabled
-                    ? __("Live", "notifybay-waitlist-and-stock-alert-woo")
-                    : __("Off", "notifybay-waitlist-and-stock-alert-woo")}
+                  {state.text}
                 </span>
               </div>
             ),
@@ -307,16 +289,15 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
               >
                 {status.available_access_levels.map((level) => {
                   const selected = accessLevel === level;
-                  const badge = LEVEL_BADGES[level];
+                  const tone = LEVEL_TONE[level] || "neutral";
+                  const badge = levelBadge(level);
 
                   return (
                     <label
                       key={level}
                       htmlFor={`mcp_level_${level}`}
                       className={`notifybay-flex notifybay-items-start notifybay-gap-3 notifybay-cursor-pointer notifybay-rounded-lg notifybay-border notifybay-p-3 notifybay-max-w-2xl ${
-                        selected
-                          ? "notifybay-border-blue-400 notifybay-bg-blue-50"
-                          : "notifybay-border-gray-200 notifybay-bg-white hover:notifybay-border-gray-400"
+                        selected ? TONE[tone].card : IDLE_CARD
                       }`}
                     >
                       <input
@@ -336,9 +317,11 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                           </span>
                           {badge && (
                             <span
-                              className={`notifybay-rounded notifybay-border notifybay-px-1.5 notifybay-py-0.5 notifybay-text-[10px] notifybay-font-bold notifybay-tracking-wide ${badge.className}`}
+                              className={`notifybay-rounded notifybay-border notifybay-px-1.5 notifybay-py-0.5 notifybay-text-[10px] notifybay-font-bold notifybay-tracking-wide ${
+                                selected ? TONE[tone].badge : IDLE_BADGE
+                              }`}
                             >
-                              {badge.text}
+                              {badge}
                             </span>
                           )}
                         </span>
@@ -466,7 +449,7 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                    * Application Passwords entirely over plain http, and an MCP
                    * client has no other way to authenticate.
                    */
-                  <p className="notifybay-m-0 notifybay-text-sm notifybay-text-red-700">
+                  <p className="notifybay-m-0 notifybay-max-w-2xl notifybay-rounded-md notifybay-border notifybay-border-red-300 notifybay-bg-red-50 notifybay-p-3 notifybay-text-sm notifybay-text-red-800">
                     {__(
                       "WordPress is refusing Application Passwords on this site, which usually means it is served over plain http. No MCP client can authenticate until the site uses https.",
                       "notifybay-waitlist-and-stock-alert-woo",
@@ -510,7 +493,7 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                 </p>
 
                 {snippet.warning && (
-                  <p className="notifybay-m-0 notifybay-rounded-md notifybay-border notifybay-border-red-200 notifybay-bg-red-50 notifybay-p-2 notifybay-text-sm notifybay-text-red-800">
+                  <p className="notifybay-m-0 notifybay-max-w-3xl notifybay-rounded-md notifybay-border notifybay-border-red-300 notifybay-bg-red-50 notifybay-p-3 notifybay-text-sm notifybay-text-red-800">
                     {snippet.warning}
                   </p>
                 )}

@@ -217,7 +217,7 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
       </div>
 
       {secret && (
-        <div className="notifybay-flex notifybay-flex-col notifybay-gap-2 notifybay-p-3 notifybay-m-0 notifybay-rounded-lg notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50">
+        <div className="notifybay-flex notifybay-flex-col notifybay-gap-2 notifybay-p-3 notifybay-m-0 notifybay-max-w-2xl notifybay-rounded-lg notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50 notifybay-text-amber-900">
           <p className="notifybay-mt-0 notifybay-font-semibold">
             {__(
               "Copy it now — this is the only time it can be shown.",

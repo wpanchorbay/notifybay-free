@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-20T07:32:05+00:00\n"
+"POT-Creation-Date: 2026-08-20T07:48:37+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: notifybay-waitlist-and-stock-alert-woo\n"
@@ -1378,18 +1378,6 @@ msgid "Full access"
 msgstr ""
 
 #: build/settings.js:2
-msgid "READ ONLY"
-msgstr ""
-
-#: build/settings.js:2
-msgid "WRITES"
-msgstr ""
-
-#: build/settings.js:2
-msgid "CAN DELETE"
-msgstr ""
-
-#: build/settings.js:2
 msgid "The assistant can list leads and read system status. It cannot change anything."
 msgstr ""
 
@@ -1403,6 +1391,26 @@ msgstr ""
 
 #: build/settings.js:2
 msgid "Failed to load MCP settings."
+msgstr ""
+
+#: build/settings.js:2
+msgid "Off"
+msgstr ""
+
+#: build/settings.js:2
+msgid "Live · read only"
+msgstr ""
+
+#: build/settings.js:2
+msgid "Live · can edit"
+msgstr ""
+
+#: build/settings.js:2
+msgid "Live · can delete"
+msgstr ""
+
+#: build/settings.js:2
+msgid "Live"
 msgstr ""
 
 #: build/settings.js:2
@@ -1494,19 +1502,23 @@ msgid "Turns the endpoint on. While off, it refuses every request."
 msgstr ""
 
 #: build/settings.js:2
-msgid "Live"
-msgstr ""
-
-#: build/settings.js:2
-msgid "Off"
-msgstr ""
-
-#: build/settings.js:2
 msgid "Access level"
 msgstr ""
 
 #: build/settings.js:2
 msgid "How much the assistant is allowed to do. Tools above this level are not offered to it at all."
+msgstr ""
+
+#: build/settings.js:2
+msgid "READ ONLY"
+msgstr ""
+
+#: build/settings.js:2
+msgid "CAN EDIT"
+msgstr ""
+
+#: build/settings.js:2
+msgid "CAN DELETE"
 msgstr ""
 
 #: build/settings.js:2
