@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { __, sprintf } from "@wordpress/i18n";
 import apiFetch from "../../../utils/apiFetch";
-import { ClassicButton } from "../../classics";
+import { ClassicInput, ClassicButton } from "../../classics";
 import { CopyToClipboard } from "../../common/CopyToClipboard";
 import { useToast } from "../../../store/toast/use-toast";
 import { McpAppPassword } from "../../../utils/types";
@@ -38,6 +38,16 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
 }) => {
   const [items, setItems] = useState<McpAppPassword[] | null>(null);
   const [isBusy, setIsBusy] = useState(false);
+
+  /*
+   * The label is what tells one credential from another when revoking, so a
+   * generated one must not be a label the reader is stuck with. Core exposes
+   * PUT on the same route (verified: HTTP 200, name updated), so renaming
+   * needs no more than the uuid already in hand.
+   */
+  const [editing, setEditing] = useState<{ uuid: string; name: string } | null>(
+    null,
+  );
   const { addToast } = useToast();
 
   /*
@@ -101,6 +111,32 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
             "Could not create the application password.",
             "notifybay-waitlist-and-stock-alert-woo",
           ),
+        "error",
+      );
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const rename = async () => {
+    if (!editing || !editing.name.trim()) {
+      setEditing(null);
+      return;
+    }
+
+    setIsBusy(true);
+    try {
+      await apiFetch({
+        url: `${endpoint}/${editing.uuid}`,
+        method: "PUT",
+        data: { name: editing.name.trim() },
+      });
+      setEditing(null);
+      await load();
+    } catch (error: any) {
+      addToast(
+        error?.message ||
+          __("Could not rename it.", "notifybay-waitlist-and-stock-alert-woo"),
         "error",
       );
     } finally {
@@ -179,19 +215,50 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
             {items.map((item) => (
               <tr key={item.uuid}>
                 <td>
-                  <strong>{item.name}</strong>
+                  {editing && editing.uuid === item.uuid ? (
+                    <ClassicInput
+                      id={`mcp_rename_${item.uuid}`}
+                      value={editing.name}
+                      onChange={(e) =>
+                        setEditing({ uuid: item.uuid, name: e.target.value })
+                      }
+                      onBlur={rename}
+                      onKeyDown={(e) => {
+                        if ("Enter" === e.key) {
+                          rename();
+                        }
+                        if ("Escape" === e.key) {
+                          setEditing(null);
+                        }
+                      }}
+                      disabled={isBusy}
+                    />
+                  ) : (
+                    <strong>{item.name}</strong>
+                  )}
                   <span className="notifybay-block notifybay-text-xs notifybay-text-gray-500">
                     {when(item)}
                   </span>
                 </td>
                 <td className="notifybay-text-right notifybay-whitespace-nowrap">
-                  <ClassicButton
-                    variant="link-delete"
-                    onClick={() => revoke(item)}
-                    disabled={isBusy}
-                  >
-                    {__("Revoke", "notifybay-waitlist-and-stock-alert-woo")}
-                  </ClassicButton>
+                  <span className="notifybay-inline-flex notifybay-gap-2">
+                    <ClassicButton
+                      variant="secondary"
+                      onClick={() =>
+                        setEditing({ uuid: item.uuid, name: item.name })
+                      }
+                      disabled={isBusy || null !== editing}
+                    >
+                      {__("Rename", "notifybay-waitlist-and-stock-alert-woo")}
+                    </ClassicButton>
+                    <ClassicButton
+                      variant="link-delete"
+                      onClick={() => revoke(item)}
+                      disabled={isBusy}
+                    >
+                      {__("Revoke", "notifybay-waitlist-and-stock-alert-woo")}
+                    </ClassicButton>
+                  </span>
                 </td>
               </tr>
             ))}
