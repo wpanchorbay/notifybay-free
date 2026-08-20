@@ -9,8 +9,8 @@ import { McpAppPassword } from "../../../utils/types";
 interface McpAppPasswordsProps {
   /** Absolute URL of core's `wp/v2/users/me/application-passwords` route. */
   endpoint: string;
-  /** Base label for the generated credential, so it and the snippet agree. */
-  baseName: string;
+  /** Seeds the label field, so the credential and the snippet agree. */
+  suggestedName: string;
 }
 
 /**
@@ -34,9 +34,10 @@ interface McpAppPasswordsProps {
  */
 export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
   endpoint,
-  baseName,
+  suggestedName,
 }) => {
   const [items, setItems] = useState<McpAppPassword[] | null>(null);
+  const [name, setName] = useState(suggestedName);
   const [isBusy, setIsBusy] = useState(false);
 
   /*
@@ -73,26 +74,32 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
   }, []);
 
   /*
-   * Core requires a name and offers no default, but it is a label for the
-   * reader rather than anything the protocol reads -- so it is derived here
-   * instead of being asked for. Core permits two passwords with the same name
-   * (verified: both creates return ok), which would leave the reader guessing
-   * which row to revoke, so a repeat of the same client is suffixed.
+   * The field follows the client picker until the reader edits it. Core
+   * permits two passwords with the same name (verified: both creates return
+   * ok), so nothing stops a duplicate -- but the label is the only thing
+   * distinguishing one row from another when revoking, which is exactly why
+   * the reader writes it rather than the machine.
    */
-  const nextName = () => {
-    const taken = new Set((items || []).map((i) => i.name));
-    if (!taken.has(baseName)) {
-      return baseName;
-    }
-    let n = 2;
-    while (taken.has(`${baseName} (${n})`)) {
-      n++;
-    }
-    return `${baseName} (${n})`;
-  };
+  useEffect(() => {
+    setName((current) =>
+      "" === current || current.startsWith("NotifyBay MCP")
+        ? suggestedName
+        : current,
+    );
+  }, [suggestedName]);
 
   const create = async () => {
-    const trimmed = nextName();
+    const trimmed = name.trim();
+    if (!trimmed) {
+      addToast(
+        __(
+          "Give the password a name first, so you can tell it apart later.",
+          "notifybay-waitlist-and-stock-alert-woo",
+        ),
+        "error",
+      );
+      return;
+    }
 
     setIsBusy(true);
     try {
@@ -178,17 +185,20 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
 
   return (
     <div className="notifybay-flex notifybay-flex-col notifybay-gap-3">
-      <div className="notifybay-flex notifybay-items-center notifybay-gap-3">
+      <div className="notifybay-flex notifybay-items-center notifybay-gap-2">
+        <ClassicInput
+          id="mcp_app_password_name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder={__(
+            "e.g. NotifyBay MCP",
+            "notifybay-waitlist-and-stock-alert-woo",
+          )}
+          disabled={isBusy}
+        />
         <ClassicButton onClick={create} disabled={isBusy}>
           {__("Generate password", "notifybay-waitlist-and-stock-alert-woo")}
         </ClassicButton>
-        <span className="notifybay-text-sm notifybay-text-gray-600">
-          {sprintf(
-            /* translators: %s: the label the new credential will be filed under. */
-            __("will be labelled “%s”", "notifybay-waitlist-and-stock-alert-woo"),
-            nextName(),
-          )}
-        </span>
       </div>
 
       {secret && (

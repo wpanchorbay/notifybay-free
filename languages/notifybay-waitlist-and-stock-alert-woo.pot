@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-20T06:38:50+00:00\n"
+"POT-Creation-Date: 2026-08-20T06:41:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: notifybay-waitlist-and-stock-alert-woo\n"
@@ -453,7 +453,7 @@ msgstr ""
 
 #: notifybay-waitlist-and-stock-alert-woo.php:144
 #: build/admin.js:1
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Cancel"
 msgstr ""
 
@@ -562,13 +562,13 @@ msgid "Disable Wishlist"
 msgstr ""
 
 #: templates/admin/meta-box-overrides.php:49
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Pro"
 msgstr ""
 
 #: templates/admin/meta-box-overrides.php:54
 #: build/admin.js:1
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Unlock with Pro"
 msgstr ""
 
@@ -753,12 +753,12 @@ msgid "Unlock with Pro ✦"
 msgstr ""
 
 #: build/admin.js:1
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Upgrade to unlock"
 msgstr ""
 
 #: build/admin.js:1
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Buy Pro"
 msgstr ""
 
@@ -847,7 +847,7 @@ msgid "Email Address"
 msgstr ""
 
 #: build/admin.js:1
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Active"
 msgstr ""
 
@@ -1074,7 +1074,7 @@ msgid "Customize how the 'Notify Me' button and social proof elements appear on 
 msgstr ""
 
 #: build/settings.js:1
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Button Text"
 msgstr ""
 
@@ -1083,7 +1083,7 @@ msgid "The text shown on the 'Notify Me' button."
 msgstr ""
 
 #: build/settings.js:1
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Button CSS Class"
 msgstr ""
 
@@ -1096,7 +1096,7 @@ msgid "e.g. my-custom-btn"
 msgstr ""
 
 #: build/settings.js:1
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Success Message"
 msgstr ""
 
@@ -1323,399 +1323,401 @@ msgid "never used"
 msgstr ""
 
 #: build/settings.js:2
+msgid "e.g. NotifyBay MCP"
+msgstr ""
+
+#: build/settings.js:2
 msgid "Could not create the application password."
+msgstr ""
+
+#: build/settings.js:2
+msgid "Give the password a name first, so you can tell it apart later."
 msgstr ""
 
 #: build/settings.js:2
 msgid "Generate password"
 msgstr ""
 
-#. translators: %s: the label the new credential will be filed under.
-#: build/settings.js:3
-#, js-format
-msgid "will be labelled “%s”"
-msgstr ""
-
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Copy it now — this is the only time it can be shown."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Done"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Rename"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Revoked. Any client still using it will get a 401 on its next request."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Could not revoke it."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Revoke"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Read only"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Read and modify"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Full access"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "The assistant can list leads and read system status. It cannot change anything."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Adds editing a lead. The assistant still cannot delete anything."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Adds deleting leads permanently. Only grant this if you trust the assistant and the account it connects with."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Failed to load MCP settings."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "That access level was rejected. Nothing was changed."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "MCP settings saved."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Failed to save MCP settings."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Loading MCP settings…"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Claude Code"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Run this in a terminal where Claude Code is installed, replacing the placeholder with base64 of \"username:application-password\"."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Claude Desktop"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Add this to your Claude Desktop config (Settings → Developer → Edit Config), fill in the application password, then restart Claude Desktop."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "NODE_TLS_REJECT_UNAUTHORIZED=0 turns off certificate checking for the proxy. It is included because this looks like a development site with a self-signed certificate. Never keep it on a live store — trust the certificate authority instead."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Cursor"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Add this to Cursor's mcp.json, replacing the placeholder with base64 of \"username:application-password\". No proxy is needed."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Codex"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "In Codex, add a custom MCP server with Streamable HTTP transport and the Authorization header above."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Anything else"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Any MCP client that speaks Streamable HTTP can connect with this URL and a Basic auth header."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "AI assistant access (MCP)"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Lets an AI assistant work with your waitlist through the Model Context Protocol. It is off until you turn it on, and whoever connects still signs in as a WordPress user with their own permissions."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Enable MCP"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Turns the endpoint on. While off, it refuses every request."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Off"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Access level"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "How much the assistant is allowed to do. Tools above this level are not offered to it at all."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Tools available"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "How many NotifyBay tools this endpoint publishes in total, before the access level filters them."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Connecting a client"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Your assistant signs in as an ordinary WordPress user with an Application Password. Its own role still limits what it can reach, on top of the access level above."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Endpoint URL"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Connect as"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "The username half of the credential. An Application Password belongs to an account, so the assistant inherits whatever that account may do."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Application Password"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "A per-application credential. It cannot be used to sign in to the dashboard, and revoking it does not change the account's own password."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Revoking stops that credential immediately. Note that an assistant connecting as an account that can edit users could issue itself another one — so revoke is a reliable off switch only for an account without that permission."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Manage all of this account's passwords"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "WordPress is refusing Application Passwords on this site, which usually means it is served over plain http. No MCP client can authenticate until the site uses https."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Client configuration"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Pick your client, paste the snippet, then substitute the credential. Nothing here contains a real password."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Allow the assistant to delete?"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Full access lets the assistant permanently delete leads. Deleted leads cannot be recovered. Only grant this if you trust the assistant and the account it connects with."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Grant full access"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Wishlist"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Enable wishlist functionality (price-drop notifications) across the store."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Enable Wishlist"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Enable Wishlist features"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Social Proof (FOMO)"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Show how many other people are waiting for this product."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Enable FOMO Banner"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Show waiting count on product page"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Use {count} as a placeholder."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Only show if count is equal or higher than this."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Wishlist Display"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Optional extra CSS class(es) added to the wishlist button."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Shown after a product is added to the wishlist."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Archive Visibility"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Show on shop archives"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Fair-Play Restock"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Prevents customer frustration by only notifying a number of people equal to the actual units restocked."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Fair-Play"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Only notify leads equal to available stock"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Notification multiplier per unit restocked."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Reservation window, in hours."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Sales Attribution"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Conversion Window (Days)"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Urgency Alerts"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Hurry Logic"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Enable follow-up urgency alerts"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Trigger alert when stock falls below this level."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Minimum hours after restock before the hurry alert fires."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Failed to load system status."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Failed to load settings."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Settings saved successfully."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Failed to save settings."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Overview"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "General"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Display"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Engine Logic"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Email Templates"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "System Status"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "AI Access"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Advanced"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Unsaved Changes"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "You have unsaved changes. Would you like to save them before switching tabs?"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Save"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:2
 msgid "Discard"
 msgstr ""

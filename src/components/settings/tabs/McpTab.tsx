@@ -377,7 +377,7 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                   <>
                     <McpAppPasswords
                       endpoint={mcp.app_passwords_rest_url}
-                      baseName={`NotifyBay MCP - ${snippet.label}`}
+                      suggestedName={`NotifyBay MCP - ${snippet.label}`}
                     />
                     {/*
                       Verified against this site, not inferred: an assistant
