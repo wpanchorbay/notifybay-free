@@ -7,7 +7,6 @@ import { CopyToClipboard } from "../../common/CopyToClipboard";
 import { useToast } from "../../../store/toast/use-toast";
 import { McpLocalize, McpStatus } from "../../../utils/types";
 import { buildMcpSnippets } from "./mcpSnippets";
-import { McpAccounts } from "./McpAccounts";
 
 interface McpTabProps {
   mcp: McpLocalize;
@@ -317,8 +316,6 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
         ]}
       />
 
-      <McpAccounts mcp={mcp} />
-
       <ClassicSettingsTable
         title={__(
           "Connecting a client",
@@ -345,6 +342,25 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
             ),
           },
           {
+            id: "mcp_connect_as",
+            label: __(
+              "Connect as",
+              "notifybay-waitlist-and-stock-alert-woo",
+            ),
+            tooltip: __(
+              "The username half of the credential. An Application Password belongs to an account, so the assistant inherits whatever that account may do.",
+              "notifybay-waitlist-and-stock-alert-woo",
+            ),
+            render: () => (
+              <div className="notifybay-flex notifybay-items-center notifybay-gap-2">
+                <code className="notifybay-text-xs">
+                  {mcp.current_user_login}
+                </code>
+                <CopyToClipboard text={mcp.current_user_login} />
+              </div>
+            ),
+          },
+          {
             id: "mcp_app_password",
             label: __(
               "Application Password",
@@ -366,7 +382,7 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                     </a>
                     {" — "}
                     {__(
-                      "or create a dedicated account below, which is the safer option.",
+                      "then pair it with the username above.",
                       "notifybay-waitlist-and-stock-alert-woo",
                     )}
                   </p>

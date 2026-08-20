@@ -331,46 +331,6 @@ uigate="$( wp_php "$MCP_WORK/uigate.php" )"
 assert_contains "administrator=shown" "$uigate" "the MCP tab renders for an administrator"
 assert_contains "nb_ai=hidden"        "$uigate" "...and is hidden from the AI account"
 
-# The account-provisioning routes are the sharpest edge in the plugin: they
-# create users and mint credentials. Two properties must hold regardless of who
-# is asking.
-#
-# First, an Application Password must not be enough. These routes require a
-# wp_rest nonce, which needs a cookie session, so an AI account holding
-# manage_options still cannot provision another AI account over MCP.
-http "$MCP_ADMIN" GET "/wp-json/notifybay/v1/admin/mcp/accounts" ""
-assert_eq 403 "$MCP_STATUS" "provisioning is unreachable with an Application Password"
-assert_contains "rest_nonce_invalid" "$MCP_BODY" "...because it demands a cookie-session nonce"
-
-# Second, manage_notifybay is not sufficient -- a shop manager may edit leads
-# but must not be able to provision an assistant.
-cat > "$MCP_WORK/provisiongate.php" <<'PHP'
-<?php
-$controller = NotifyBay\Api\McpAccountController::get_instance();
-
-foreach ( [ 'administrator', 'shop_manager', 'nb_ai' ] as $who ) {
-	if ( 'nb_ai' === $who ) {
-		$user = get_user_by( 'login', 'nb_ai' );
-	} else {
-		$found = get_users( [ 'role' => $who, 'number' => 1 ] );
-		$user  = $found ? $found[0] : null;
-	}
-
-	if ( ! $user ) { printf( "%s=absent\n", $who ); continue; }
-
-	wp_set_current_user( $user->ID );
-	$request = new WP_REST_Request( 'GET', '/notifybay/v1/admin/mcp/accounts' );
-	$request->set_header( 'X-WP-Nonce', wp_create_nonce( 'wp_rest' ) );
-
-	$result = $controller->mcp_admin_permissions_check( $request );
-	printf( "%s=%s\n", $who, is_wp_error( $result ) ? $result->get_error_code() : 'allowed' );
-}
-PHP
-gate="$( wp_php "$MCP_WORK/provisiongate.php" )"
-assert_contains "administrator=allowed"      "$gate" "an administrator may provision MCP accounts"
-assert_contains "shop_manager=rest_forbidden" "$gate" "...a shop manager may not, despite manage_notifybay"
-assert_contains "nb_ai=rest_forbidden"        "$gate" "...and the AI account certainly may not"
-
 # ---------------------------------------------------------------------------
 case_start "Destructive tool, and the audit trail"
 

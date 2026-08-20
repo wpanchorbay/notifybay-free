@@ -92,10 +92,7 @@ export interface McpLocalize {
 	product_key: string;
 	/** Base URL of the kit's settings routes, e.g. `.../wp-json/wpab/v1/notifybay`. */
 	rest_url: string;
-	/** Base URL of NotifyBay's own admin routes, used for account provisioning. */
-	admin_rest_url: string;
 	app_passwords_url: string;
-	users_url: string;
 	current_user_login: string;
 	/** False when WordPress refuses Application Passwords, e.g. over plain http. */
 	app_passwords_available: boolean;
@@ -128,30 +125,6 @@ export interface McpStatus {
 	available_access_levels: string[];
 	client_config: Record< string, unknown >;
 	settings: McpSettingField[];
-}
-
-/**
- * One Application Password issued by McpAccountController, as reported back.
- * Never carries the secret -- that exists only in the create/rotate response.
- */
-export interface McpAppPassword {
-	created: number;
-	last_used: string | null;
-	last_ip: string | null;
-}
-
-/** An account that can currently reach the MCP endpoint. */
-export interface McpAccount {
-	user_id: number;
-	user_login: string;
-	roles: string[];
-	/** True when the capability was granted per-user, which is what makes it revocable. */
-	granted_here: boolean;
-	is_administrator: boolean;
-	/** An administrator can POST to the kit's settings route and move itself up the ladder. */
-	can_raise_own_level: boolean;
-	can_delete_leads: boolean;
-	app_passwords: McpAppPassword[];
 }
 
 /**

@@ -391,9 +391,7 @@ class Admin {
 		return array(
 			'product_key'             => 'notifybay',
 			'rest_url'                => get_rest_url( null, 'wpab/v1/notifybay' ),
-			'admin_rest_url'          => get_rest_url( null, \NOTIFYBAY_TEXT_DOMAIN . '/v1/admin' ),
 			'app_passwords_url'       => admin_url( 'profile.php#application-passwords-section' ),
-			'users_url'               => admin_url( 'users.php' ),
 			'current_user_login'      => $user && $user->exists() ? $user->user_login : '',
 
 			/*
