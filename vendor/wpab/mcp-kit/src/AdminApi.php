@@ -42,13 +42,48 @@ final class AdminApi {
 	private static function register_routes( string $product_key, string $manifest_path ): void {
 
 		// Gated on manage_options, matching wpab_mcp_toggle_<product_key>
-		// (D1 §6) -- NOT wpab_mcp_access, and NOT manage_woocommerce. The
-		// surface that sets the access-level policy must be gated on
-		// something the AI account itself does not hold, or that account
-		// could raise its own ceiling with the very credential the store
-		// owner issued it (D1 §4.12).
-		$permission = static function () {
+		// (D1 §6) -- NOT wpab_mcp_access, and NOT manage_woocommerce.
+		//
+		// Reading status escalates nothing, so the capability is the whole
+		// gate here.
+		$read = static function () {
 			return current_user_can( 'manage_options' );
+		};
+
+		// D1 §4.12 requires that the surface setting access-level policy be
+		// gated on something the AI account does not hold. manage_options
+		// alone did not achieve that: the account a store owner connects an
+		// assistant as is normally an administrator, so the assistant could
+		// POST here with the very credential it was issued and set itself to
+		// `full`. The ladder was advisory rather than enforced.
+		//
+		// A nonce closes it without narrowing the capability. Nonces are
+		// bound to a session token that HTTP Basic never establishes, so an
+		// Application Password cannot produce a valid one and cannot obtain
+		// one -- reading a nonce out of wp-admin requires the cookie session
+		// it does not have. The store owner is unaffected: their browser
+		// sends X-WP-Nonce on every admin-originated request.
+		//
+		// Applied to the write only. GET status is read-only, and gating it
+		// the same way would break every adopter reading status from a
+		// script or CI without changing what an attacker can do.
+		$write = static function ( \WP_REST_Request $request ) {
+
+			if ( ! current_user_can( 'manage_options' ) ) {
+				return false;
+			}
+
+			$nonce = $request->get_header( 'X-WP-Nonce' );
+
+			if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+				return new \WP_Error(
+					'rest_nonce_invalid',
+					__( 'Changing MCP settings requires an authenticated admin session. An application password is not sufficient.', 'wpab-mcp-kit' ),
+					[ 'status' => 403 ]
+				);
+			}
+
+			return true;
 		};
 
 		register_rest_route(
@@ -56,7 +91,7 @@ final class AdminApi {
 			"/{$product_key}/status",
 			[
 				'methods'             => 'GET',
-				'permission_callback' => $permission,
+				'permission_callback' => $read,
 				'callback'            => static function () use ( $product_key, $manifest_path ) {
 					return rest_ensure_response( self::status( $product_key, $manifest_path ) );
 				},
@@ -68,7 +103,7 @@ final class AdminApi {
 			"/{$product_key}/settings",
 			[
 				'methods'             => 'POST',
-				'permission_callback' => $permission,
+				'permission_callback' => $write,
 				'args'                => [
 					'enabled'      => [
 						'type'     => 'boolean',

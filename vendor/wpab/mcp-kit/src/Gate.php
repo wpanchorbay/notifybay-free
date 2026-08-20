@@ -37,11 +37,22 @@ final class Gate {
 	/**
 	 * The transport permission callback -- create_server() argument 13.
 	 *
-	 * MUST return boolean false to deny, never WP_Error. The adapter's
-	 * HttpTransport::check_permission() treats a WP_Error from this
-	 * callback as the *callback itself* having failed: it logs the error
-	 * and falls through to `current_user_can('read')`, which every
-	 * logged-in user holds. A WP_Error here is a silent, total bypass.
+	 * MUST return boolean false to deny, never WP_Error.
+	 *
+	 * On mcp-adapter 0.1.0 -- the copy WooCommerce vendors --
+	 * HttpTransport::check_permission() treats a WP_Error from this callback
+	 * as the *callback itself* having failed: it logs the error and falls
+	 * through to `current_user_can('read')`, which every logged-in user
+	 * holds. A WP_Error there is a silent, total bypass.
+	 *
+	 * 0.5.0 -- shipped by fluent-toolkit -- returns false instead and fails
+	 * closed. Do not read that as the rule being obsolete. Which copy wins on
+	 * a site carrying both depends on load order, and this callback cannot
+	 * tell which one is calling it. Returning false is correct under either.
+	 *
+	 * This is the opposite of the rule for an ability *handler*, where
+	 * returning WP_Error is correct and the adapter converts it into the
+	 * protocol's own isError. Two callbacks, opposite rules.
 	 *
 	 * @param \WP_REST_Request $request The incoming REST request.
 	 * @param string           $product_key The consuming plugin's `product_key` (D1 §5).

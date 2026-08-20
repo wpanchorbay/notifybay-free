@@ -52,6 +52,12 @@ final class Kit {
 			}
 		);
 
+		// Registered here rather than inside Bootstrap because provisioning an
+		// account must work whether or not any product is enabled -- an
+		// operator locked out of a disabled endpoint still needs to create the
+		// account that will reach it once switched on.
+		Cli::register();
+
 		// Bootstrap hooks plugins_loaded itself. Kit::boot() MUST be called
 		// at file scope in the plugin's main file, not deferred into the
 		// host's own plugins_loaded callback -- doing so would register

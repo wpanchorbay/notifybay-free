@@ -129,13 +129,47 @@ done
 [ -n "$LEAD_ID" ] && [ "$LEAD_ID" != 0 ] || { echo "could not seed a lead" >&2; exit 1; }
 echo "→ probe lead id $LEAD_ID"
 
+# settings_post <json-body>
+# Drives the kit's settings route, which is deliberately unreachable with an
+# application password -- it is the surface that sets access-level policy, and
+# the account an assistant connects as must not be able to raise its own
+# ceiling with the credential it was issued.
+#
+# So this goes through rest_do_request under a real user with a wp_rest nonce
+# rather than over Basic auth. The route, its permission callback and its
+# handler all still run, which is the property this suite wants: the endpoint
+# is switched on through the kit's own surface, not by writing the option
+# behind its back, so the toggle listener is exercised.
+#
+# This script cannot use the kit harness's admin_login instead, because it
+# borrows an existing administrator whose password it does not know and must
+# never change.
+settings_post() {
+	cat > "$MCP_WORK/settingspost.php" <<PHP
+<?php
+\$admin = get_user_by( 'login', '$ADMIN_LOGIN' );
+wp_set_current_user( \$admin->ID );
+
+\$r = new WP_REST_Request( 'POST', '/wpab/v1/notifybay/settings' );
+\$r->set_header( 'Content-Type', 'application/json' );
+\$r->set_header( 'X-WP-Nonce', wp_create_nonce( 'wp_rest' ) );
+\$r->set_body( '$1' );
+
+\$res = rest_do_request( \$r );
+printf( "%d\\n%s", \$res->get_status(), wp_json_encode( \$res->get_data() ) );
+PHP
+	local out; out="$( wp_php "$MCP_WORK/settingspost.php" )"
+	MCP_STATUS="$( printf '%s' "$out" | head -1 )"
+	MCP_BODY="$( printf '%s' "$out" | tail -n +2 )"
+}
+
 # set_level <read|read+modify|full>
 set_level() {
-	http "$MCP_ADMIN" POST "/wp-json/wpab/v1/notifybay/settings" "{\"enabled\":true,\"access_level\":\"$1\"}"
+	settings_post "{\"enabled\":true,\"access_level\":\"$1\"}"
 }
 
 cleanup() {
-	http "$MCP_ADMIN" POST "/wp-json/wpab/v1/notifybay/settings" '{"enabled":false,"access_level":"read"}' >/dev/null 2>&1
+	settings_post '{"enabled":false,"access_level":"read"}' >/dev/null 2>&1
 	cat > "$MCP_WORK/teardown.php" <<PHP
 <?php
 global \$wpdb;
@@ -304,8 +338,33 @@ case_start "The AI account cannot raise its own ceiling"
 # could also reach the settings route it could simply set itself to full and
 # the ladder would be decorative. The kit gates that route on manage_options,
 # which nb_ai does not hold.
+# Two independent guards, each asserted separately. A single 403 would keep
+# passing if either were removed -- and after the nonce landed, the capability
+# check could have been deleted entirely without this suite noticing.
+#
+# Pinned to a known rung first: earlier cases leave the level at full quite
+# legitimately, so "unchanged" needs something to be unchanged from.
+set_level read
+
+# The capability is checked first, so nb_ai never reaches the nonce check.
 http "$MCP_AI" POST "/wp-json/wpab/v1/notifybay/settings" '{"access_level":"full"}'
 assert_eq 403 "$MCP_STATUS" "the AI account is refused the settings route"
+assert_contains "rest_forbidden" "$MCP_BODY" "...for want of manage_options, not the nonce"
+
+# The guard that actually matters. The kit grants wpab_mcp_access to the
+# administrator role, so the account a store owner connects an assistant as is
+# normally an administrator -- one that holds manage_options and would
+# otherwise be free to set itself to full.
+http "$MCP_ADMIN" POST "/wp-json/wpab/v1/notifybay/settings" '{"access_level":"full"}'
+assert_eq 403 "$MCP_STATUS" "an administrator over an application password is refused too"
+assert_contains "rest_nonce_invalid" "$MCP_BODY" "...because the route demands a session an application password cannot have"
+
+# And nothing moved.
+http "$MCP_ADMIN" GET "/wp-json/wpab/v1/notifybay/status" ""
+assert_eq read "$( json "d['settings'][1]['value']" )" "...and the stored level is unchanged after both attempts"
+
+# Restore what the following cases expect.
+set_level full
 
 # ...and the admin tab that drives that route is hidden from it too. Asserted
 # here rather than left to a one-off manual check, because a tab rendered for
@@ -396,7 +455,7 @@ assert_contains "fixturetwo|0.3.2"        "$prod" "...and a second scoped copy"
 # ---------------------------------------------------------------------------
 case_start "The site is left as it was found"
 
-http "$MCP_ADMIN" POST "/wp-json/wpab/v1/notifybay/settings" '{"enabled":false,"access_level":"read"}'
+settings_post '{"enabled":false,"access_level":"read"}'
 assert_eq 200 "$MCP_STATUS" "the endpoint switches back off"
 
 http "$MCP_AI" POST "/wp-json/wpab/notifybay/mcp" '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' 'Accept: application/json'
