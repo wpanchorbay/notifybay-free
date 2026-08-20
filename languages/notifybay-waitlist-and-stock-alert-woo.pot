@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-20T09:27:59+00:00\n"
+"POT-Creation-Date: 2026-08-20T09:30:46+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: notifybay-waitlist-and-stock-alert-woo\n"
@@ -1354,7 +1354,7 @@ msgid "Generate password"
 msgstr ""
 
 #: build/settings.js:2
-msgid "This credential is already active. Copy the password now — it is the only time it can be shown."
+msgid "This credential is already active, and the connection snippets below now contain it in full — username and password, ready to paste. Copy what you need now: the password cannot be shown again, and the snippets go back to placeholders once you press Done."
 msgstr ""
 
 #: build/settings.js:2

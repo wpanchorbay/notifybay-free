@@ -274,7 +274,7 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
         {secret && (
           <p className="notifybay-m-0 notifybay-rounded-md notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50 notifybay-p-2 notifybay-text-sm">
             {__(
-              "This credential is already active. Copy the password now — it is the only time it can be shown.",
+              "This credential is already active, and the connection snippets below now contain it in full — username and password, ready to paste. Copy what you need now: the password cannot be shown again, and the snippets go back to placeholders once you press Done.",
               "notifybay-waitlist-and-stock-alert-woo",
             )}
           </p>
