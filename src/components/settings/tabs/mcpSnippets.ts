@@ -42,7 +42,6 @@ interface BuildOptions {
   password?: string | null;
 }
 
-const BASIC_PLACEHOLDER = "<base64(username:application-password)>";
 const PASS_PLACEHOLDER = "<your-application-password>";
 
 export function buildMcpSnippets({
@@ -63,9 +62,15 @@ export function buildMcpSnippets({
    * [A-Za-z0-9]. A multi-byte character would throw, which is why this is not
    * a general-purpose encoder.
    */
+  /*
+   * The placeholder names the actual account rather than the word "username".
+   * HTTP Basic has no username field -- both halves are inside the base64 --
+   * so a generic placeholder beside a comment saying "connects as admin" left
+   * the reader to work out where the account name was supposed to go.
+   */
   const BASIC = hasSecret
     ? window.btoa(`${user}:${password}`)
-    : BASIC_PLACEHOLDER;
+    : `<base64(${user}:application-password)>`;
 
   /*
    * Half of each instruction was telling the reader to substitute a
@@ -94,7 +99,10 @@ export function buildMcpSnippets({
       label: __("Claude Code", "notifybay-waitlist-and-stock-alert-woo"),
       kind: "shell",
       snippet: [
-        `# Connects as ${user}. Basic auth carries the username in the base64.`,
+        hasSecret
+          ? `# Connects as ${user}.`
+          : `# Connects as ${user}. Replace the placeholder with base64 of ${user}:<password>,`,
+        ...( hasSecret ? [] : [ '# or generate a password above and this fills itself in.' ] ),
         "claude mcp add \\",
         "  --transport http \\",
         `  notifybay ${endpoint} \\`,
