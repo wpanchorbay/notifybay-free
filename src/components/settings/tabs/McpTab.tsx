@@ -7,6 +7,7 @@ import { CopyToClipboard } from "../../common/CopyToClipboard";
 import { useToast } from "../../../store/toast/use-toast";
 import { McpLocalize, McpStatus } from "../../../utils/types";
 import { buildMcpSnippets } from "./mcpSnippets";
+import { McpAppPasswords } from "./McpAppPasswords";
 
 interface McpTabProps {
   mcp: McpLocalize;
@@ -367,25 +368,40 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
               "notifybay-waitlist-and-stock-alert-woo",
             ),
             tooltip: __(
-              "A revocable, per-application credential. It cannot be used to sign in to the dashboard, and revoking it does not change the account's own password.",
+              "A per-application credential. It cannot be used to sign in to the dashboard, and revoking it does not change the account's own password.",
               "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <div className="notifybay-flex notifybay-flex-col notifybay-gap-2">
                 {mcp.app_passwords_available ? (
-                  <p className="description notifybay-m-0">
-                    <a href={mcp.app_passwords_url}>
+                  <>
+                    <McpAppPasswords
+                      endpoint={mcp.app_passwords_rest_url}
+                      suggestedName={`NotifyBay MCP - ${snippet.label}`}
+                    />
+                    {/*
+                      Verified against this site, not inferred: an assistant
+                      holding one of these can POST the same core route and
+                      issue itself another (HTTP 201). Revoking is therefore
+                      only a reliable kill switch for an account that cannot
+                      edit users -- which an administrator can. Saying so here
+                      is the difference between a credential the reader
+                      understands and one they over-trust.
+                    */}
+                    <p className="description notifybay-m-0">
                       {__(
-                        "Create one on your profile",
+                        "Revoking stops that credential immediately. Note that an assistant connecting as an account that can edit users could issue itself another one — so revoke is a reliable off switch only for an account without that permission.",
                         "notifybay-waitlist-and-stock-alert-woo",
                       )}
-                    </a>
-                    {" — "}
-                    {__(
-                      "then pair it with the username above.",
-                      "notifybay-waitlist-and-stock-alert-woo",
-                    )}
-                  </p>
+                      {" "}
+                      <a href={mcp.app_passwords_url}>
+                        {__(
+                          "Manage all of this account's passwords",
+                          "notifybay-waitlist-and-stock-alert-woo",
+                        )}
+                      </a>
+                    </p>
+                  </>
                 ) : (
                   /*
                    * Without this the adopter gets an unexplained 401 and no

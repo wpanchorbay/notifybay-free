@@ -392,6 +392,14 @@ class Admin {
 			'product_key'             => 'notifybay',
 			'rest_url'                => get_rest_url( null, 'wpab/v1/notifybay' ),
 			'app_passwords_url'       => admin_url( 'profile.php#application-passwords-section' ),
+
+			/*
+			 * Core's own route, used so the AI Access tab can issue and revoke
+			 * the credential without sending the reader to their profile screen.
+			 * `me` is the security boundary: no request the tab makes names a
+			 * user, so there is no target to tamper with.
+			 */
+			'app_passwords_rest_url'  => get_rest_url( null, 'wp/v2/users/me/application-passwords' ),
 			'current_user_login'      => $user && $user->exists() ? $user->user_login : '',
 
 			/*

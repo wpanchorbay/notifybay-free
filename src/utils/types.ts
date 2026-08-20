@@ -93,12 +93,26 @@ export interface McpLocalize {
 	/** Base URL of the kit's settings routes, e.g. `.../wp-json/wpab/v1/notifybay`. */
 	rest_url: string;
 	app_passwords_url: string;
+	/** Core's `wp/v2/users/me/application-passwords` route. */
+	app_passwords_rest_url: string;
 	current_user_login: string;
 	/** False when WordPress refuses Application Passwords, e.g. over plain http. */
 	app_passwords_available: boolean;
 	is_local_dev: boolean;
 	/** Only true on an https development host, where a self-signed cert is plausible. */
 	offer_tls_bypass: boolean;
+}
+
+/**
+ * One Application Password, as core's users/me/application-passwords route
+ * reports it. `password` is present only in the response that creates one.
+ */
+export interface McpAppPassword {
+	uuid: string;
+	name: string;
+	created: string;
+	last_used: string | null;
+	last_ip: string | null;
 }
 
 /**
