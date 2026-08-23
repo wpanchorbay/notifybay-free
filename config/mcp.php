@@ -139,7 +139,7 @@ return array(
 				'properties' => array(
 					'page'     => array(
 						'type'        => 'integer',
-						'description' => '1-based page number for the failed leads list. Read has_more to decide whether to ask for the next one.',
+						'description' => '1-based page number for the failed leads list. Read leads_has_more in the response to decide whether to ask for the next one.',
 						'default'     => 1,
 						'minimum'     => 1,
 					),
