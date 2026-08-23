@@ -36,17 +36,23 @@ const LEVEL_LABELS: Record<string, string> = {
   full: __("Full access", "notifybay-waitlist-and-stock-alert-woo"),
 };
 
+/*
+ * These have to name every tool the level unlocks. They are the only place a
+ * store owner is told what they are agreeing to, and the ladder is the only
+ * control they have -- a level that quietly gained a tool is consent they never
+ * gave. Update this whenever config/mcp.php gains an ability.
+ */
 const LEVEL_DESCRIPTIONS: Record<string, string> = {
   read: __(
-    "The assistant can list leads and read system status. It cannot change anything.",
+    "The assistant can list leads, see which products have the longest waitlists, read system status and diagnose failed notifications. It cannot change anything.",
     "notifybay-waitlist-and-stock-alert-woo",
   ),
   "read+modify": __(
-    "Adds editing a lead. The assistant still cannot delete anything.",
+    "Adds editing a lead's status or email address. The assistant still cannot delete anything or email your customers.",
     "notifybay-waitlist-and-stock-alert-woo",
   ),
   full: __(
-    "Adds deleting leads permanently. Only grant this if you trust the assistant and the account it connects with.",
+    "Adds deleting leads permanently, and re-sending back-in-stock emails to real customers. Neither can be undone. Only grant this if you trust the assistant and the account it connects with.",
     "notifybay-waitlist-and-stock-alert-woo",
   ),
 };

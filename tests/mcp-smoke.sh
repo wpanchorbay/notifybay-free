@@ -229,7 +229,7 @@ assert_eq 200 "$MCP_STATUS" "the status route answers"
 assert_json           "...with JSON, not a fatal or a notice-corrupted body"
 assert_eq ok    "$( json "d['status']" )"                 "the toggle persisted"
 assert_eq true  "$( json "d['settings'][0]['value']" )"   "...and reads back as enabled in the settings payload"
-assert_eq 4     "$( json "d['tool_count']" )"             "all 4 manifest abilities validated -- none silently rejected"
+assert_eq 7     "$( json "d['tool_count']" )"             "all 7 manifest abilities validated -- none silently rejected"
 
 # ---------------------------------------------------------------------------
 case_start "Registration -- the count, not just the absence of an error"
@@ -245,8 +245,8 @@ reg="$( wp_php "$MCP_WORK/count.php" )"
 
 # Core reports every registration failure as _doing_it_wrong() and a null
 # return, so a dropped ability is invisible unless it is counted.
-assert_contains "count=4" "$reg" "exactly 4 notifybay abilities register with core"
-assert_contains "notifybay/delete-leads,notifybay/list-leads,notifybay/system-status,notifybay/update-lead" \
+assert_contains "count=7" "$reg" "exactly 7 notifybay abilities register with core"
+assert_contains "notifybay/delete-leads,notifybay/list-leads,notifybay/notification-failures,notifybay/product-summary,notifybay/resend-notifications,notifybay/system-status,notifybay/update-lead" \
 	"$reg" "...and they are the four the manifest declares"
 
 # ---------------------------------------------------------------------------
@@ -312,12 +312,20 @@ assert_contains     "notifybay-list-leads"    "$names" "read: readonly list-lead
 assert_contains     "notifybay-system-status" "$names" "read: readonly system-status is advertised"
 assert_not_contains "notifybay-update-lead"   "$names" "read: idempotent update-lead is hidden"
 assert_not_contains "notifybay-delete-leads"  "$names" "read: destructive delete-leads is hidden"
+# The one tool that reaches a real customer. Everything else the ladder hides
+# is recoverable; a back-in-stock email is not, so this is asserted at every
+# level below full rather than left to the destructive class in general.
+assert_not_contains "notifybay-resend-notifications" "$names" "read: the customer-emailing tool is hidden"
+assert_contains     "notifybay-notification-failures" "$names" "read: readonly notification-failures is advertised"
+assert_contains     "notifybay-product-summary"       "$names" "read: readonly product-summary is advertised"
 
 # Not advertised is not enough. It must also be refused when called directly.
 mcp_tool "$MCP_ADMIN" notifybay notifybay-delete-leads "{\"ids\":[$LEAD_ID]}"
 assert_eq true "$( refused )" "read: delete-leads called directly is refused, not merely unlisted"
 mcp_tool "$MCP_ADMIN" notifybay notifybay-update-lead "{\"id\":$LEAD_ID,\"status\":\"expired\"}"
 assert_eq true "$( refused )" "read: update-lead called directly is refused"
+mcp_tool "$MCP_ADMIN" notifybay notifybay-resend-notifications "{\"ids\":[$LEAD_ID]}"
+assert_eq true "$( refused )" "read: resend-notifications called directly is refused -- no mail is queued"
 
 # read+modify
 set_level read+modify >/dev/null
@@ -325,8 +333,11 @@ mcp_call "$MCP_ADMIN" notifybay tools/list '{}'
 names="$( tool_names )"
 assert_contains     "notifybay-update-lead"  "$names" "read+modify: idempotent update-lead appears"
 assert_not_contains "notifybay-delete-leads" "$names" "read+modify: destructive is still hidden"
+assert_not_contains "notifybay-resend-notifications" "$names" "read+modify: the customer-emailing tool is still hidden"
 mcp_tool "$MCP_ADMIN" notifybay notifybay-delete-leads "{\"ids\":[$LEAD_ID]}"
 assert_eq true "$( refused )" "read+modify: delete-leads is still refused directly"
+mcp_tool "$MCP_ADMIN" notifybay notifybay-resend-notifications "{\"ids\":[$LEAD_ID]}"
+assert_eq true "$( refused )" "read+modify: resend-notifications is still refused directly"
 
 mcp_tool "$MCP_ADMIN" notifybay notifybay-update-lead "{\"id\":$LEAD_ID,\"status\":\"unsubscribed\"}"
 assert_eq false "$( is_error )" "read+modify: update-lead now succeeds"

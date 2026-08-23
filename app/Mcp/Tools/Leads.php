@@ -57,6 +57,21 @@ class Leads {
 	 * @since 1.0.3
 	 * @var string[]
 	 */
+	/**
+	 * Statuses a restock notification may be re-sent for.
+	 *
+	 * `failed` is the retry case: the engine gave up after three attempts.
+	 * `notified` is the resend case: it went out, and somebody wants it sent
+	 * again. Nothing else qualifies -- an `active` lead has not been dispatched
+	 * to yet and belongs to the stock engine, and re-mailing an `unsubscribed`
+	 * or `converted` customer is the kind of thing an assistant should not be
+	 * able to do by passing an id.
+	 *
+	 * @since 1.0.4
+	 * @var string[]
+	 */
+	private const RESENDABLE = array( 'failed', 'notified' );
+
 	private const STATUSES = array(
 		'active',
 		'pending_verification',
@@ -339,6 +354,336 @@ class Leads {
 			'not_found' => $not_found,
 			'failed'    => $failed,
 			'affected'  => $deleted,
+		);
+	}
+
+	/**
+	 * Why notifications are not arriving: failed leads with their recorded
+	 * reason, and failed background jobs grouped by hook.
+	 *
+	 * Two separate things are reported because they are two separate problems
+	 * and the counts in system-status invite conflating them. A failed *lead*
+	 * is a customer who did not get their email. A failed *job* is usually a
+	 * maintenance task that could not run -- on this store every one of them is
+	 * "no callbacks are registered", which happens when an action fires while
+	 * the plugin (or NotifyBay Pro) is not loaded, and has nothing to do with
+	 * any individual customer.
+	 *
+	 * @since 1.0.4
+	 * @param array $input Validated tool input.
+	 * @return array
+	 */
+	public static function notification_failures( array $input ): array {
+
+		global $wpdb;
+
+		$per_page = isset( $input['per_page'] ) ? absint( $input['per_page'] ) : 20;
+		$per_page = max( 1, min( 100, $per_page ) );
+		$page     = max( 1, isset( $input['page'] ) ? absint( $input['page'] ) : 1 );
+
+		$pagination = Lead::paginate( $page, $per_page, array( 'status' => 'failed' ), array(), 'updated_at' );
+
+		$leads = array();
+
+		foreach ( $pagination['data'] as $lead ) {
+			$row                = self::shape( $lead );
+			$row['retry_count'] = (int) $lead->retry_count;
+			$row['last_error']  = self::last_action_error( (int) $lead->id );
+			$leads[]            = $row;
+		}
+
+		return array(
+			'leads'       => $leads,
+			'leads_page'  => (int) $pagination['page'],
+			'leads_total' => (int) $pagination['total'],
+			'has_more'    => ( (int) $pagination['page'] * $per_page ) < (int) $pagination['total'],
+			'jobs'        => self::failed_jobs(),
+		);
+	}
+
+	/**
+	 * The most recent Action Scheduler log line for a lead's send attempts.
+	 *
+	 * The plugin does not persist a per-lead failure reason -- handle_failure()
+	 * records only a retry count -- so the only account of what went wrong is
+	 * Action Scheduler's own log, reached through the action whose args carry
+	 * this lead id.
+	 *
+	 * Both arg spellings are matched. Action Scheduler stores the same
+	 * parameter as `[1219,"waitlist_restock"]` from one call path and
+	 * `["1219","waitlist_restock"]` from another, so matching one spelling
+	 * silently finds nothing for half the actions. The trailing comma anchors
+	 * the id so lead 12 does not match lead 123.
+	 *
+	 * @since 1.0.4
+	 * @param int $lead_id Lead id.
+	 * @return string|null Null when no attempt was ever logged.
+	 */
+	private static function last_action_error( int $lead_id ) {
+
+		global $wpdb;
+
+		$actions = $wpdb->prefix . 'actionscheduler_actions';
+		$logs    = $wpdb->prefix . 'actionscheduler_logs';
+
+		if ( ! $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $actions ) ) ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Action Scheduler tables; a direct, uncached read is intentional for this real-time report.
+			return null;
+		}
+
+		$message = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Action Scheduler tables; a direct, uncached read is intentional for this real-time report.
+			$wpdb->prepare(
+				'SELECT lg.message
+				 FROM %i lg
+				 INNER JOIN %i a ON a.action_id = lg.action_id
+				 WHERE a.hook = %s AND ( a.args LIKE %s OR a.args LIKE %s )
+				 ORDER BY lg.log_id DESC
+				 LIMIT 1',
+				$logs,
+				$actions,
+				'notifybay_send_email_worker',
+				'[' . $lead_id . ',%',
+				'["' . $lead_id . '",%'
+			)
+		);
+
+		// Null, never '', so a caller can tell "nothing was ever logged for
+		// this lead" from "the log line was empty".
+		return ( null === $message || '' === $message ) ? null : (string) $message;
+	}
+
+	/**
+	 * Failed background jobs in the notifybay_alerts group, grouped by hook.
+	 *
+	 * @since 1.0.4
+	 * @return array
+	 */
+	private static function failed_jobs(): array {
+
+		global $wpdb;
+
+		$actions = $wpdb->prefix . 'actionscheduler_actions';
+		$groups  = $wpdb->prefix . 'actionscheduler_groups';
+		$logs    = $wpdb->prefix . 'actionscheduler_logs';
+
+		if ( ! $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $actions ) ) ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Action Scheduler tables; a direct, uncached read is intentional for this real-time report.
+			return array();
+		}
+
+		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Action Scheduler tables; a direct, uncached read is intentional for this real-time report.
+			$wpdb->prepare(
+				'SELECT a.hook, COUNT(*) AS failures, MAX(a.action_id) AS latest
+				 FROM %i a
+				 INNER JOIN %i g ON a.group_id = g.group_id
+				 WHERE g.slug = %s AND a.status = %s
+				 GROUP BY a.hook
+				 ORDER BY failures DESC
+				 LIMIT 20',
+				$actions,
+				$groups,
+				'notifybay_alerts',
+				'failed'
+			)
+		);
+
+		$out = array();
+
+		foreach ( (array) $rows as $row ) {
+			$message = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Action Scheduler tables; a direct, uncached read is intentional for this real-time report.
+				$wpdb->prepare( 'SELECT message FROM %i WHERE action_id = %d ORDER BY log_id DESC LIMIT 1', $logs, (int) $row->latest )
+			);
+
+			$out[] = array(
+				'hook'         => (string) $row->hook,
+				'failures'     => (int) $row->failures,
+				'last_message' => ( null === $message || '' === $message ) ? null : (string) $message,
+			);
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Waitlist size per product, with a per-status breakdown.
+	 *
+	 * @since 1.0.4
+	 * @param array $input Validated tool input.
+	 * @return array
+	 */
+	public static function product_summary( array $input ): array {
+
+		global $wpdb;
+
+		$limit = isset( $input['limit'] ) ? absint( $input['limit'] ) : 10;
+		$limit = max( 1, min( 50, $limit ) );
+
+		$table = $wpdb->prefix . 'notifybay_leads';
+
+		/*
+		 * Grouped by product_id only, so a variable product is reported as one
+		 * waitlist rather than one per variation. That is the question people
+		 * actually ask ("which product has the longest waitlist"), and the
+		 * variation split is still reachable through list-leads.
+		 */
+		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached aggregate is intentional for this real-time report.
+			$wpdb->prepare(
+				'SELECT product_id, status, COUNT(*) AS c, MAX(product_name_snapshot) AS name
+				 FROM %i
+				 GROUP BY product_id, status',
+				$table
+			)
+		);
+
+		$products = array();
+
+		foreach ( (array) $rows as $row ) {
+			$pid = (int) $row->product_id;
+
+			if ( ! isset( $products[ $pid ] ) ) {
+				$products[ $pid ] = array(
+					'product_id'   => $pid,
+					'product_name' => (string) $row->name,
+					'total'        => 0,
+					'by_status'    => array_fill_keys( self::STATUSES, 0 ),
+				);
+			}
+
+			$products[ $pid ]['total'] += (int) $row->c;
+
+			// A status not in STATUSES would be data this build does not know
+			// about; counted in the total, and surfaced rather than dropped.
+			$products[ $pid ]['by_status'][ (string) $row->status ] = (int) $row->c;
+		}
+
+		usort(
+			$products,
+			static function ( array $a, array $b ) {
+				return $b['total'] <=> $a['total'];
+			}
+		);
+
+		$products = array_slice( $products, 0, $limit );
+
+		foreach ( $products as $i => $product ) {
+			$live = function_exists( 'wc_get_product' ) ? wc_get_product( $product['product_id'] ) : null;
+
+			// The snapshot is what the row was called when somebody signed up;
+			// the live product is authoritative when it still exists.
+			if ( $live ) {
+				$products[ $i ]['product_name'] = $live->get_name();
+				$products[ $i ]['in_stock']     = (bool) $live->is_in_stock();
+			} else {
+				$products[ $i ]['in_stock'] = null;
+			}
+		}
+
+		return array(
+			'products' => array_values( $products ),
+			'returned' => count( $products ),
+		);
+	}
+
+	/**
+	 * Re-send the back-in-stock notification for specific leads.
+	 *
+	 * @since 1.0.4
+	 * @param array $input Validated tool input.
+	 * @return array|WP_Error
+	 */
+	public static function resend_notifications( array $input ) {
+
+		$ids = isset( $input['ids'] ) && is_array( $input['ids'] ) ? $input['ids'] : array();
+		$ids = array_values( array_unique( array_filter( array_map( 'absint', $ids ) ) ) );
+
+		if ( empty( $ids ) ) {
+			return new WP_Error(
+				'notifybay_no_ids',
+				__( 'No lead ids were supplied.', 'notifybay-waitlist-and-stock-alert-woo' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		if ( ! function_exists( 'as_enqueue_async_action' ) ) {
+			return new WP_Error(
+				'notifybay_no_scheduler',
+				__( 'Action Scheduler is not available, so nothing can be queued.', 'notifybay-waitlist-and-stock-alert-woo' ),
+				array( 'status' => 503 )
+			);
+		}
+
+		$queued       = array();
+		$not_found    = array();
+		$wrong_status = array();
+		$out_of_stock = array();
+
+		foreach ( $ids as $id ) {
+			$lead = Lead::find( $id );
+
+			if ( null === $lead ) {
+				$not_found[] = $id;
+				continue;
+			}
+
+			if ( ! in_array( (string) $lead->status, self::RESENDABLE, true ) ) {
+				$wrong_status[] = array(
+					'id'     => $id,
+					'status' => (string) $lead->status,
+				);
+				continue;
+			}
+
+			/*
+			 * A back-in-stock email is only true if the product is back in
+			 * stock. Re-sending one for a product that has since sold out
+			 * tells a real customer something false, on an assistant's say-so,
+			 * and nothing downstream would catch it -- the engine trusts that
+			 * whoever queued the job had a reason.
+			 */
+			$product_id = $lead->variation_id ? (int) $lead->variation_id : (int) $lead->product_id;
+			$product    = function_exists( 'wc_get_product' ) ? wc_get_product( $product_id ) : null;
+
+			if ( ! $product || ! $product->is_in_stock() ) {
+				$out_of_stock[] = array(
+					'id'           => $id,
+					'product_id'   => (int) $lead->product_id,
+					'product_name' => $product ? $product->get_name() : (string) $lead->product_name_snapshot,
+					'reason'       => $product ? 'out_of_stock' : 'product_missing',
+				);
+				continue;
+			}
+
+			/*
+			 * retry_count is reset because handle_failure() increments and
+			 * gives up at three. A failed lead is already at the ceiling, so
+			 * without this a resend gets one attempt and no backoff before
+			 * failing again -- which looks like the resend itself not working.
+			 *
+			 * The status must become `processing`: Worker::handle() returns
+			 * early for any non-verification email whose lead is not in that
+			 * state, so queuing without it silently sends nothing.
+			 */
+			$lead->retry_count = 0;
+			$lead->status      = 'processing';
+			$lead->updated_at  = current_time( 'mysql' );
+
+			if ( ! $lead->save() ) {
+				$wrong_status[] = array(
+					'id'     => $id,
+					'status' => 'save_failed',
+				);
+				continue;
+			}
+
+			as_enqueue_async_action( 'notifybay_send_email_worker', array( (int) $lead->id, 'waitlist_restock' ), 'notifybay_alerts' );
+
+			$queued[] = $id;
+		}
+
+		return array(
+			'queued'       => $queued,
+			'not_found'    => $not_found,
+			'wrong_status' => $wrong_status,
+			'out_of_stock' => $out_of_stock,
+			'affected'     => $queued,
 		);
 	}
 

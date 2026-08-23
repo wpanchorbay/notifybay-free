@@ -96,7 +96,7 @@ To rebuild the compiled assets from source: run `npm install`, then `npm run bui
 
 = 1.0.3 =
 * New: NotifyBay can be connected to an AI assistant over MCP (Model Context Protocol). It is off until you turn it on, under WooCommerce → Settings → Leads Settings → AI Access, where you also choose how much the assistant is allowed to do and copy the connection details.
-* New: four assistant tools — list leads, check system status, update a lead, and delete leads. Deleting is offered only at the "Full access" level, and only to an account that can manage NotifyBay.
+* New: seven assistant tools — list leads, waitlist size by product, system status, diagnose failed notifications, update a lead, resend a back-in-stock email, and delete leads. Deleting and resending are offered only at the "Full access" level, and only to an account that can manage NotifyBay.
 * New: generate, rename and revoke the Application Password the assistant connects with directly on the AI Access screen, without visiting your profile. Name it so you can tell it apart later, press Generate, and WordPress creates the password itself. The screen also shows the endpoint address and the account to connect as.
 * New: connection details for Claude Code, Claude Desktop, Cursor, Codex, and any other client that speaks MCP over HTTP. The moment a password is generated they open in a dialog with everything filled in — the password and a ready-to-paste snippet for each client, with nothing left to substitute and no need to encode anything yourself.
 * New: the connection details say so when MCP is switched off, instead of handing you a snippet that would be refused.
