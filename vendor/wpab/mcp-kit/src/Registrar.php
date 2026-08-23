@@ -126,19 +126,9 @@ final class Registrar {
 			'label'               => $ability['label'],
 			'description'         => $ability['description'] ?? '',
 			'category'            => $category_slug,
-			// `properties` is an empty PHP *array*, never new stdClass(). Core's
-			// rest_validate_value_from_schema() does isset( $args['properties']
-			// [ $key ] ) for each key the client sent, which fatals with
-			// "Cannot use object of type stdClass as array" the moment a
-			// caller passes any argument at all. An empty object only looks
-			// necessary for JSON serialisation, and the adapter already omits
-			// an empty properties list from the advertised inputSchema.
 			'input_schema'        => $is_tombstone
 				? self::tombstone_schema( $ability )
-				: ( $ability['input_schema'] ?? [
-					'type'       => 'object',
-					'properties' => [],
-				] ),
+				: self::input_schema( $ability['input_schema'] ?? [ 'type' => 'object' ] ),
 			'execute_callback'    => $is_tombstone
 				? self::tombstone_callback( $ability )
 				: self::wrap_execute( $product_key, $ability_key, $ability ),
@@ -148,6 +138,59 @@ final class Registrar {
 			// meta is rebuilt here rather than passed through.
 			'meta'                => [],
 		];
+	}
+
+	/**
+	 * An empty `properties` cannot be spelled the same way on both sides of
+	 * this boundary, so it is spelled on neither: it is dropped.
+	 *
+	 * The array is used twice. Core validates against it, and
+	 * rest_validate_object_value_from_schema() does
+	 * `isset( $args['properties'][ $property ] )` for every key the caller
+	 * sent -- which fatals with "Cannot use object of type stdClass as array"
+	 * if `properties` is an empty object. So it may not be stdClass.
+	 *
+	 * The adapter also serialises the same array straight into the advertised
+	 * inputSchema, where an empty PHP array becomes JSON `[]`. JSON Schema
+	 * requires `properties` to be an object, and a strict client rejects
+	 * `tools/list` *as a whole* over one bad entry -- so a single argument-less
+	 * tool takes down every other tool the product publishes. Observed against
+	 * Claude Code: "tools.1.inputSchema.properties: expected record, received
+	 * array", and no NotifyBay tools available at all.
+	 *
+	 * Omitting the key satisfies both. `isset()` on a missing key is false, so
+	 * core is happy, and `{"type":"object"}` is valid JSON Schema meaning the
+	 * same thing as an empty properties map.
+	 *
+	 * A previous comment here claimed the adapter already omitted an empty
+	 * properties list. It does not: McpTool::to_array() substitutes
+	 * `['type' => 'object']` only when the *whole* schema is empty, and the
+	 * kit's own default supplied a non-empty one, which defeated it.
+	 *
+	 * @param array $schema One ability's declared input schema.
+	 * @return array
+	 */
+	private static function input_schema( array $schema ): array {
+
+		if ( isset( $schema['properties'] ) && is_array( $schema['properties'] ) ) {
+			if ( [] === $schema['properties'] ) {
+				unset( $schema['properties'] );
+			} else {
+				// Nested object properties serialise through the same path and
+				// fail the same way, so this is not only a top-level concern.
+				foreach ( $schema['properties'] as $name => $sub ) {
+					if ( is_array( $sub ) ) {
+						$schema['properties'][ $name ] = self::input_schema( $sub );
+					}
+				}
+			}
+		}
+
+		if ( isset( $schema['items'] ) && is_array( $schema['items'] ) ) {
+			$schema['items'] = self::input_schema( $schema['items'] );
+		}
+
+		return $schema;
 	}
 
 	/**
@@ -172,19 +215,20 @@ final class Registrar {
 		$schema['type']                 = 'object';
 		$schema['additionalProperties'] = true;
 
-		// Empty array, not stdClass -- see the note in build_args(). This
-		// matters most here: a tombstone exists precisely to be called with
-		// the *old* arguments, so it is the one schema guaranteed to receive
-		// keys it does not declare.
-		if ( ! isset( $schema['properties'] ) || ! is_array( $schema['properties'] ) ) {
-			$schema['properties'] = [];
+		// A tombstone exists precisely to be called with the *old* arguments,
+		// so it is the one schema guaranteed to receive keys it does not
+		// declare -- which additionalProperties above already permits. An
+		// empty properties map adds nothing and breaks the advertised schema,
+		// so it is dropped rather than synthesised. See input_schema().
+		if ( isset( $schema['properties'] ) && ! is_array( $schema['properties'] ) ) {
+			unset( $schema['properties'] );
 		}
 
 		// A tombstone accepts whatever the old tool took, so nothing is
 		// required -- a leftover `required` list would reject the old input.
 		unset( $schema['required'] );
 
-		return $schema;
+		return self::input_schema( $schema );
 	}
 
 	/**

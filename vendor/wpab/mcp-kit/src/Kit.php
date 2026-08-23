@@ -21,7 +21,7 @@ final class Kit {
 	 *
 	 * @var string
 	 */
-	public const VERSION = '0.3.2';
+	public const VERSION = '0.3.3';
 
 	/**
 	 * Wire the kit into the host plugin. Call at file scope, not inside a
