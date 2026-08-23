@@ -94,9 +94,19 @@ class CronTasks {
 		global $wpdb;
 		$table = $wpdb->prefix . 'notifybay_leads';
 
-		// 15 minutes ago
-		$cutoff       = time() - ( 15 * MINUTE_IN_SECONDS );
-		$cutoff_mysql = gmdate( 'Y-m-d H:i:s', $cutoff );
+		/*
+		 * The cutoff MUST be built in the same clock the column is written in.
+		 * updated_at comes from current_time( 'mysql' ), which is site-local,
+		 * and this compared it against a gmdate() cutoff in UTC. On a store
+		 * behind UTC -- most of the US -- the stored value is already older
+		 * than the UTC cutoff, so a lead the dispatcher had only just set to
+		 * `processing` was reclaimed within seconds, while its worker was still
+		 * in flight, and then dispatched a second time. Ahead of UTC the
+		 * opposite happened: nothing was reclaimed for hours, which strands the
+		 * recovery path a disabled restock email now depends on.
+		 * expire_reservations() below already builds its bound correctly.
+		 */
+		$cutoff_mysql = current_datetime()->modify( '-15 minutes' )->format( 'Y-m-d H:i:s' );
 
 		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached write is intentional for this scheduled maintenance job.
 			$wpdb->prepare(
@@ -115,9 +125,10 @@ class CronTasks {
 		global $wpdb;
 		$table = $wpdb->prefix . 'notifybay_leads';
 
-		// 24 hours ago
-		$cutoff       = time() - DAY_IN_SECONDS;
-		$cutoff_mysql = gmdate( 'Y-m-d H:i:s', $cutoff );
+		// Same local-vs-UTC mismatch as recover_stale_processing_leads():
+		// created_at is written with current_time( 'mysql' ), so the cutoff has
+		// to be local too or tokens expire early or never.
+		$cutoff_mysql = current_datetime()->modify( '-1 day' )->format( 'Y-m-d H:i:s' );
 
 		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached write is intentional for this scheduled maintenance job.
 			$wpdb->prepare(

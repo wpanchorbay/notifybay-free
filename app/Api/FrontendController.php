@@ -388,6 +388,26 @@ class FrontendController extends ApiController {
 			);
 		}
 
+		/*
+		 * A variation_id that does not belong to this product produced a lead
+		 * the dispatcher can never match -- it queries by variation_id, so the
+		 * row sits `active` forever and the customer is never notified. Reject
+		 * it rather than storing an unreachable subscription.
+		 */
+		$requested_variation = (int) $request->get_param( 'variation_id' );
+
+		if ( $requested_variation ) {
+			$variation = wc_get_product( $requested_variation );
+
+			if ( ! $variation instanceof \WC_Product || $variation->get_parent_id() !== (int) $validated['product_id'] ) {
+				return new \WP_Error(
+					'invalid_variation',
+					__( 'That variation does not belong to this product.', 'notifybay-waitlist-and-stock-alert-woo' ),
+					array( 'status' => 404 )
+				);
+			}
+		}
+
 		$lead_data = array(
 			'user_email'            => $validated['email'],
 			'user_id'               => $user_id ? $user_id : null,

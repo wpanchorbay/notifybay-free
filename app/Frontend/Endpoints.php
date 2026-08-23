@@ -84,7 +84,7 @@ class Endpoints {
 	 */
 	private function verify_lead( $token ) {
 		if ( ! $token ) {
-			wp_die( esc_html__( 'Invalid verification token.', 'notifybay-waitlist-and-stock-alert-woo' ) );
+			wp_die( esc_html__( 'Invalid verification token.', 'notifybay-waitlist-and-stock-alert-woo' ), '', array( 'response' => 400 ) );
 		}
 
 		global $wpdb;
@@ -100,7 +100,7 @@ class Endpoints {
 		);
 
 		if ( ! $lead ) {
-			wp_die( esc_html__( 'Invalid or expired verification link.', 'notifybay-waitlist-and-stock-alert-woo' ) );
+			wp_die( esc_html__( 'Invalid or expired verification link.', 'notifybay-waitlist-and-stock-alert-woo' ), '', array( 'response' => 404 ) );
 		}
 
 		$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
@@ -126,7 +126,7 @@ class Endpoints {
 	 */
 	private function unsubscribe_lead( $token ) {
 		if ( ! $token ) {
-			wp_die( esc_html__( 'Invalid unsubscribe token.', 'notifybay-waitlist-and-stock-alert-woo' ) );
+			wp_die( esc_html__( 'Invalid unsubscribe token.', 'notifybay-waitlist-and-stock-alert-woo' ), '', array( 'response' => 400 ) );
 		}
 
 		global $wpdb;
@@ -142,7 +142,7 @@ class Endpoints {
 		);
 
 		if ( ! $lead ) {
-			wp_die( esc_html__( 'Unsubscribe failed. Lead not found.', 'notifybay-waitlist-and-stock-alert-woo' ) );
+			wp_die( esc_html__( 'Unsubscribe failed. Lead not found.', 'notifybay-waitlist-and-stock-alert-woo' ), '', array( 'response' => 404 ) );
 		}
 
 		$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; values are bound via prepare(). Direct, uncached queries are intentional for this real-time data-access layer.
