@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { __ } from "@wordpress/i18n";
 import CustomModal from "../../common/CustomModal";
 import { CopyToClipboard } from "../../common/CopyToClipboard";
@@ -57,6 +57,7 @@ export const McpConnectionModal: React.FC<McpConnectionModalProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const [asking, setAsking] = useState(false);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   /*
    * CustomModal renders null while closed, but this component stays mounted, so
@@ -80,6 +81,22 @@ export const McpConnectionModal: React.FC<McpConnectionModalProps> = ({
       setAsking(false);
     }
   }, [isOpen]);
+
+  /*
+   * Escape is switched off here, and CustomModal does not move focus when it
+   * opens. Together that strands a keyboard user: focus stays on the Generate
+   * button behind the overlay, and the usual way out of a dialog does nothing.
+   *
+   * Focusing the password and selecting it fixes both halves at once -- the
+   * dialog now has focus, and the value is already selected, so the keyboard
+   * route to copying it is the two keystrokes everybody knows.
+   */
+  useEffect(() => {
+    if (isOpen) {
+      passwordRef.current?.focus();
+      passwordRef.current?.select();
+    }
+  }, [isOpen, password]);
 
   const markCopied = () => setCopied(true);
 
@@ -154,6 +171,7 @@ export const McpConnectionModal: React.FC<McpConnectionModalProps> = ({
             fair way to copy it.
           */}
           <input
+            ref={passwordRef}
             type="text"
             id="mcp_modal_password"
             className="regular-text notifybay-font-mono"
