@@ -6,15 +6,25 @@ import { BookmarkCheck, CopyCheck, Paperclip } from 'lucide-react';
 interface CopyToClipboardProps {
 	/** The text content to be copied to the clipboard. */
 	text: string;
+	/**
+	 * Fired once the clipboard write has actually succeeded. Optional, so no
+	 * existing caller changes -- it exists for callers that must know whether
+	 * a secret was taken before they clear it off the screen.
+	 */
+	onCopy?: () => void;
 }
 
-export const CopyToClipboard: FC< CopyToClipboardProps > = ( { text } ) => {
+export const CopyToClipboard: FC< CopyToClipboardProps > = ( {
+	text,
+	onCopy,
+} ) => {
 	const [ copied, setCopied ] = useState< boolean >( false );
 	const [ copping, setCopping ] = useState< boolean >( false );
 
 	const handleCopy = async () => {
 		try {
 			await navigator.clipboard.writeText( text );
+			onCopy?.();
 			setCopied( true );
 			setCopping( true );
 			setTimeout( () => setCopping( false ), 200 ); // Quick transition from check to bookmark
@@ -26,6 +36,16 @@ export const CopyToClipboard: FC< CopyToClipboardProps > = ( { text } ) => {
 
 	return (
 		<button
+			/*
+			 * Without this the button defaults to type="submit". These render
+			 * inside WooCommerce's #mainform on the settings screens, where
+			 * Settings.tsx intercepts submit and calls handleSave() -- so
+			 * copying a value to the clipboard silently wrote the whole
+			 * settings blob to the database and popped a "Settings saved"
+			 * toast. Verified live: one click on a Copy button produced
+			 * POST /notifybay/v1/settings.
+			 */
+			type="button"
 			onClick={ handleCopy }
 			className="notifybay-inline-flex notifybay-items-center notifybay-justify-center notifybay-cursor-pointer"
 			aria-label={ `Copy "${ text }" to clipboard` }

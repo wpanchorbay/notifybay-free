@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { __, sprintf } from "@wordpress/i18n";
+import { __ } from "@wordpress/i18n";
 import apiFetch from "../../../utils/apiFetch";
 import { ClassicSettingsTable, ClassicToggle } from "../../classics";
 import { ConfirmationModal } from "../../common/ConfirmationModal";
@@ -8,6 +8,8 @@ import { useToast } from "../../../store/toast/use-toast";
 import { McpLocalize, McpStatus } from "../../../utils/types";
 import { buildMcpSnippets } from "./mcpSnippets";
 import { McpAppPasswords } from "./McpAppPasswords";
+import { McpClientConfig } from "./McpClientConfig";
+import { McpConnectionModal } from "./McpConnectionModal";
 import {
   TONE,
   IDLE_CARD,
@@ -73,14 +75,19 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [pendingLevel, setPendingLevel] = useState<string | null>(null);
-  const [activeClient, setActiveClient] = useState("claude-code");
 
   /*
    * Held here rather than in McpAppPasswords because the snippets need it: a
    * connection command with "<base64(username:application-password)>" in it is
-   * not a command, it is homework. Lives only as long as the one-time display.
+   * not a command, it is homework.
+   *
+   * It survives the modal being closed, and lives until the page is reloaded.
+   * That is a deliberate second chance -- someone who dismisses the dialog too
+   * fast can still read the snippets off the tab -- and it is why nothing here
+   * claims the secret is destroyed at the moment the dialog closes.
    */
   const [liveSecret, setLiveSecret] = useState<string | null>(null);
+  const [showConnection, setShowConnection] = useState(false);
   const { addToast } = useToast();
 
   useEffect(() => {
@@ -221,7 +228,20 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
     offerTlsBypass: mcp.offer_tls_bypass,
     password: liveSecret,
   });
-  const snippet = snippets.find((s) => s.id === activeClient) || snippets[0];
+
+  /*
+   * A snippet is only as good as the endpoint behind it. While MCP is off the
+   * client will be refused, and nothing else on this screen says so at the
+   * point where someone is copying a command they are about to run.
+   */
+  const offNotice = !isEnabled ? (
+    <p className="notifybay-m-0 notifybay-max-w-3xl notifybay-rounded-md notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50 notifybay-p-2 notifybay-text-sm">
+      {__(
+        "MCP is currently switched off, so a client using this will be refused until you turn on Enable MCP above.",
+        "notifybay-waitlist-and-stock-alert-woo",
+      )}
+    </p>
+  ) : undefined;
 
   return (
     <div className="notifybay-flex notifybay-flex-col notifybay-gap-6">
@@ -416,8 +436,38 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                   <>
                     <McpAppPasswords
                       endpoint={mcp.app_passwords_rest_url}
-                      onSecretChange={setLiveSecret}
+                      onSecretChange={(secret) => {
+                        setLiveSecret(secret);
+                        setShowConnection(null !== secret);
+                      }}
                     />
+
+                    {/*
+                      The password is legible in two places for the rest of this
+                      page load -- inside the dialog, and in the snippets below.
+                      Saying so is the whole point: without it, someone who
+                      closed the dialog early has no idea the value is still
+                      recoverable, and reloads the page to look for it.
+                    */}
+                    {liveSecret && (
+                      <p className="notifybay-m-0 notifybay-max-w-2xl notifybay-rounded-md notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50 notifybay-p-2 notifybay-text-sm">
+                        {__(
+                          "The password you just created is still filled into the connection snippets below. Reloading this page clears it for good — WordPress keeps only a hash and cannot show it again.",
+                          "notifybay-waitlist-and-stock-alert-woo",
+                        )}
+                        {" "}
+                        <button
+                          type="button"
+                          className="notifybay-cursor-pointer notifybay-underline notifybay-bg-transparent notifybay-border-0 notifybay-p-0 notifybay-text-sm"
+                          onClick={() => setShowConnection(true)}
+                        >
+                          {__(
+                            "Show the connection details again",
+                            "notifybay-waitlist-and-stock-alert-woo",
+                          )}
+                        </button>
+                      </p>
+                    )}
                     {/*
                       Verified against this site, not inferred: an assistant
                       holding one of these can POST the same core route and
@@ -465,77 +515,27 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
               "notifybay-waitlist-and-stock-alert-woo",
             ),
             tooltip: __(
-              "Pick your client, paste the snippet, then substitute the credential. Nothing here contains a real password.",
+              "Pick your client and copy the snippet. It contains a real password only while a freshly generated one is still on screen.",
               "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
-              <div className="notifybay-flex notifybay-flex-col notifybay-gap-2">
-                <div className="notifybay-flex notifybay-flex-wrap notifybay-gap-1.5">
-                  {snippets.map((s) => (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => setActiveClient(s.id)}
-                      className={`notifybay-cursor-pointer notifybay-rounded-full notifybay-border notifybay-px-3 notifybay-py-1 notifybay-text-xs notifybay-font-medium ${
-                        activeClient === s.id
-                          ? "notifybay-border-blue-600 notifybay-bg-blue-600 notifybay-text-white"
-                          : "notifybay-border-gray-300 notifybay-bg-white notifybay-text-gray-700 hover:notifybay-border-gray-500"
-                      }`}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-
-                <p className="description notifybay-m-0">
-                  {snippet.instructions}
-                </p>
-
-                {snippet.warning && (
-                  <p className="notifybay-m-0 notifybay-max-w-3xl notifybay-rounded-md notifybay-border notifybay-border-red-300 notifybay-bg-red-50 notifybay-p-3 notifybay-text-sm notifybay-text-red-800">
-                    {snippet.warning}
-                  </p>
-                )}
-
-                {/*
-                  The copy button belongs in the block's own header rather than
-                  floating above it -- this screen has four copyable things and
-                  a detached button does not say which one it takes.
-                */}
-                <div className="notifybay-max-w-3xl notifybay-overflow-hidden notifybay-rounded-lg notifybay-border notifybay-border-gray-200">
-                  <div className="notifybay-flex notifybay-items-center notifybay-justify-between notifybay-border-b notifybay-border-gray-200 notifybay-bg-gray-100 notifybay-px-3 notifybay-py-1.5">
-                    <span className="notifybay-text-xs notifybay-font-semibold notifybay-text-gray-600">
-                      {snippet.label}
-                      {/*
-                        Basic auth carries the username inside the base64, so
-                        three of these five snippets never show which account
-                        they are for. Naming it here fixes that without putting
-                        a comment inside a JSON file, which Cursor's mcp.json
-                        would reject.
-                      */}
-                      {mcp.current_user_login && (
-                        <span className="notifybay-font-normal notifybay-text-gray-500">
-                          {sprintf(
-                            /* translators: %s: the WordPress username the snippet authenticates as. */
-                            __(
-                              " · connects as %s",
-                              "notifybay-waitlist-and-stock-alert-woo",
-                            ),
-                            mcp.current_user_login,
-                          )}
-                        </span>
-                      )}
-                    </span>
-                    <CopyToClipboard text={snippet.snippet} />
-                  </div>
-                  <pre className="notifybay-m-0 notifybay-overflow-x-auto notifybay-bg-gray-50 notifybay-p-3 notifybay-text-xs">
-                    {snippet.snippet}
-                  </pre>
-                </div>
-              </div>
+              <McpClientConfig
+                snippets={snippets}
+                username={mcp.current_user_login}
+                notice={offNotice}
+              />
             ),
           },
         ]}
+      />
+
+      <McpConnectionModal
+        isOpen={showConnection && null !== liveSecret}
+        password={liveSecret || ""}
+        snippets={snippets}
+        username={mcp.current_user_login}
+        mcpEnabled={isEnabled}
+        onClose={() => setShowConnection(false)}
       />
 
       <ConfirmationModal

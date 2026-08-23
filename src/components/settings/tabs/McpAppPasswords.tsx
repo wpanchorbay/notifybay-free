@@ -2,8 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { __, sprintf } from "@wordpress/i18n";
 import apiFetch from "../../../utils/apiFetch";
 import { ClassicInput, ClassicButton } from "../../classics";
-import { ConfirmationModal } from "../../common/ConfirmationModal";
-import { CopyToClipboard } from "../../common/CopyToClipboard";
 import { useToast } from "../../../store/toast/use-toast";
 import { McpAppPassword } from "../../../utils/types";
 
@@ -11,9 +9,9 @@ interface McpAppPasswordsProps {
   /** Absolute URL of core's `wp/v2/users/me/application-passwords` route. */
   endpoint: string;
   /**
-   * Reports the live secret upwards while it is on screen, so the connection
-   * snippets can be shown complete instead of asking the reader to base64 a
-   * credential by hand. Called with null the moment the form is cleared.
+   * Hands the new secret upward the moment it exists. The parent owns what
+   * happens next -- it opens the one-time dialog and fills the connection
+   * snippets, neither of which this component can see.
    */
   onSecretChange: (secret: string | null) => void;
 }
@@ -33,17 +31,13 @@ interface McpAppPasswordsProps {
  * user_id in any request this component makes, so there is no target to
  * tamper with.
  *
- * There is one button that does anything, and it is Generate. WordPress mints
- * the secret inside the call that stores it, so the credential exists and works
- * from that moment -- there is no later step to commit. This form briefly had a
- * Save button after Generate, which was a lie: nothing was unsaved, and all it
- * could do was rename something already created.
- *
- * What is real is the risk of losing the secret, since it is displayed once and
- * only a hash is kept. So Done confirms it has been copied before clearing the
- * screen, and the name locks once used -- an editable field that no longer
- * affects anything is the same lie in a smaller form. Renaming afterwards is
- * what the list is for.
+ * The form is a name and one button, and that is the whole of it. WordPress
+ * mints the secret inside the call that stores it, so the credential exists and
+ * works from that moment -- there is no later step to commit, and this form
+ * briefly had a Save button that could only ever have renamed something already
+ * created. Nor does the secret appear here: it goes to the parent, which shows
+ * it once alongside the connection snippets it belongs with. A password on its
+ * own is not what anyone came for.
  *
  * @param root0
  * @param root0.endpoint
@@ -57,12 +51,10 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
   const [isBusy, setIsBusy] = useState(false);
   const { addToast } = useToast();
 
-  // The new credential being set up. `name` starts empty on purpose: a
-  // prefilled one gets accepted without being read, and the name is the only
-  // thing that tells two rows apart when deciding which to revoke.
+  // `name` starts empty on purpose: a prefilled one gets accepted without being
+  // read, and the name is the only thing that tells two rows apart when
+  // deciding which to revoke.
   const [name, setName] = useState("");
-  const [secret, setSecret] = useState<string | null>(null);
-  const [confirming, setConfirming] = useState(false);
 
   /*
    * Renaming an existing row. Core exposes PUT on the same route (verified:
@@ -118,10 +110,8 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
        * where one breaks it. WordPress strips whitespace before comparing, so
        * both forms authenticate.
        */
-      const value = response.password.replace(/\s/g, "");
-
-      setSecret(value);
-      onSecretChange(value);
+      onSecretChange(response.password.replace(/\s/g, ""));
+      setName("");
       await load();
     } catch (error) {
       failed(
@@ -142,16 +132,6 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
       method: "PUT",
       data: { name: next },
     });
-  };
-
-  // Reached only through the confirmation, which is the whole point of it.
-  // Nothing is written here -- the credential was stored by Generate. This
-  // clears the one copy of the secret off the screen.
-  const dismiss = () => {
-    setConfirming(false);
-    setSecret(null);
-    setName("");
-    onSecretChange(null);
   };
 
   const commitRename = async () => {
@@ -208,77 +188,26 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
 
   return (
     <div className="notifybay-flex notifybay-flex-col notifybay-gap-3">
-      <div className="notifybay-flex notifybay-flex-col notifybay-gap-2 notifybay-max-w-2xl">
-        <div className="notifybay-flex notifybay-items-center notifybay-gap-2">
-          <label
-            htmlFor="mcp_app_password_name"
-            className="notifybay-w-24 notifybay-text-sm notifybay-shrink-0"
-          >
-            {__("Name", "notifybay-waitlist-and-stock-alert-woo")}
-          </label>
-          <ClassicInput
-            id="mcp_app_password_name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder={__(
-              "e.g. Claude on my laptop",
-              "notifybay-waitlist-and-stock-alert-woo",
-            )}
-            disabled={isBusy || null !== secret}
-          />
-        </div>
-
-        <div className="notifybay-flex notifybay-items-center notifybay-gap-2">
-          <label
-            htmlFor="mcp_app_password_value"
-            className="notifybay-w-24 notifybay-text-sm notifybay-shrink-0"
-          >
-            {__("Password", "notifybay-waitlist-and-stock-alert-woo")}
-          </label>
-
-          {/*
-            Readonly rather than disabled: WordPress generates the value, so it
-            is never typed -- but a disabled field cannot be selected, and
-            selecting it by hand is a fair way to copy.
-          */}
-          <input
-            type="text"
-            id="mcp_app_password_value"
-            className="regular-text notifybay-font-mono"
-            value={secret || ""}
-            readOnly
-            placeholder={__(
-              "generated for you",
-              "notifybay-waitlist-and-stock-alert-woo",
-            )}
-          />
-
-          {secret && <CopyToClipboard text={secret} />}
-        </div>
-
-        <div className="notifybay-flex notifybay-items-center notifybay-gap-2 notifybay-pl-[6.5rem]">
-          {secret ? (
-            <ClassicButton onClick={() => setConfirming(true)} disabled={isBusy}>
-              {__("Done", "notifybay-waitlist-and-stock-alert-woo")}
-            </ClassicButton>
-          ) : (
-            <ClassicButton onClick={generate} disabled={isBusy}>
-              {__(
-                "Generate password",
-                "notifybay-waitlist-and-stock-alert-woo",
-              )}
-            </ClassicButton>
+      <div className="notifybay-flex notifybay-flex-wrap notifybay-items-center notifybay-gap-2 notifybay-max-w-2xl">
+        <label
+          htmlFor="mcp_app_password_name"
+          className="notifybay-w-24 notifybay-text-sm notifybay-shrink-0"
+        >
+          {__("Name", "notifybay-waitlist-and-stock-alert-woo")}
+        </label>
+        <ClassicInput
+          id="mcp_app_password_name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder={__(
+            "e.g. Claude on my laptop",
+            "notifybay-waitlist-and-stock-alert-woo",
           )}
-        </div>
-
-        {secret && (
-          <p className="notifybay-m-0 notifybay-rounded-md notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50 notifybay-p-2 notifybay-text-sm">
-            {__(
-              "This credential is already active, and the connection snippets below now contain it in full — username and password, ready to paste. Copy what you need now: the password cannot be shown again, and the snippets go back to placeholders once you press Done.",
-              "notifybay-waitlist-and-stock-alert-woo",
-            )}
-          </p>
-        )}
+          disabled={isBusy}
+        />
+        <ClassicButton onClick={generate} disabled={isBusy}>
+          {__("Generate password", "notifybay-waitlist-and-stock-alert-woo")}
+        </ClassicButton>
       </div>
 
       {null !== items && items.length > 0 && (
@@ -337,36 +266,6 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
           </tbody>
         </table>
       )}
-
-      <ConfirmationModal
-        isOpen={confirming}
-        title={__(
-          "Have you copied the password?",
-          "notifybay-waitlist-and-stock-alert-woo",
-        )}
-        message={__(
-          "The credential is already saved and working — this only clears the password from the screen. WordPress cannot show it again, because it stores only a hash. If you have not copied it, choose Not yet. Losing it costs nothing but a replacement: revoke this credential and generate another.",
-          "notifybay-waitlist-and-stock-alert-woo",
-        )}
-        confirmLabel={__(
-          "I have copied it",
-          "notifybay-waitlist-and-stock-alert-woo",
-        )}
-        cancelLabel={__(
-          "Not yet",
-          "notifybay-waitlist-and-stock-alert-woo",
-        )}
-        /*
-         * ConfirmationModal's own prop, not the DOM attribute the a11y rule is
-         * aimed at. It focuses the confirm button by default, so without this,
-         * opening the dialog and pressing Enter would dismiss the one warning
-         * standing between the reader and a lost secret.
-         */
-        // eslint-disable-next-line jsx-a11y/no-autofocus
-        autoFocus="cancel"
-        onConfirm={dismiss}
-        onCancel={() => setConfirming(false)}
-      />
     </div>
   );
 };

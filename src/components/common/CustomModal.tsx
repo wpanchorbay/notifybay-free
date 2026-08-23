@@ -11,6 +11,12 @@ interface CustomModalProps {
 	footer?: ReactNode;
 	maxWidth?: string;
 	closeOnOutsideClick?: boolean;
+	/**
+	 * Escape closes by default. Set false when the dialog shows something that
+	 * cannot be recovered once dismissed -- Escape is a reflex, and a reflex
+	 * should not be able to destroy a one-time secret.
+	 */
+	closeOnEscape?: boolean;
 	className?: string;
 	showHeader?: boolean;
 	classNames?: {
@@ -28,6 +34,7 @@ const CustomModal: React.FC< CustomModalProps > = ( {
 	footer,
 	maxWidth = 'notifybay-max-w-2xl',
 	closeOnOutsideClick = true,
+	closeOnEscape = true,
 	className = '',
 	showHeader = true,
 	classNames = {
@@ -39,7 +46,7 @@ const CustomModal: React.FC< CustomModalProps > = ( {
 	// Handle Escape key to close
 	useEffect( () => {
 		const handleEsc = ( e: KeyboardEvent ) => {
-			if ( e.key === 'Escape' ) {
+			if ( e.key === 'Escape' && closeOnEscape ) {
 				onClose();
 			}
 		};
@@ -54,7 +61,7 @@ const CustomModal: React.FC< CustomModalProps > = ( {
 			window.removeEventListener( 'keydown', handleEsc );
 			document.body.style.overflow = '';
 		};
-	}, [ isOpen, onClose ] );
+	}, [ isOpen, onClose, closeOnEscape ] );
 
 	if ( ! isOpen ) {
 		return null;
@@ -89,6 +96,7 @@ const CustomModal: React.FC< CustomModalProps > = ( {
 							{ title }
 						</h3>
 						<button
+							type="button"
 							onClick={ onClose }
 							className="notifybay-p-1.5 notifybay-text-gray-400 hover:notifybay-text-gray-600 notifybay-transition-colors hover:notifybay-bg-gray-100 notifybay-rounded-full"
 							aria-label="Close modal"
