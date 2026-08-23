@@ -62,6 +62,11 @@ class Leads {
 		'pending_verification',
 		'processing',
 		'notified',
+		// Offered by the admin Leads screen (src/pages/Leads.tsx) with its own
+		// badge, and the single most common status in real data. It was
+		// missing from both this list and the manifest enum, which made every
+		// converted lead unlistable and unsettable through MCP.
+		'converted',
 		'expired',
 		'failed',
 		'unsubscribed',
@@ -107,7 +112,17 @@ class Leads {
 			$search['user_email'] = sanitize_text_field( $input['search'] );
 		}
 
-		$pagination = Lead::paginate( $page, $per_page, $where, $search );
+		/*
+		 * Ordered by created_at, not by the primary key.
+		 *
+		 * For leads created through the site the two agree, because the id is
+		 * auto-increment and created_at is stamped at insert. They diverge for
+		 * anything imported or migrated, where ids are assigned in load order
+		 * and created_at carries the original signup time -- and there the
+		 * default id ordering silently answers "who joined most recently" with
+		 * whoever happened to be inserted last.
+		 */
+		$pagination = Lead::paginate( $page, $per_page, $where, $search, 'created_at' );
 
 		$items = array();
 
@@ -151,6 +166,22 @@ class Leads {
 					$as_table,
 					$groups_table
 				)
+			);
+
+			/*
+			 * Seeded with every Action Scheduler status before the counts are
+			 * merged in. GROUP BY returns no row for a status with no actions,
+			 * so without this the key is simply absent -- and a caller cannot
+			 * tell "none are running" from "running was never measured". That
+			 * distinction matters most when diagnosing a stalled queue, which
+			 * is the one job this tool exists to do.
+			 */
+			$jobs = array(
+				'pending'  => 0,
+				'running'  => 0,
+				'complete' => 0,
+				'failed'   => 0,
+				'canceled' => 0,
 			);
 
 			foreach ( $results as $res ) {

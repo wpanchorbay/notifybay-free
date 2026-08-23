@@ -278,15 +278,32 @@ abstract class Model {
 	}
 
 	/**
+	 * Columns `paginate()` will order by, beyond the primary key.
+	 *
+	 * Deliberately separate from $queryable_columns. That list controls what
+	 * may appear in a WHERE clause, and widening it to make a column sortable
+	 * would also make it filterable -- a different decision with a different
+	 * blast radius. A model wants to sort by created_at without created_at
+	 * becoming an equality filter.
+	 *
+	 * @var string[]
+	 */
+	protected $sortable_columns = array();
+
+	/**
 	 * Paginate records.
 	 *
-	 * @param int   $page     Page number.
-	 * @param int   $per_page Items per page.
-	 * @param array $where    Optional simple WHERE clauses (e.g., ['status' => 'active']).
-	 * @param array $search   Optional search ['column' => 'value'].
+	 * @param int    $page     Page number.
+	 * @param int    $per_page Items per page.
+	 * @param array  $where    Optional simple WHERE clauses (e.g., ['status' => 'active']).
+	 * @param array  $search   Optional search ['column' => 'value'].
+	 * @param string $orderby  Optional column to order by, descending. Must be
+	 *                         listed in $sortable_columns; anything else falls
+	 *                         back to the primary key. The primary key is always
+	 *                         appended as a tiebreaker.
 	 * @return array An array containing 'data', 'total', 'page', 'per_page'.
 	 */
-	public static function paginate( $page = 1, $per_page = 20, $where = array(), $search = array() ) {
+	public static function paginate( $page = 1, $per_page = 20, $where = array(), $search = array(), $orderby = '' ) {
 		global $wpdb;
 		$instance = new static();
 		$table    = $instance->get_table();
@@ -337,12 +354,29 @@ abstract class Model {
 			)
 		);
 
-		// Fetch the page. The ORDER BY column is the model's hardcoded primary key,
-		// bound as a %i identifier.
-		$data_args = array_merge( array( $table ), $where_args, array( $instance->primary_key, $per_page, $offset ) );
+		/*
+		 * Order by an allow-listed column, defaulting to the primary key so
+		 * every existing caller keeps the behaviour it had. Both identifiers
+		 * are bound as %i, and $orderby is checked against $sortable_columns,
+		 * so a caller cannot reach an arbitrary column or inject one.
+		 *
+		 * The primary key is always appended as a tiebreaker. Sorting on a
+		 * column with duplicate values alone leaves row order undefined
+		 * between queries, and since pagination is LIMIT/OFFSET over repeated
+		 * queries, that shows up as rows appearing on two pages while others
+		 * are never returned at all -- silently, and worst on exactly the
+		 * columns worth sorting by, since timestamps tie constantly.
+		 */
+		$order_col = $instance->primary_key;
+
+		if ( $orderby && in_array( $orderby, $instance->sortable_columns, true ) ) {
+			$order_col = $orderby;
+		}
+
+		$data_args = array_merge( array( $table ), $where_args, array( $order_col, $instance->primary_key, $per_page, $offset ) );
 		$results   = $wpdb->get_results( // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional, and $where_sql holds only prepared %i/%s fragments so every identifier and value is bound.
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $data_args is built at runtime (table + optional filters + primary key + limit/offset); its count always matches the placeholders.
-				"SELECT * FROM %i WHERE 1=1{$where_sql} ORDER BY %i DESC LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where_sql is a literal placeholder fragment; all values are bound.
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $data_args is built at runtime (table + optional filters + order column + primary key + limit/offset); its count always matches the placeholders.
+				"SELECT * FROM %i WHERE 1=1{$where_sql} ORDER BY %i DESC, %i DESC LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where_sql is a literal placeholder fragment; all values are bound.
 				$data_args
 			),
 			ARRAY_A

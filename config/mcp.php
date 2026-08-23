@@ -21,6 +21,16 @@ defined( 'ABSPATH' ) || exit;
 
 use NotifyBay\Mcp\Tools\Leads;
 
+/*
+ * Every status a lead can hold, declared once and shared by the two tools that
+ * accept one. They were written out separately and drifted: `converted` was
+ * missing from both, which made the single most common status in real data
+ * impossible to filter on and impossible to set -- and a model reading the enum
+ * had no way to discover it existed. Keep in sync with Leads::STATUSES and the
+ * options in src/pages/Leads.tsx.
+ */
+$notifybay_statuses = array( 'active', 'pending_verification', 'processing', 'notified', 'converted', 'expired', 'failed', 'unsubscribed' );
+
 return array(
 
 	/*
@@ -55,7 +65,7 @@ return array(
 		// --- readonly ---------------------------------------------------
 		'notifybay/list-leads'    => array(
 			'label'        => __( 'List Waitlist Leads', 'notifybay-waitlist-and-stock-alert-woo' ),
-			'description'  => 'List NotifyBay waitlist leads, newest first, optionally filtered by status, subscription type, product or email. Returns id, email, product id and name, type, status, and creation time for each. Use this to answer questions about who is waiting for which product.',
+			'description'  => 'List NotifyBay waitlist leads, most recently signed up first, optionally filtered by status, subscription type, product or email address. Returns for each: id, email, product id and name, variation id (0 when the product has no variations), type, status, and the created_at, notified_at and expires_at timestamps. Results are paginated; the response carries total and has_more. Use this to answer questions about who is waiting for which product.',
 			'input_schema' => array(
 				'type'       => 'object',
 				'properties' => array(
@@ -64,35 +74,43 @@ return array(
 					// any key that is not, so an invented filter name would
 					// return unfiltered results rather than an error.
 					'status'     => array(
-						'type' => 'string',
-						'enum' => array( 'active', 'pending_verification', 'processing', 'notified', 'expired', 'failed', 'unsubscribed' ),
+						'type'        => 'string',
+						'description' => 'Return only leads in this state. active: waiting for stock. pending_verification: signed up but has not confirmed their email. processing: currently being dispatched to, a transient lock. notified: a back-in-stock email was sent. converted: went on to buy. expired: the reservation window passed. failed: the notification could not be delivered. unsubscribed: opted out.',
+						'enum'        => $notifybay_statuses,
 					),
 					// Not an enum: the free plugin only writes 'waitlist', but
 					// NotifyBay Pro adds its own types, and an enum here would
-					// silently make them unfilterable.
+					// silently make them unfilterable. Named in the description
+					// instead, because a wrong guess here does not error -- it
+					// returns zero rows, which reads as "nobody is waiting".
 					'type'       => array(
-						'type' => 'string',
+						'type'        => 'string',
+						'description' => 'Subscription type. The free plugin only ever writes "waitlist"; NotifyBay Pro adds others. An unrecognised value is not an error and returns no leads.',
 					),
 					'product_id' => array(
-						'type'    => 'integer',
-						'minimum' => 1,
+						'type'        => 'integer',
+						'description' => 'WooCommerce product id. Filters to leads waiting on that product. This is the only way to filter by product -- the search parameter does not match product names.',
+						'minimum'     => 1,
 					),
 					'search'     => array(
-						'type' => 'string',
+						'type'        => 'string',
+						'description' => 'Case-insensitive substring match against the customer email address ONLY. It does not search product names; use product_id for that. An unmatched value returns no leads rather than an error.',
 					),
 					'page'       => array(
-						'type'    => 'integer',
-						'default' => 1,
-						'minimum' => 1,
+						'type'        => 'integer',
+						'description' => '1-based page number. Read has_more in the response to decide whether to ask for the next one.',
+						'default'     => 1,
+						'minimum'     => 1,
 					),
 					'per_page'   => array(
-						'type'    => 'integer',
-						'default' => 20,
-						'minimum' => 1,
+						'type'        => 'integer',
+						'description' => 'How many leads to return per page, 1 to 100.',
+						'default'     => 20,
+						'minimum'     => 1,
 						// Equal to Envelope::MAX_PER_PAGE. JSON Schema cannot
 						// reference a PHP constant, so this number is a
 						// deliberate duplicate that must be kept in sync.
-						'maximum' => 100,
+						'maximum'     => 100,
 					),
 				),
 			),
@@ -104,7 +122,7 @@ return array(
 
 		'notifybay/system-status' => array(
 			'label'        => __( 'NotifyBay System Status', 'notifybay-waitlist-and-stock-alert-woo' ),
-			'description'  => 'Report NotifyBay queue health: counts of scheduled, pending, running, complete and failed Action Scheduler jobs in the notifybay_alerts group, plus how many leads are stuck in the failed or processing state. Use this to diagnose why restock notifications are not going out.',
+			'description'  => 'Report NotifyBay queue health. Returns jobs: Action Scheduler action counts in the notifybay_alerts group, always carrying all five keys (pending, running, complete, failed, canceled) so a zero is distinguishable from a missing measurement. Note that Action Scheduler prunes old completed actions, so complete is a count of what is still retained, not of everything ever run. Also returns failed_leads and processing_leads, which count leads in those states and are unrelated to the job counts -- one failed job can leave many or no failed leads. Also returns wc_version and plugin_version. Use this to diagnose why restock notifications are not going out.',
 			'input_schema' => array(
 				'type'       => 'object',
 				'properties' => array(),
@@ -116,20 +134,23 @@ return array(
 		// --- idempotent: running it twice leaves the same state -----------
 		'notifybay/update-lead'   => array(
 			'label'        => __( 'Update Waitlist Lead', 'notifybay-waitlist-and-stock-alert-woo' ),
-			'description'  => "Change a single waitlist lead's status or email address. Running this twice with the same input has no additional effect. Setting status to unsubscribed is how you remove somebody from a waitlist without deleting their record.",
+			'description'  => "Change a single waitlist lead's status or email address. Running this twice with the same input has no additional effect. Setting status to unsubscribed is how you remove somebody from a waitlist without deleting their record. This only edits the record: it never emails the customer, and setting status to notified does not send a back-in-stock email, it just marks one as sent. Returns the updated lead and a changed list naming the fields that were written.",
 			'input_schema' => array(
 				'type'       => 'object',
 				'properties' => array(
 					'id'         => array(
-						'type'    => 'integer',
-						'minimum' => 1,
+						'type'        => 'integer',
+						'description' => 'The lead id to change, as returned by list-leads.',
+						'minimum'     => 1,
 					),
 					'status'     => array(
-						'type' => 'string',
-						'enum' => array( 'active', 'pending_verification', 'processing', 'notified', 'expired', 'failed', 'unsubscribed' ),
+						'type'        => 'string',
+						'description' => 'New status for the lead. Same values list-leads filters on. Supply this, user_email, or both -- supplying neither is an error.',
+						'enum'        => $notifybay_statuses,
 					),
 					'user_email' => array(
-						'type' => 'string',
+						'type'        => 'string',
+						'description' => 'Corrected email address for the lead. Must be a valid address; it is not verified with the customer.',
 					),
 				),
 				'required'   => array( 'id' ),
@@ -141,21 +162,22 @@ return array(
 		// --- destructive: deletes ----------------------------------------
 		'notifybay/delete-leads'  => array(
 			'label'        => __( 'Delete Waitlist Leads', 'notifybay-waitlist-and-stock-alert-woo' ),
-			'description'  => 'Permanently delete the waitlist leads with the given ids. This cannot be undone and the customers are not notified. Prefer setting status to unsubscribed unless the records genuinely need to be erased.',
+			'description'  => 'Permanently delete the waitlist leads with the given ids. This cannot be undone and the customers are not notified. Prefer setting status to unsubscribed unless the records genuinely need to be erased. Reports each id separately rather than failing the whole call on the first miss: deleted lists the ids that were erased, not_found the ids that did not exist, and failed the ids that exist but could not be erased. Repeated ids are collapsed.',
 			'input_schema' => array(
 				'type'       => 'object',
 				'properties' => array(
 					'ids' => array(
-						'type'     => 'array',
-						'items'    => array(
+						'type'        => 'array',
+						'description' => 'Lead ids to erase, 1 to 50 per call, as returned by list-leads.',
+						'items'       => array(
 							'type'    => 'integer',
 							'minimum' => 1,
 						),
 						// Mandatory on a bulk array parameter, and with rate
 						// limiting not implemented it is part of what stands
 						// in for one.
-						'maxItems' => 50,
-						'minItems' => 1,
+						'maxItems'    => 50,
+						'minItems'    => 1,
 					),
 				),
 				'required'   => array( 'ids' ),

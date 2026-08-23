@@ -348,6 +348,17 @@ final class Registrar {
 				if ( 'readonly' !== $risk ) {
 					$affected = ( is_array( $result ) && isset( $result['affected'] ) ) ? $result['affected'] : null;
 					Observability::log_tool_call( $ability_key, $access_level, $input, is_wp_error( $result ) ? 'error' : 'success', $affected );
+
+					// `affected` is this kit's contract with the handler, not
+					// part of the tool's answer, so it is removed once the log
+					// has it. Left in, it reached the client as an extra
+					// undocumented key beside the real ones -- and a model
+					// cannot tell an internal audit field from a result it is
+					// supposed to interpret, so it either invents a meaning or
+					// reports it as data.
+					if ( is_array( $result ) ) {
+						unset( $result['affected'] );
+					}
 				}
 
 				// Returned raw, not through Envelope::error() -- verified

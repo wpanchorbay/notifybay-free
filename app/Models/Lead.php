@@ -35,6 +35,13 @@ class Lead extends Model {
 	protected $queryable_columns = array( 'user_email', 'user_id', 'product_id', 'variation_id', 'type', 'status' );
 
 	/**
+	 * Columns paginate() may order by. See Model::$sortable_columns.
+	 *
+	 * @var string[]
+	 */
+	protected $sortable_columns = array( 'created_at', 'updated_at', 'notified_at' );
+
+	/**
 	 * Perform an Insert OR Update if duplicate key exists.
 	 * This is essential for Smart Transition and preventing duplicate active leads.
 	 *
