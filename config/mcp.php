@@ -67,8 +67,15 @@ return array(
 			'label'        => __( 'List Waitlist Leads', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'description'  => 'List NotifyBay waitlist leads, most recently signed up first, optionally filtered by status, subscription type, product or email address. Returns for each: id, email, product id and name, variation id (0 when the product has no variations), type, status, and the created_at, notified_at and expires_at timestamps. notified_at is null on any lead that did not go through the notification engine -- imported or seeded records commonly carry status notified with no timestamp -- so a null there means \'not recorded\', not \'never notified\'. expires_at is only set by the reservation window, which is a NotifyBay Pro feature. Results are paginated; the response carries total and has_more. Use this to answer questions about who is waiting for which product.',
 			'input_schema' => array(
-				'type'       => 'object',
-				'properties' => array(
+				'type'                 => 'object',
+				// Reject unknown keys. Without this, an invented filter such as
+				// {"bogus_filter":"x"} was accepted and returned the FULL
+				// unfiltered result set -- indistinguishable from a successful
+				// filtered query, because Model::paginate() silently drops any
+				// key that is not queryable. A wrong answer that looks right is
+				// worse than an error, so this errors now.
+				'additionalProperties' => false,
+				'properties'           => array(
 					// Every filter below is a real column in
 					// Lead::$queryable_columns. Model::paginate() silently drops
 					// any key that is not, so an invented filter name would
@@ -135,8 +142,15 @@ return array(
 			'label'        => __( 'Diagnose Notification Failures', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'description'  => 'Explain why restock notifications are not arriving. Returns two separate things. leads: waitlist leads in the failed state, ordered by last_attempt_at (the record\'s last-modified time, returned on every row) descending, each with its retry_count and last_error. last_error is usually null, and that is expected rather than a gap: Action Scheduler judges whether the action RAN, not whether the mail was delivered, so a send that failed inside an action that completed normally leaves no error text anywhere. Only a message from an action Action Scheduler itself marked failed is reported. retry_count is the better signal -- the engine stops retrying at three, though a lead imported or seeded as failed will show 0. jobs: failed background jobs in the notifybay_alerts group, grouped by hook, with the failure count and latest message for each. The two are usually unrelated: a failed job is typically a maintenance task that could not run, often because the plugin or its Pro add-on was not loaded when the action fired, and says nothing about any individual customer. Use this rather than list-leads with status failed when you need the reason, not just the list.',
 			'input_schema' => array(
-				'type'       => 'object',
-				'properties' => array(
+				'type'                 => 'object',
+				// Reject unknown keys. Without this, an invented filter such as
+				// {"bogus_filter":"x"} was accepted and returned the FULL
+				// unfiltered result set -- indistinguishable from a successful
+				// filtered query, because Model::paginate() silently drops any
+				// key that is not queryable. A wrong answer that looks right is
+				// worse than an error, so this errors now.
+				'additionalProperties' => false,
+				'properties'           => array(
 					'page'     => array(
 						'type'        => 'integer',
 						'description' => '1-based page number for the failed leads list. The leads list is paginated with leads_page, leads_per_page, leads_total and leads_has_more; the jobs breakdown is not. Read leads_has_more to decide whether to ask for the next page.',
@@ -160,8 +174,15 @@ return array(
 			'label'        => __( 'Waitlist Size By Product', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'description'  => 'How many people are waiting for each product, biggest waitlist first, with a per-status breakdown and whether the product is currently in stock (in_stock is null when the product no longer exists in WooCommerce, in which case product_name is the name recorded at signup). Grouped by product, so a variable product is reported as one waitlist rather than one per variation; use list-leads with product_id if you need the variation split. Returns total, the number of products with any leads at all, so a full list is distinguishable from one truncated by limit. Answers "which product has the most demand" in one call instead of paging the whole lead list.',
 			'input_schema' => array(
-				'type'       => 'object',
-				'properties' => array(
+				'type'                 => 'object',
+				// Reject unknown keys. Without this, an invented filter such as
+				// {"bogus_filter":"x"} was accepted and returned the FULL
+				// unfiltered result set -- indistinguishable from a successful
+				// filtered query, because Model::paginate() silently drops any
+				// key that is not queryable. A wrong answer that looks right is
+				// worse than an error, so this errors now.
+				'additionalProperties' => false,
+				'properties'           => array(
 					'limit' => array(
 						'type'        => 'integer',
 						'description' => 'How many products to return, 1 to 50, ordered by waitlist size descending.',
@@ -180,8 +201,15 @@ return array(
 			'label'        => __( 'Update Waitlist Lead', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'description'  => "Change a single waitlist lead's status or email address. Running this twice with the same input has no additional effect. Setting status to unsubscribed is how you remove somebody from a waitlist without deleting their record. This only edits the record: it never emails the customer, and setting status to notified does not send a back-in-stock email, it just marks one as sent. Returns the updated lead and a changed list naming the fields that were written.",
 			'input_schema' => array(
-				'type'       => 'object',
-				'properties' => array(
+				'type'                 => 'object',
+				// Reject unknown keys. Without this, an invented filter such as
+				// {"bogus_filter":"x"} was accepted and returned the FULL
+				// unfiltered result set -- indistinguishable from a successful
+				// filtered query, because Model::paginate() silently drops any
+				// key that is not queryable. A wrong answer that looks right is
+				// worse than an error, so this errors now.
+				'additionalProperties' => false,
+				'properties'           => array(
 					'id'         => array(
 						'type'        => 'integer',
 						'description' => 'The lead id to change, as returned by list-leads.',
@@ -197,7 +225,7 @@ return array(
 						'description' => 'Corrected email address for the lead. Must be a valid address; it is not verified with the customer.',
 					),
 				),
-				'required'   => array( 'id' ),
+				'required'             => array( 'id' ),
 			),
 			'risk'         => 'idempotent',
 			'handler'      => array( Leads::class, 'update_lead' ),
@@ -208,8 +236,15 @@ return array(
 			'label'        => __( 'Resend Back-in-Stock Notifications', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'description'  => 'Queue the back-in-stock email again for specific leads. THIS EMAILS REAL CUSTOMERS AND CANNOT BE TAKEN BACK, and it is NOT idempotent -- calling it twice with the same ids sends twice. Only leads whose status is failed (the engine gave up after three attempts) or notified (it was sent and you want it sent again) are eligible; anything else is reported back in wrong_status and left alone. A lead whose product is out of stock or no longer exists is reported in out_of_stock and NOT sent, because the email says the item is back. Repeated ids are collapsed, so listing an id twice in one call sends once. Reports each id in exactly one of five lists. queued and not_found are plain id lists. wrong_status rows are {id, status}, where status is the lead\'s current state -- the reason it was not eligible. out_of_stock rows are {id, product_id, product_name, reason}, where reason is out_of_stock or product_missing. failed rows are plain ids whose record could not be written; that is an infrastructure error, not a lead state, so retry rather than treating it as ineligible. Status is checked before stock, so a lead that is both ineligible and out of stock is reported only in wrong_status. Get the ids from notification-failures or list-leads. Sending is asynchronous, so a queued id means the job was scheduled, not that the mail has left.',
 			'input_schema' => array(
-				'type'       => 'object',
-				'properties' => array(
+				'type'                 => 'object',
+				// Reject unknown keys. Without this, an invented filter such as
+				// {"bogus_filter":"x"} was accepted and returned the FULL
+				// unfiltered result set -- indistinguishable from a successful
+				// filtered query, because Model::paginate() silently drops any
+				// key that is not queryable. A wrong answer that looks right is
+				// worse than an error, so this errors now.
+				'additionalProperties' => false,
+				'properties'           => array(
 					'ids' => array(
 						'type'        => 'array',
 						'description' => 'Lead ids to re-notify, 1 to 50 per call. Each must currently be failed or notified.',
@@ -222,7 +257,7 @@ return array(
 						'minItems'    => 1,
 					),
 				),
-				'required'   => array( 'ids' ),
+				'required'             => array( 'ids' ),
 			),
 
 			/*
@@ -243,8 +278,15 @@ return array(
 			'label'        => __( 'Delete Waitlist Leads', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'description'  => 'Permanently delete the waitlist leads with the given ids. This cannot be undone and the customers are not notified. Prefer setting status to unsubscribed unless the records genuinely need to be erased. Reports each id separately rather than failing the whole call on the first miss: deleted lists the ids that were erased, not_found the ids that did not exist, and failed the ids that exist but could not be erased. Repeated ids are collapsed.',
 			'input_schema' => array(
-				'type'       => 'object',
-				'properties' => array(
+				'type'                 => 'object',
+				// Reject unknown keys. Without this, an invented filter such as
+				// {"bogus_filter":"x"} was accepted and returned the FULL
+				// unfiltered result set -- indistinguishable from a successful
+				// filtered query, because Model::paginate() silently drops any
+				// key that is not queryable. A wrong answer that looks right is
+				// worse than an error, so this errors now.
+				'additionalProperties' => false,
+				'properties'           => array(
 					'ids' => array(
 						'type'        => 'array',
 						'description' => 'Lead ids to erase, 1 to 50 per call, as returned by list-leads.',
@@ -260,7 +302,7 @@ return array(
 						'minItems'    => 1,
 					),
 				),
-				'required'   => array( 'ids' ),
+				'required'             => array( 'ids' ),
 			),
 			'risk'         => 'destructive',
 			// Narrower than wpab_mcp_access. `manage_notifybay` is the plugin's
