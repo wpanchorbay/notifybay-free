@@ -65,7 +65,7 @@ return array(
 		// --- readonly ---------------------------------------------------
 		'notifybay/list-leads'            => array(
 			'label'        => __( 'List Waitlist Leads', 'notifybay-waitlist-and-stock-alert-woo' ),
-			'description'  => 'List NotifyBay waitlist leads, most recently signed up first, optionally filtered by status, subscription type, product or email address. Returns for each: id, email, product id and name, variation id (0 when the product has no variations), type, status, and the created_at, notified_at and expires_at timestamps. notified_at is null on any lead that did not go through the notification engine -- imported or seeded records commonly carry status notified with no timestamp -- so a null there means \'not recorded\', not \'never notified\'. expires_at is only set by the reservation window, which is a NotifyBay Pro feature. Results are paginated; the response carries total and has_more. Use this to answer questions about who is waiting for which product.',
+			'description'  => 'List NotifyBay waitlist leads, most recently signed up first, optionally filtered by status, subscription type, product or email address. Returns for each: id, user_email, product id and name, variation id (0 when the product has no variations), type, status, and the created_at, notified_at and expires_at timestamps. notified_at is null on any lead that did not go through the notification engine -- imported or seeded records commonly carry status notified with no timestamp -- so a null there means \'not recorded\', not \'never notified\'. expires_at is only set by the reservation window, which is a NotifyBay Pro feature. Results are paginated; the response carries total and has_more. Use this to answer questions about who is waiting for which product.',
 			'input_schema' => array(
 				'type'                 => 'object',
 				// Reject unknown keys. Without this, an invented filter such as
@@ -131,8 +131,13 @@ return array(
 			'label'        => __( 'NotifyBay System Status', 'notifybay-waitlist-and-stock-alert-woo' ),
 			'description'  => 'Report NotifyBay queue health. Returns jobs: Action Scheduler action counts in the notifybay_alerts group, always carrying all five keys (pending, running, complete, failed, canceled) so a zero is distinguishable from a missing measurement. Note that Action Scheduler prunes old completed actions, so complete is a count of what is still retained, not of everything ever run. Also returns failed_leads and processing_leads, which count leads in those states and are unrelated to the job counts -- one failed job can leave many or no failed leads. Also returns restock_email_enabled: the WooCommerce \'Enable this email\' toggle for the back-in-stock notification, which is the final gate on every send and lives in WooCommerce\'s settings rather than NotifyBay\'s. When it is false, dispatch still runs and jobs still complete but no customer is emailed, so the job counts look healthy while nothing arrives -- check this first when leads are waiting and no mail is going out. It is null if the email could not be resolved. Also returns wc_version and plugin_version. Use this to diagnose why restock notifications are not going out.',
 			'input_schema' => array(
-				'type'       => 'object',
-				'properties' => array(),
+				'type'                 => 'object',
+				// The kit's Registrar::input_schema() only rewrites
+				// `properties` and `items`; every other key passes through, so
+				// this closes the unknown-key gap without re-introducing the
+				// `properties: []` that broke tools/list in 10472de.
+				'additionalProperties' => false,
+				'properties'           => array(),
 			),
 			'risk'         => 'readonly',
 			'handler'      => array( Leads::class, 'system_status' ),
@@ -172,7 +177,7 @@ return array(
 
 		'notifybay/product-summary'       => array(
 			'label'        => __( 'Waitlist Size By Product', 'notifybay-waitlist-and-stock-alert-woo' ),
-			'description'  => 'How many people are waiting for each product, biggest waitlist first, with a per-status breakdown and whether the product is currently in stock (in_stock is null when the product no longer exists in WooCommerce, in which case product_name is the name recorded at signup). Grouped by product, so a variable product is reported as one waitlist rather than one per variation; use list-leads with product_id if you need the variation split. Returns total, the number of products with any leads at all, so a full list is distinguishable from one truncated by limit. Answers "which product has the most demand" in one call instead of paging the whole lead list.',
+			'description'  => 'How many people are waiting for each product, biggest waitlist first, with a per-status breakdown and whether the product is currently in stock (in_stock is null when the product no longer exists in WooCommerce, in which case product_name is the name recorded at signup). Grouped by product, so a variable product is reported as one waitlist rather than one per variation; use list-leads with product_id if you need the variation split. Returns returned, how many products are in this response, and total, the number of products with any leads at all, so a full list is distinguishable from one truncated by limit. Answers "which product has the most demand" in one call instead of paging the whole lead list.',
 			'input_schema' => array(
 				'type'                 => 'object',
 				// Reject unknown keys. Without this, an invented filter such as

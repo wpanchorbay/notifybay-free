@@ -237,6 +237,34 @@ class Leads {
 	}
 
 	/**
+	 * Normalise a datetime column to a real timestamp string or null.
+	 *
+	 * A plain truthiness test is not enough. MySQL happily stores the zero
+	 * date "0000-00-00 00:00:00" -- any writer that binds a PHP null with a
+	 * %s format produces an empty string, which MySQL coerces to it -- and
+	 * that string is truthy in PHP, so it sailed through as if it were a
+	 * timestamp. It reached clients on 156 of 258 rows, directly contradicting
+	 * the documented rule that null means "not recorded", and no parser can
+	 * read it. Treated as absent, which is what it means.
+	 *
+	 * @param mixed $value Raw column value.
+	 * @return string|null
+	 */
+	private static function date_or_null( $value ) {
+		if ( empty( $value ) ) {
+			return null;
+		}
+
+		$value = (string) $value;
+
+		if ( '' === trim( $value ) || 0 === strpos( $value, '0000-00-00' ) ) {
+			return null;
+		}
+
+		return $value;
+	}
+
+	/**
 	 * Change a single lead's status or email address.
 	 *
 	 * @since 1.0.3
@@ -406,7 +434,7 @@ class Leads {
 			// The field this list is ordered by. Sorting on a value the caller
 			// cannot see leaves them unable to confirm the order is what the
 			// description claims, or to merge this list with another.
-			$row['last_attempt_at'] = $lead->updated_at ? (string) $lead->updated_at : null;
+			$row['last_attempt_at'] = self::date_or_null( $lead->updated_at );
 			$row['last_error']      = self::last_action_error( (int) $lead->id );
 
 			$leads[] = $row;
@@ -763,8 +791,8 @@ class Leads {
 			'type'         => (string) $lead->type,
 			'status'       => (string) $lead->status,
 			'created_at'   => (string) $lead->created_at,
-			'notified_at'  => $lead->notified_at ? (string) $lead->notified_at : null,
-			'expires_at'   => $lead->expires_at ? (string) $lead->expires_at : null,
+			'notified_at'  => self::date_or_null( $lead->notified_at ),
+			'expires_at'   => self::date_or_null( $lead->expires_at ),
 		);
 	}
 }
