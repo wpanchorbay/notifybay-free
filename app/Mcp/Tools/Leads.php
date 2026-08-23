@@ -386,18 +386,28 @@ class Leads {
 		$leads = array();
 
 		foreach ( $pagination['data'] as $lead ) {
-			$row                = self::shape( $lead );
+			$row = self::shape( $lead );
+
 			$row['retry_count'] = (int) $lead->retry_count;
-			$row['last_error']  = self::last_action_error( (int) $lead->id );
-			$leads[]            = $row;
+
+			// The field this list is ordered by. Sorting on a value the caller
+			// cannot see leaves them unable to confirm the order is what the
+			// description claims, or to merge this list with another.
+			$row['last_attempt_at'] = $lead->updated_at ? (string) $lead->updated_at : null;
+			$row['last_error']      = self::last_action_error( (int) $lead->id );
+
+			$leads[] = $row;
 		}
 
 		return array(
-			'leads'       => $leads,
-			'leads_page'  => (int) $pagination['page'],
-			'leads_total' => (int) $pagination['total'],
-			'has_more'    => ( (int) $pagination['page'] * $per_page ) < (int) $pagination['total'],
-			'jobs'        => self::failed_jobs(),
+			'leads'          => $leads,
+			'leads_page'     => (int) $pagination['page'],
+			'leads_per_page' => (int) $pagination['per_page'],
+			'leads_total'    => (int) $pagination['total'],
+			// Prefixed like the rest. A bare has_more beside leads_total reads
+			// as if it covered the whole payload, jobs included.
+			'leads_has_more' => ( (int) $pagination['page'] * $per_page ) < (int) $pagination['total'],
+			'jobs'           => self::failed_jobs(),
 		);
 	}
 
@@ -408,6 +418,19 @@ class Leads {
 	 * records only a retry count -- so the only account of what went wrong is
 	 * Action Scheduler's own log, reached through the action whose args carry
 	 * this lead id.
+	 *
+	 * Restricted to actions Action Scheduler itself marked failed. Without
+	 * that clause this returned the newest log line for any matching action
+	 * whatever its outcome, so a lead whose last attempt ran fine reported
+	 * "action complete via notifybay_fallback" as its error -- a success string
+	 * in a field named last_error, on the row a model reads first and then
+	 * feeds to an irreversible resend.
+	 *
+	 * The narrower query is also the honest one. Action Scheduler judges
+	 * whether the action RAN, not whether the mail arrived: Worker catches its
+	 * own send failure and schedules a backoff, so the action completes and AS
+	 * logs nothing wrong. A per-lead delivery reason is therefore usually
+	 * absent, and the description says so rather than implying otherwise.
 	 *
 	 * Both arg spellings are matched. Action Scheduler stores the same
 	 * parameter as `[1219,"waitlist_restock"]` from one call path and
@@ -435,12 +458,13 @@ class Leads {
 				'SELECT lg.message
 				 FROM %i lg
 				 INNER JOIN %i a ON a.action_id = lg.action_id
-				 WHERE a.hook = %s AND ( a.args LIKE %s OR a.args LIKE %s )
+				 WHERE a.hook = %s AND a.status = %s AND ( a.args LIKE %s OR a.args LIKE %s )
 				 ORDER BY lg.log_id DESC
 				 LIMIT 1',
 				$logs,
 				$actions,
 				'notifybay_send_email_worker',
+				'failed',
 				'[' . $lead_id . ',%',
 				'["' . $lead_id . '",%'
 			)
@@ -554,6 +578,8 @@ class Leads {
 			$products[ $pid ]['by_status'][ (string) $row->status ] = (int) $row->c;
 		}
 
+		$total_products = count( $products );
+
 		usort(
 			$products,
 			static function ( array $a, array $b ) {
@@ -579,6 +605,9 @@ class Leads {
 		return array(
 			'products' => array_values( $products ),
 			'returned' => count( $products ),
+			// Without this, `returned == limit` is ambiguous: a caller cannot
+			// tell a complete list from one truncated by the limit.
+			'total'    => $total_products,
 		);
 	}
 
