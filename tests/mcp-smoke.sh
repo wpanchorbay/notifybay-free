@@ -56,11 +56,12 @@ wp_php() { local r="$MCP_WORK/$( basename "$1" )"; cp "$1" "/tmp/pilot-$( basena
 echo "→ target: $MCP_BASE  (NotifyBay pilot)"
 
 # The vendored kit is deliberately ahead of what composer.lock pins: the lock
-# still resolves wpab/mcp-kit to the published v0.3.2, which predates the
-# settings-route nonce. A `composer install` from a clean checkout therefore
-# reverts it and silently reopens the escalation this suite exists to prove
-# closed. Checked here rather than left to a confusing 200-instead-of-403
-# twenty cases later.
+# still resolves wpab/mcp-kit to the published v0.3.2, which predates both the
+# settings-route nonce and the inputSchema fix. A `composer install` from a
+# clean checkout therefore reverts them -- silently reopening the escalation
+# this suite exists to prove closed, and taking every tool out of every strict
+# MCP client again. Checked here rather than left to a confusing
+# 200-instead-of-403 twenty cases later.
 if ! grep -q 'rest_nonce_invalid' vendor/wpab/mcp-kit/src/AdminApi.php 2>/dev/null; then
 	echo "vendor/wpab/mcp-kit predates the settings-route nonce -- composer.lock" >&2
 	echo "has reverted it. Re-sync the kit before trusting anything below." >&2
@@ -259,6 +260,28 @@ assert_eq 200 "$MCP_STATUS" "tools/list answers over the negotiated session"
 names="$( tool_names )"
 assert_contains "notifybay-list-leads" "$names" "the hyphenated wire name is what is advertised"
 assert_not_contains "notifybay/list-leads" "$names" "...not the slashed ability key"
+
+# Every advertised inputSchema.properties must be a JSON object, never [].
+#
+# An argument-less tool declares `'properties' => array()` in the manifest, and
+# an empty PHP array encodes as `[]`. JSON Schema requires an object there, and
+# a strict client rejects tools/list AS A WHOLE over one bad entry -- so this
+# single field made every NotifyBay tool unavailable in Claude Code while the
+# endpoint itself answered correctly. Reported as:
+#   tools.1.inputSchema.properties: expected record, received array
+#
+# Asserted across all tools rather than just system-status: the failure is a
+# property of how an empty map serialises, so the next argument-less tool
+# anybody adds is the next outage.
+bad_props="$( printf '%s' "$MCP_BODY" | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+print(",".join(
+    t["name"] for t in d.get("result", {}).get("tools", [])
+    if isinstance(t.get("inputSchema", {}).get("properties"), list)
+) or "none")
+' 2>/dev/null )"
+assert_eq "none" "$bad_props" "no tool advertises properties as a JSON array"
 
 # ---------------------------------------------------------------------------
 case_start "A tool round-trip, with isError checked explicitly"
@@ -460,9 +483,9 @@ prod="$( wp_php "$MCP_WORK/products.php" )"
 # copies under their own prefixes, one of them a different version. All three
 # must report independently.
 assert_contains "count=3"                 "$prod" "three products are discovered"
-assert_contains "notifybay|0.3.2|ok"      "$prod" "NotifyBay's unscoped copy reports itself"
+assert_contains "notifybay|0.3.3|ok"      "$prod" "NotifyBay's unscoped copy reports itself"
 assert_contains "fixtureone|0.1.3-legacy" "$prod" "...alongside a scoped copy of a DIFFERENT version"
-assert_contains "fixturetwo|0.3.2"        "$prod" "...and a second scoped copy"
+assert_contains "fixturetwo|0.3.3"        "$prod" "...and a second scoped copy"
 
 # ---------------------------------------------------------------------------
 case_start "The site is left as it was found"
