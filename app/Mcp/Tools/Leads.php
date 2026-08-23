@@ -214,12 +214,25 @@ class Leads {
 			$wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE status = 'processing'", $lead_table )
 		);
 
+		/*
+		 * The WooCommerce "Enable this email" toggle is the final gate on every
+		 * restock send, and it lives in WooCommerce's settings rather than
+		 * NotifyBay's. With it off, dispatch runs, jobs complete, and nothing
+		 * reaches a customer -- so the queue counts above all look healthy
+		 * while the plugin does nothing. Reported here because it is the first
+		 * thing worth checking when leads are waiting and no mail arrives.
+		 */
+		$restock_email = class_exists( '\NotifyBay\Emails\EmailManager' )
+			? \NotifyBay\Emails\EmailManager::get_email( 'notifybay_restock' )
+			: null;
+
 		return array(
-			'jobs'             => $jobs,
-			'failed_leads'     => $failed_leads,
-			'processing_leads' => $processing_leads,
-			'wc_version'       => class_exists( 'WooCommerce' ) ? WC()->version : null,
-			'plugin_version'   => defined( 'NOTIFYBAY_VERSION' ) ? NOTIFYBAY_VERSION : null,
+			'jobs'                  => $jobs,
+			'failed_leads'          => $failed_leads,
+			'processing_leads'      => $processing_leads,
+			'restock_email_enabled' => $restock_email ? (bool) $restock_email->is_enabled() : null,
+			'wc_version'            => class_exists( 'WooCommerce' ) ? WC()->version : null,
+			'plugin_version'        => defined( 'NOTIFYBAY_VERSION' ) ? NOTIFYBAY_VERSION : null,
 		);
 	}
 

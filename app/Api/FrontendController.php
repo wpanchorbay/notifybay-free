@@ -227,9 +227,19 @@ class FrontendController extends ApiController {
 			? $overrides['backorder_mode']
 			: $settings->get_settings( 'general_backorderWaitlist', '0' );
 
-		$variation_id       = (int) $request->get_param( 'variation_id' );
-		$is_out_of_stock    = ( $variation_id ) ? ( ! wc_get_product( $variation_id )->is_in_stock() ) : ( ! $product->is_in_stock() );
-		$backorders_allowed = ( $variation_id ) ? ( wc_get_product( $variation_id )->backorders_allowed() ) : ( $product->backorders_allowed() );
+		$variation_id = (int) $request->get_param( 'variation_id' );
+
+		// Resolve once and fall back to the parent. Chaining straight off
+		// wc_get_product( $variation_id ) was fatal on false for a variation
+		// that had been deleted or belongs to another product.
+		$stock_source = $variation_id ? wc_get_product( $variation_id ) : $product;
+
+		if ( ! $stock_source instanceof \WC_Product ) {
+			$stock_source = $product;
+		}
+
+		$is_out_of_stock    = ! $stock_source->is_in_stock();
+		$backorders_allowed = $stock_source->backorders_allowed();
 
 		$show_waitlist = false;
 		if ( empty( $overrides['disable_waitlist'] ) ) {
@@ -362,7 +372,22 @@ class FrontendController extends ApiController {
 			$expires_at = gmdate( 'Y-m-d H:i:s', time() + ( $expiry_days * DAY_IN_SECONDS ) );
 		}
 
-		$product   = wc_get_product( $validated['product_id'] );
+		// Guarded because this route is reachable by anyone holding a nonce and
+		// the plugin hands nonces out publicly. Without the check, a product
+		// deleted between page render and submit made get_price() below fatal
+		// on false and returned a 500 to a real shopper. Every other
+		// wc_get_product() call in this controller already guards; this one did
+		// not.
+		$product = wc_get_product( $validated['product_id'] );
+
+		if ( ! $product instanceof \WC_Product ) {
+			return new \WP_Error(
+				'not_found',
+				__( 'Product not found.', 'notifybay-waitlist-and-stock-alert-woo' ),
+				array( 'status' => 404 )
+			);
+		}
+
 		$lead_data = array(
 			'user_email'            => $validated['email'],
 			'user_id'               => $user_id ? $user_id : null,

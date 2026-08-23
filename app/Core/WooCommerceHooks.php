@@ -52,9 +52,19 @@ class WooCommerceHooks {
 	public function run( Plugin $plugin ) {
 		$loader = $plugin->get_loader();
 
-		// Stock Observers
+		// Stock Observers. Two WooCommerce hooks matter here and they are not
+		// interchangeable: set_stock fires only when stock_quantity is among
+		// the updated props, while flipping the In stock / Out of stock
+		// dropdown on a product that does not manage quantities fires only
+		// set_stock_status. Listening to the first alone meant merchants who
+		// do not track quantities collected waitlist leads that were never
+		// notified -- the signup form still shows, so the leads pile up unused.
+		// A quantity change updates both props and fires both hooks, so
+		// maybe_enqueue_restock() de-duplicates within the request.
 		$loader->add_action( 'woocommerce_product_set_stock', $this, 'handle_stock_change' );
 		$loader->add_action( 'woocommerce_variation_set_stock', $this, 'handle_stock_change' );
+		$loader->add_action( 'woocommerce_product_set_stock_status', $this, 'handle_stock_status_change', 10, 3 );
+		$loader->add_action( 'woocommerce_variation_set_stock_status', $this, 'handle_stock_status_change', 10, 3 );
 
 		// Note: additional stock/order observers and conversion tracking are
 		// provided by a premium add-on (NotifyBay Pro), which registers them
@@ -80,24 +90,73 @@ class WooCommerceHooks {
 			return;
 		}
 
+		$this->maybe_enqueue_restock( $product );
+	}
+
+	/**
+	 * Handle a stock *status* change -- the only restock signal a product that
+	 * does not manage quantities ever emits.
+	 *
+	 * The signature is WooCommerce's, not ours: it passes the id and the new
+	 * status before the product object, so this cannot share a callback with
+	 * handle_stock_change().
+	 *
+	 * @param int    $product_id   Product or variation id.
+	 * @param string $stock_status The new stock status. Unused; is_in_stock() is authoritative.
+	 * @param mixed  $product      The product object when WooCommerce supplies one.
+	 */
+	public function handle_stock_status_change( $product_id, $stock_status = '', $product = null ) {
+		if ( ! $product instanceof \WC_Product ) {
+			$product = wc_get_product( $product_id );
+		}
+
+		if ( ! $product instanceof \WC_Product ) {
+			return;
+		}
+
+		$this->maybe_enqueue_restock( $product );
+	}
+
+	/**
+	 * Queue a restock dispatch if the product is now buyable.
+	 *
+	 * @param \WC_Product $product The product or variation.
+	 */
+	private function maybe_enqueue_restock( \WC_Product $product ) {
 		$product_id   = $product->get_id();
 		$variation_id = $product->is_type( 'variation' ) ? $product_id : 0;
 		$parent_id    = $variation_id ? $product->get_parent_id() : $product_id;
 
 		$stock_quantity = $product->get_stock_quantity();
 
-		if ( $product->is_in_stock() && $stock_quantity > 0 ) {
+		// null means the product does not manage stock, so there is no
+		// quantity to satisfy and is_in_stock() is the whole answer. The old
+		// `$stock_quantity > 0` test read that null as zero and refused to
+		// notify anyone waiting on an unmanaged product.
+		$has_quantity = ( null === $stock_quantity ) || ( $stock_quantity > 0 );
 
-			// Enqueue dispatcher for restock
-			if ( function_exists( 'as_enqueue_async_action' ) ) {
-
-				// Deduplication: as_enqueue_async_action handles basic deduplication if args are identical and job is pending
-				as_enqueue_async_action( 'notifybay_run_dispatcher', array( $parent_id, $variation_id ), 'notifybay_alerts' );
-			}
-
-			// Clear transients
-			wc_delete_product_transients( $parent_id );
+		if ( ! $product->is_in_stock() || ! $has_quantity ) {
+			return;
 		}
+
+		// A quantity change fires set_stock AND set_stock_status, so without
+		// this the managed path would enqueue twice and the customer would get
+		// two emails. as_enqueue_async_action() de-duplicates only while an
+		// identical action is still pending, which is not guaranteed here.
+		static $enqueued = array();
+		$key             = $parent_id . ':' . $variation_id;
+
+		if ( isset( $enqueued[ $key ] ) ) {
+			return;
+		}
+
+		$enqueued[ $key ] = true;
+
+		if ( function_exists( 'as_enqueue_async_action' ) ) {
+			as_enqueue_async_action( 'notifybay_run_dispatcher', array( $parent_id, $variation_id ), 'notifybay_alerts' );
+		}
+
+		wc_delete_product_transients( $parent_id );
 	}
 
 	/**

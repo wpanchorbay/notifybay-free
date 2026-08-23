@@ -209,15 +209,34 @@ class Worker {
 		$wc_email = ! empty( $config['wc_email'] ) ? \NotifyBay\Emails\EmailManager::get_email( $config['wc_email'] ) : null;
 
 		if ( $wc_email ) {
-			// Engine settings already gated dispatch; the WooCommerce "Enable
-			// this email" toggle is the final say. If disabled, consume the lead
-			// (so it does not loop through the stale-lead reaper) without sending.
+			/*
+			 * Engine settings already gated dispatch; the WooCommerce "Enable
+			 * this email" toggle is the final say.
+			 *
+			 * This used to apply status_after ('notified') and stamp
+			 * notified_at before returning, to consume the lead so it would not
+			 * loop through the stale-lead reaper. That made a disabled toggle a
+			 * silent, unrecoverable data loss: the admin list, notified_at, and
+			 * every MCP tool reported that the customer had been emailed when
+			 * nothing was ever sent, and re-enabling the email did not bring
+			 * the waitlist back because 'notified' is terminal.
+			 *
+			 * The lead is now left exactly as it is -- still 'processing' -- so
+			 * recover_stale_processing_leads() returns it to 'active' and it is
+			 * picked up again once the merchant re-enables the email. Looping
+			 * through the reaper is the reaper doing its job, not a fault.
+			 */
 			if ( ! $wc_email->is_enabled() ) {
-				if ( ! empty( $config['status_after'] ) ) {
-					$lead->status      = $config['status_after'];
-					$lead->notified_at = current_time( 'mysql' );
-					$lead->updated_at  = current_time( 'mysql' );
-					$lead->save();
+				if ( function_exists( 'notifybay_log' ) ) {
+					notifybay_log(
+						sprintf(
+							/* translators: 1: WooCommerce email id, 2: lead id. */
+							'Send suppressed: the WooCommerce email "%1$s" is disabled, so lead %2$d was not notified and stays queued.',
+							(string) $config['wc_email'],
+							(int) $lead->id
+						),
+						'warning'
+					);
 				}
 				if ( $switched_locale && function_exists( 'restore_current_locale' ) ) {
 					restore_current_locale();

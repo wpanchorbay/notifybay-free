@@ -134,9 +134,31 @@ const Leads: FC = () => {
   };
 
   const handleExport = () => {
-    const baseUrl = store.rest_url.endsWith("/") ? store.rest_url : `${store.rest_url}/`;
-    const url = `${baseUrl}admin/leads/export?_wpnonce=${store.nonce}`;
-    window.open(url, "_blank");
+    // The export route authenticates on the X-WP-Nonce *header*
+    // (ApiController::get_item_permissions_check reads nothing else), and a
+    // window.open() navigation cannot set headers -- so passing the nonce as
+    // ?_wpnonce= always came back 403 and rendered raw JSON in a stray tab.
+    // Fetch it with the header instead and save the response as a file.
+    // `parse: false` is required: apiFetch would otherwise try to JSON-parse
+    // CSV and throw.
+    apiFetch({
+      path: "admin/leads/export",
+      parse: false,
+    })
+      .then((response) => (response as unknown as Response).blob())
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `notifybay-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(() => {
+        addToast(__("Could not export leads.", "notifybay-waitlist-and-stock-alert-woo"), "error");
+      });
   };
 
   const handleEdit = (lead: LeadData) => {
