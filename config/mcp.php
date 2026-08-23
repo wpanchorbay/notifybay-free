@@ -139,7 +139,7 @@ return array(
 				'properties' => array(
 					'page'     => array(
 						'type'        => 'integer',
-						'description' => '1-based page number for the failed leads list. Read leads_has_more in the response to decide whether to ask for the next one.',
+						'description' => '1-based page number for the failed leads list. The leads list is paginated with leads_page, leads_per_page, leads_total and leads_has_more; the jobs breakdown is not. Read leads_has_more to decide whether to ask for the next page.',
 						'default'     => 1,
 						'minimum'     => 1,
 					),
@@ -206,7 +206,7 @@ return array(
 		// --- destructive: emails real customers ---------------------------
 		'notifybay/resend-notifications'  => array(
 			'label'        => __( 'Resend Back-in-Stock Notifications', 'notifybay-waitlist-and-stock-alert-woo' ),
-			'description'  => 'Queue the back-in-stock email again for specific leads. THIS EMAILS REAL CUSTOMERS AND CANNOT BE TAKEN BACK, and it is NOT idempotent -- calling it twice with the same ids sends twice. Only leads whose status is failed (the engine gave up after three attempts) or notified (it was sent and you want it sent again) are eligible; anything else is reported back in wrong_status and left alone. A lead whose product is out of stock or no longer exists is reported in out_of_stock and NOT sent, because the email says the item is back. Repeated ids are collapsed, so listing an id twice in one call sends once. Reports each id separately: queued and not_found are plain id lists; wrong_status and out_of_stock name the id together with the reason it was skipped. Get the ids from notification-failures or list-leads. Sending is asynchronous, so a queued id means the job was scheduled, not that the mail has left.',
+			'description'  => 'Queue the back-in-stock email again for specific leads. THIS EMAILS REAL CUSTOMERS AND CANNOT BE TAKEN BACK, and it is NOT idempotent -- calling it twice with the same ids sends twice. Only leads whose status is failed (the engine gave up after three attempts) or notified (it was sent and you want it sent again) are eligible; anything else is reported back in wrong_status and left alone. A lead whose product is out of stock or no longer exists is reported in out_of_stock and NOT sent, because the email says the item is back. Repeated ids are collapsed, so listing an id twice in one call sends once. Reports each id in exactly one of five lists. queued and not_found are plain id lists. wrong_status rows are {id, status}, where status is the lead\'s current state -- the reason it was not eligible. out_of_stock rows are {id, product_id, product_name, reason}, where reason is out_of_stock or product_missing. failed rows are plain ids whose record could not be written; that is an infrastructure error, not a lead state, so retry rather than treating it as ineligible. Status is checked before stock, so a lead that is both ineligible and out of stock is reported only in wrong_status. Get the ids from notification-failures or list-leads. Sending is asynchronous, so a queued id means the job was scheduled, not that the mail has left.',
 			'input_schema' => array(
 				'type'       => 'object',
 				'properties' => array(

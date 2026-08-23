@@ -643,6 +643,7 @@ class Leads {
 		$not_found    = array();
 		$wrong_status = array();
 		$out_of_stock = array();
+		$failed       = array();
 
 		foreach ( $ids as $id ) {
 			$lead = Lead::find( $id );
@@ -695,10 +696,16 @@ class Leads {
 			$lead->updated_at  = current_time( 'mysql' );
 
 			if ( ! $lead->save() ) {
-				$wrong_status[] = array(
-					'id'     => $id,
-					'status' => 'save_failed',
-				);
+				/*
+				 * Reported separately, not as a wrong_status row. A write
+				 * failure is an infrastructure error, not a lead state --
+				 * putting it in wrong_status made `status` return
+				 * 'save_failed', a value that is not a NotifyBay status and
+				 * is absent from the documented enum, so a client mapping
+				 * that field onto the enum reads a state that cannot exist.
+				 * `failed` is also what delete-leads already calls this.
+				 */
+				$failed[] = $id;
 				continue;
 			}
 
@@ -712,6 +719,7 @@ class Leads {
 			'not_found'    => $not_found,
 			'wrong_status' => $wrong_status,
 			'out_of_stock' => $out_of_stock,
+			'failed'       => $failed,
 			'affected'     => $queued,
 		);
 	}
