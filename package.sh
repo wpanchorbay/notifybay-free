@@ -36,6 +36,11 @@ rm -f $ZIP_NAME
 # 3. Create staging directories
 mkdir -p "dist/wordpress/$PLUGIN_SLUG"
 mkdir -p "dist/woocommerce/$PLUGIN_SLUG"
+# dist/svn/trunk mirrors the real WordPress.org SVN layout (trunk/ IS the
+# plugin root, no plugin-slug wrapper) -- rsync straight into an svn working
+# copy's trunk/ for `svn commit`. Left as a plain folder on purpose (not
+# zipped, not removed after) since that's how svn expects it.
+mkdir -p "dist/svn/trunk"
 
 # Helper function to copy plugin files to a target path
 copy_plugin_files() {
@@ -73,10 +78,11 @@ copy_plugin_files() {
     cp composer.json "$DEST/"
 }
 
-# 4. Copy files to both staging areas
+# 4. Copy files to all staging areas
 echo "Step 3: Copying folders and files..."
 copy_plugin_files "dist/wordpress/$PLUGIN_SLUG"
 copy_plugin_files "dist/woocommerce/$PLUGIN_SLUG"
+copy_plugin_files "dist/svn/trunk"
 
 # 5. Create WordPress Zip
 # The wp.org build puts the plugin files at the ROOT of the zip (no wrapping
@@ -100,6 +106,7 @@ echo "------------------------------------------------------"
 echo "Done! Packages created successfully:"
 echo "- dist/wordpress/$ZIP_NAME"
 echo "- dist/woocommerce/$ZIP_NAME"
+echo "- dist/svn/trunk/ (uncompressed, ready for \`svn commit\` into a checkout's trunk/)"
 echo ""
 echo "Note: The WordPress zip has files at the root (no '$PLUGIN_SLUG' folder);"
 echo "      the WooCommerce zip wraps them in the '$PLUGIN_SLUG' folder."
