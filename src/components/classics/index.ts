@@ -10,5 +10,4 @@ export { default as ClassicLayout } from './ClassicLayout';
 export { ClassicRepeater } from './ClassicRepeater';
 export { ClassicTable } from './ClassicTable';
 export { ClassicSettingsTable } from './ClassicSettingsTable';
-export { ClassicToggle } from './ClassicToggle';
 export { ClassicTextarea } from './ClassicTextarea';

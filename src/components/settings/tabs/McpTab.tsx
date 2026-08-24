@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { __ } from "@wordpress/i18n";
 import apiFetch from "../../../utils/apiFetch";
-import { ClassicSettingsTable, ClassicToggle } from "../../classics";
+import { ClassicSettingsTable } from "../../classics";
+import { Switch } from "../../common/Switch";
 import { ConfirmationModal } from "../../common/ConfirmationModal";
 import { CopyToClipboard } from "../../common/CopyToClipboard";
 import { useToast } from "../../../store/toast/use-toast";
@@ -270,10 +271,11 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
             ),
             render: () => (
               <div className="notifybay-flex notifybay-items-center notifybay-gap-3">
-                <ClassicToggle
+                <Switch
                   id="mcp_enabled"
                   checked={isEnabled}
                   disabled={isSaving}
+                  size="medium"
                   onChange={(checked) => save({ enabled: checked })}
                 />
                 <span
