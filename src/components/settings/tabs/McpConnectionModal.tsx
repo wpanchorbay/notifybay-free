@@ -153,7 +153,7 @@ export const McpConnectionModal: React.FC<McpConnectionModalProps> = ({
       <div className="notifybay-flex notifybay-flex-col notifybay-gap-4">
         <p className="notifybay-m-0 notifybay-rounded-md notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50 notifybay-p-3 notifybay-text-sm">
           {__(
-            "The credential is already active — there is nothing left to save. This is the only time it can be read: WordPress stores just a hash of it. It stays on this screen and on the AI Access tab until you reload the page, and is gone for good after that.",
+            "The credential is already active — there is nothing left to save. This is the only time it can be read: WordPress stores just a hash of it. It stays on this screen and on the MCP Connection tab until you reload the page, and is gone for good after that.",
             "notifybay-waitlist-and-stock-alert-woo",
           )}
         </p>

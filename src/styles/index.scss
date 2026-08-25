@@ -633,12 +633,12 @@ video {
   background: #f0f0f1;
 }
 
-.toplevel_page_notifybay #wpwrap {
+#wpwrap:has(#notifybay) {
   background: #f0f0f1;
 }
 
 #wpcontent:has(#notifybay) .notice,
-.toplevel_page_notifybay #wpfooter {
+#wpwrap:has(#notifybay) #wpfooter {
   display: none;
 }
 

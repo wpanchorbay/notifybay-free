@@ -22,6 +22,7 @@ return array(
 	'defaults' => array(
 		'general_doubleOptIn'               => false,
 		'general_backorderWaitlist'         => '0',
+		'general_showMainMenu'              => true,
 		'appearance_waitlistButtonText'     => 'Notify Me',
 		'appearance_waitlistButtonClass'    => '',
 		'appearance_waitlistExpiryEnabled'  => false,
@@ -40,6 +41,7 @@ return array(
 	'schema'   => array(
 		'general_doubleOptIn'               => array( 'type' => 'boolean' ),
 		'general_backorderWaitlist'         => array( 'type' => 'string' ),
+		'general_showMainMenu'              => array( 'type' => 'boolean' ),
 		'appearance_waitlistButtonText'     => array( 'type' => 'string' ),
 		'appearance_waitlistButtonClass'    => array( 'type' => 'string' ),
 		'appearance_waitlistExpiryEnabled'  => array( 'type' => 'boolean' ),

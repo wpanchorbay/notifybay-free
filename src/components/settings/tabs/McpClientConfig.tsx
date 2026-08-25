@@ -17,7 +17,7 @@ interface McpClientConfigProps {
 /**
  * The client picker and its snippet pane.
  *
- * Extracted because this renders in two places at once -- on the AI Access tab,
+ * Extracted because this renders in two places at once -- on the MCP Connection tab,
  * where it usually holds placeholders, and inside the one-time modal, where it
  * holds the real credential. Those two must never drift: a snippet that is
  * correct in the modal and subtly wrong on the tab is worse than having only

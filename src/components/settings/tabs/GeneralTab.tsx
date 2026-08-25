@@ -88,6 +88,30 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
             />
           ),
         },
+        {
+          id: "general_showMainMenu",
+          label: __("Main Menu", "notifybay-waitlist-and-stock-alert-woo"),
+          tooltip: __(
+            "Adds a top-level NotifyBay menu to the WordPress admin sidebar, alongside the existing Products → Leads and WooCommerce → Settings entries.",
+            "notifybay-waitlist-and-stock-alert-woo",
+          ),
+          render: () => (
+            <ClassicCheckbox
+              checked={settings.general_showMainMenu}
+              onChange={(val) =>
+                setSettings({
+                  ...settings,
+                  general_showMainMenu: val,
+                })
+              }
+              label={__("Show NotifyBay in the main admin menu", "notifybay-waitlist-and-stock-alert-woo")}
+              description={__(
+                "Turning this off only hides the sidebar shortcut — Products → Leads and WooCommerce → Settings → NotifyBay still work.",
+                "notifybay-waitlist-and-stock-alert-woo",
+              )}
+            />
+          ),
+        },
       ]}
     />
   );

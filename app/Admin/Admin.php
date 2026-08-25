@@ -115,7 +115,12 @@ class Admin {
 
 		$config      = $this->get_config();
 		$menu_config = $config['menu'] ?? array();
-		$show_main   = $config['show_main_menu'] ?? true;
+		// Live setting, not just the static config default -- lets a store
+		// owner turn the top-level menu off from the General settings tab.
+		// The config value is only the fallback for the instant before any
+		// settings row has ever been saved (e.g. right after activation).
+		$show_main   = Settings::get_instance()->get_settings( 'general_showMainMenu', $config['show_main_menu'] ?? true );
+		$top_slug    = $menu_config['top_level']['menu_slug'] ?? null;
 
 		// 1. Add top-level menu
 		if ( $show_main && ! empty( $menu_config['top_level'] ) ) {
@@ -134,6 +139,11 @@ class Admin {
 		// 2. Add sub-menus
 		if ( ! empty( $menu_config['sub_menus'] ) ) {
 			foreach ( $menu_config['sub_menus'] as $sub ) {
+				// The entry whose parent_slug is the top-level's own slug only
+				// makes sense once that top-level page actually exists.
+				if ( $sub['parent_slug'] === $top_slug && ! $show_main ) {
+					continue;
+				}
 				add_submenu_page(
 					$sub['parent_slug'],
 					$sub['page_title'],
@@ -141,6 +151,34 @@ class Admin {
 					$sub['capability'],
 					$sub['menu_slug'],
 					array( $this, 'add_setting_root_div' )
+				);
+			}
+		}
+
+		// 3. Plain links into pages NotifyBay doesn't own (WooCommerce's own
+		// wc-settings page). These are NOT registered via add_submenu_page():
+		// wc-settings already has its own registered page hook (WooCommerce's),
+		// and a second add_submenu_page() call for the same page risks
+		// colliding with it. Appending directly to the $submenu global is the
+		// standard WP technique for linking into another plugin's existing
+		// page from your own menu.
+		if ( $show_main && $top_slug ) {
+			global $submenu;
+			if ( isset( $submenu[ $top_slug ] ) ) {
+				$submenu[ $top_slug ][] = array(
+					__( 'Settings', 'notifybay-waitlist-and-stock-alert-woo' ),
+					'manage_woocommerce', // wc-settings' own required capability.
+					'admin.php?page=wc-settings&tab=' . \NOTIFYBAY_PLUGIN_NAME,
+				);
+				$submenu[ $top_slug ][] = array(
+					__( 'MCP Connection', 'notifybay-waitlist-and-stock-alert-woo' ),
+					// manage_options, not manage_notifybay: the "mcp" tab only
+					// renders for a manage_options user (see get_mcp_localize()
+					// below) -- a lower-capability user following this link
+					// would otherwise land on a settings page with an empty
+					// tab body.
+					'manage_options',
+					'admin.php?page=wc-settings&tab=' . \NOTIFYBAY_PLUGIN_NAME . '&notifybay_tab=mcp',
 				);
 			}
 		}
@@ -394,7 +432,7 @@ class Admin {
 			'app_passwords_url'       => admin_url( 'profile.php#application-passwords-section' ),
 
 			/*
-			 * Core's own route, used so the AI Access tab can issue and revoke
+			 * Core's own route, used so the MCP Connection tab can issue and revoke
 			 * the credential without sending the reader to their profile screen.
 			 * `me` is the security boundary: no request the tab makes names a
 			 * user, so there is no target to tamper with.

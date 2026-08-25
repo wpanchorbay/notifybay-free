@@ -34,6 +34,7 @@ export interface PluginSettings {
 	// --- Free ---
 	general_doubleOptIn: boolean;
 	general_backorderWaitlist: string;
+	general_showMainMenu: boolean;
 	appearance_waitlistButtonText: string;
 	appearance_waitlistButtonClass: string;
 	appearance_waitlistExpiryEnabled: boolean;
