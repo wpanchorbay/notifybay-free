@@ -200,6 +200,47 @@ class Settings {
 	}
 
 	/**
+	 * The waitlist expiry windows on offer, as positive integers.
+	 *
+	 * One source of truth for a list that was being parsed in four places --
+	 * Api\FrontendController when accepting a subscription,
+	 * templates/frontend/waitlist-form.php when rendering the <select>,
+	 * Frontend\ProductPage when localising it for the block form, and
+	 * assets/js/frontend.js from that localised value. Only the first applied
+	 * the fallback below, so a store whose option list was cleared or saved
+	 * with nothing usable in it showed a form offering no window at all while
+	 * the server still accepted and assigned one. A logged-in shopper, whose
+	 * one-click subscribe never renders the <select>, was then given the
+	 * configured default -- up to 90 days -- on a store whose UI offered
+	 * nothing, and dropped when it passed.
+	 *
+	 * An empty result is not "the merchant offers no windows": it is a setting
+	 * never filled in, or saved with nothing valid. Core\Settings::load_settings()
+	 * merges the stored value over the config default, so a stored empty string
+	 * wins and explode() yields one empty entry that the filter drops. Falling
+	 * back to the packaged list keeps the expiry toggle meaning what it says.
+	 *
+	 * @since 1.0.3
+	 * @return int[] Positive day counts, never empty.
+	 */
+	public function get_expiry_options() {
+		$raw = (string) $this->get_settings( 'appearance_waitlistExpiryOptions', '7,14,30,60,90' );
+
+		$options = array_values(
+			array_unique(
+				array_filter(
+					array_map( 'intval', array_map( 'trim', explode( ',', $raw ) ) ),
+					static function ( $days ) {
+						return $days > 0;
+					}
+				)
+			)
+		);
+
+		return empty( $options ) ? array( 7, 14, 30, 60, 90 ) : $options;
+	}
+
+	/**
 	 * Get settings schema.
 	 *
 	 * @since 1.0.0
@@ -262,6 +303,21 @@ class Settings {
 			}
 			if ( 'textarea' === $format ) {
 				$sanitized_output[ $key ] = sanitize_textarea_field( $value );
+				continue;
+			}
+			// A comma-separated list of day counts, normalised to positive
+			// integers. The renderers and Api\FrontendController all require
+			// `> 0`, so anything else stored here can only produce an option
+			// that is offered to the shopper and then silently ignored.
+			if ( 'day_list' === $format ) {
+				$days = array_filter(
+					array_map( 'intval', explode( ',', (string) $value ) ),
+					static function ( $day ) {
+						return $day > 0;
+					}
+				);
+
+				$sanitized_output[ $key ] = implode( ',', array_unique( $days ) );
 				continue;
 			}
 

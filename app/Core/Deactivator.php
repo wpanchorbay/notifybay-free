@@ -42,15 +42,30 @@ class Deactivator {
 	/**
 	 * Removes the custom plugin capabilities from all roles.
 	 *
+	 * Uses wp_roles()->get_names() rather than get_editable_roles(). The latter
+	 * is defined only in wp-admin/includes/user.php, which the REST plugins
+	 * controller never loads -- it pulls in plugin.php, file.php,
+	 * class-wp-upgrader.php and plugin-install.php and nothing else. So
+	 * deactivating over `PUT /wp/v2/plugins/<plugin>` fatalled with
+	 * "Call to undefined function NotifyBay\Core\get_editable_roles()",
+	 * and because core fires deactivate_{$plugin} *before* it writes
+	 * active_plugins, the fatal aborted that write and the plugin was left
+	 * active -- a deactivation that reports a 500 and silently does nothing.
+	 * wp_roles() lives in wp-includes and is available in every context.
+	 *
+	 * Iterating every role (rather than the editable_roles-filtered subset) is
+	 * also the more thorough choice here: a role hidden from that filter can
+	 * still hold the capability.
+	 *
 	 * @since 1.0.0
 	 * @access private
 	 * @return void
 	 */
 	private static function remove_custom_capabilities() {
-		$roles             = get_editable_roles();
+		$roles             = wp_roles()->get_names();
 		$custom_capability = 'manage_notifybay';
 
-		foreach ( $roles as $role_name => $role_info ) {
+		foreach ( array_keys( $roles ) as $role_name ) {
 			$role = get_role( $role_name );
 			if ( $role && $role->has_cap( $custom_capability ) ) {
 				$role->remove_cap( $custom_capability );

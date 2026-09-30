@@ -102,6 +102,13 @@ export interface McpLocalize {
 	is_local_dev: boolean;
 	/** Only true on an https development host, where a self-signed cert is plausible. */
 	offer_tls_bypass: boolean;
+	/**
+	 * Nonced admin-post URL for the Claude Desktop `.mcpb` bundle, which
+	 * installs by double-click instead of hand-editing the config file.
+	 */
+	desktop_bundle_url: string;
+	/** Nonced admin-post URL that grants `wpab_mcp_access` to administrators. */
+	grant_cap_url: string;
 }
 
 /**
@@ -137,6 +144,13 @@ export interface McpStatus {
 	status: string;
 	endpoint: string;
 	tool_count: number;
+	/**
+	 * Whether the current user holds `wpab_mcp_access`, the capability the MCP
+	 * endpoint itself requires. This is NOT the capability that gates the
+	 * settings routes (`manage_options`), so it can be false on a site whose
+	 * panel otherwise reports a healthy, enabled endpoint.
+	 */
+	has_access_capability: boolean;
 	available_access_levels: string[];
 	client_config: Record< string, unknown >;
 	settings: McpSettingField[];

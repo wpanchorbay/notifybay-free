@@ -10,10 +10,20 @@ interface McpConnectionModalProps {
   isOpen: boolean;
   /** The just-minted secret. Shown in full; WordPress keeps only a hash. */
   password: string;
-  /** Already filled with `password`, one entry per client. */
-  snippets: McpSnippet[];
+  /**
+   * Already filled with `password`, one entry per client. Typed nullable only
+   * because the caller builds it from the same live-secret state that gates
+   * `isOpen` -- in practice this modal never opens without one.
+   */
+  snippets: McpSnippet[] | null;
   username: string;
-  /** False means the endpoint will refuse these snippets until it is enabled. */
+  /**
+   * Nonced admin-post URL for the Claude Desktop bundle, so the one-time dialog
+   * can offer the download at the moment the credential exists -- which is the
+   * only moment it can be baked into the file.
+   */
+  bundleUrl?: string;
+  /** False means the endpoint does not exist yet, so these cannot connect. */
   mcpEnabled: boolean;
   onClose: () => void;
 }
@@ -43,6 +53,7 @@ interface McpConnectionModalProps {
  * @param root0.isOpen
  * @param root0.password
  * @param root0.snippets
+ * @param root0.bundleUrl
  * @param root0.username
  * @param root0.mcpEnabled
  * @param root0.onClose
@@ -51,6 +62,7 @@ export const McpConnectionModal: React.FC<McpConnectionModalProps> = ({
   isOpen,
   password,
   snippets,
+  bundleUrl,
   username,
   mcpEnabled,
   onClose,
@@ -111,7 +123,7 @@ export const McpConnectionModal: React.FC<McpConnectionModalProps> = ({
   const offNotice = !mcpEnabled ? (
     <p className="notifybay-m-0 notifybay-rounded-md notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50 notifybay-p-2 notifybay-text-sm">
       {__(
-        "MCP is currently switched off, so this connection will be refused until you turn on Enable MCP. The credential itself is fine — save it now and enable the endpoint when you are ready.",
+        "MCP is currently switched off, so a client will report the address as not found until you turn on Enable MCP. The credential itself is fine — save it now and enable the endpoint when you are ready.",
         "notifybay-waitlist-and-stock-alert-woo",
       )}
     </p>
@@ -184,6 +196,8 @@ export const McpConnectionModal: React.FC<McpConnectionModalProps> = ({
         <McpClientConfig
           snippets={snippets}
           username={username}
+          password={password}
+          bundleUrl={bundleUrl}
           notice={offNotice}
           onCopy={markCopied}
         />

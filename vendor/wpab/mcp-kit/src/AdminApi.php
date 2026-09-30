@@ -160,6 +160,17 @@ final class AdminApi {
 			'product_key'             => $product_key,
 			'status'                  => $state['enabled'] ? 'ok' : 'disabled',
 			'endpoint'                => $endpoint,
+			/*
+			 * Whether the caller actually holds the capability the MCP endpoint
+			 * requires. This route gates on manage_options, but Gate::transport()
+			 * gates on wpab_mcp_access -- two different capabilities. A site that
+			 * was updated rather than activated never received the second one, so
+			 * this payload reported `ok` with a full tool count while every real
+			 * MCP request answered 403, and nothing anywhere said why. Reporting
+			 * it here is what makes that state, and a later role reset that leaves
+			 * Gate's one-shot flag stamped, diagnosable instead of silent.
+			 */
+			'has_access_capability'   => current_user_can( 'wpab_mcp_access' ),
 			'tool_count'              => count( $manifest['abilities'] ),
 			'available_access_levels' => [ 'read', 'read+modify', 'full' ],
 			'client_config'           => self::client_config_snippet( $product_key, $endpoint ),

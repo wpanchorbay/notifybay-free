@@ -46,17 +46,36 @@ $notifybay_is_logged_in = is_user_logged_in();
 					
 					<?php
 					if ( $settings->get_settings( 'appearance_waitlistExpiryEnabled', false ) ) :
-						$notifybay_expiry_options = explode( ',', $settings->get_settings( 'appearance_waitlistExpiryOptions', '7,14,30,60,90' ) );
-						$notifybay_default_expiry = $settings->get_settings( 'appearance_waitlistExpiryDefault', '' );
+						/*
+						 * Positive integers only, matching
+						 * Api\FrontendController::get_expiry_options(). is_numeric()
+						 * was wrong here: it passes "0" and negatives, so a merchant
+						 * option list of "0,7,14" rendered a "0 days" choice that the
+						 * server -- whose every guard is `$days > 0` -- silently read
+						 * as no expiry at all, a duplicate of the empty option. intval
+						 * also normalises "07" to 7, without which the value posted
+						 * back would fail the server's strict in_array() check.
+						 */
+						$notifybay_expiry_options = $settings->get_expiry_options();
+
+						$notifybay_default_expiry = (int) $settings->get_settings( 'appearance_waitlistExpiryDefault', 0 );
+
+						/*
+						 * If the configured default is not one of the offered
+						 * options, selected() below matches nothing and the
+						 * browser falls back to the first <option> — the empty
+						 * "No expiry" one. A returning guest can submit without
+						 * ever opening this form, so that silently becomes their
+						 * choice. Pin the first real option instead.
+						 */
+						if ( ! in_array( $notifybay_default_expiry, $notifybay_expiry_options, true ) ) {
+							$notifybay_default_expiry = isset( $notifybay_expiry_options[0] ) ? $notifybay_expiry_options[0] : 0;
+						}
 						?>
 						<select name="notifybay_expiry">
 							<option value=""><?php esc_html_e( 'No expiry', 'notifybay-waitlist-and-stock-alert-woo' ); ?></option>
 							<?php
 							foreach ( $notifybay_expiry_options as $notifybay_days ) :
-								$notifybay_days = trim( $notifybay_days );
-								if ( ! is_numeric( $notifybay_days ) ) {
-									continue;
-								}
 								?>
 								<option value="<?php echo esc_attr( $notifybay_days ); ?>" <?php selected( $notifybay_default_expiry, $notifybay_days ); ?>>
 									<?php echo (int) $notifybay_days; ?> <?php esc_html_e( 'days', 'notifybay-waitlist-and-stock-alert-woo' ); ?>

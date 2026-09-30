@@ -35,6 +35,15 @@ final class Bootstrap {
 			return;
 		}
 
+		// Step 1a -- repair the capability on sites that were UPDATED rather
+		// than activated. register_activation_hook() does not fire on an update,
+		// and Gate::activate() was the only grant, so those sites answer 403 to
+		// every MCP request while reporting themselves healthy. Deliberately
+		// above the `enabled` gate at step 5: a product that is switched off
+		// today still needs the capability in place for when it is switched on.
+		// One shot, guarded by its own option -- see Gate::maybe_backfill().
+		Gate::maybe_backfill();
+
 		// Registering the toggle listener needs product_key baked into the
 		// hook *name* itself (`wpab_mcp_toggle_<product_key>`), which the
 		// full manifest is the only source of. D1 §4.1 says step 1 must not

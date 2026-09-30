@@ -98,14 +98,50 @@ class FrontendController extends ApiController {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'refresh_nonce' ),
-				// Intentionally public: a `wp_rest` nonce is not a secret (it's
-				// already inlined in every page's HTML), it just needs to be fresh.
-				// This lets frontend JS recover from an expired nonce (e.g. after a
-				// guest loads a page-cached product page hours after it was cached)
-				// without requiring a full page reload.
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( $this, 'can_refresh_nonce' ),
 			)
 		);
+	}
+
+	/**
+	 * Gate on /nonce: guests only.
+	 *
+	 * Not a security fix, despite appearances -- the record matters here,
+	 * because the shape of this endpoint invites a scarier reading than it
+	 * deserves. It mints `wp_create_nonce( 'wp_rest' )`, which is bound to the
+	 * current user and session, and core makes REST responses readable
+	 * cross-origin with credentials (rest_send_cors_headers() echoes any
+	 * Origin). That looks like script on an unrelated site could read a
+	 * logged-in administrator's live nonce and then act as them.
+	 *
+	 * It could not. wp-includes/rest-api.php:1155 does `wp_set_current_user( 0 )`
+	 * for any REST request that arrives without an X-WP-Nonce header -- which a
+	 * cross-origin caller cannot supply, because reading it is the thing the
+	 * same-origin policy prevents. Such a request is therefore anonymous by the
+	 * time it reaches here, and receives the logged-out nonce, which authorises
+	 * nothing the caller could not already do. Verified against a live install:
+	 * the cross-origin response carried the anonymous nonce, not the admin's.
+	 *
+	 * What this gate is, then, is housekeeping. Nothing signed in ever calls
+	 * the route -- assets/js/frontend.js sends logged-in users to
+	 * admin-ajax.php?action=rest-nonce instead -- so serving them here is a
+	 * capability with no caller, and the narrower surface is worth having.
+	 * Anyone tempted to reopen it should know it costs nothing today, and
+	 * anyone reading the old behaviour as a breach should know it was not one.
+	 *
+	 * @since 1.0.3
+	 * @return true|\WP_Error True for guests, an error for anyone signed in.
+	 */
+	public function can_refresh_nonce() {
+		if ( is_user_logged_in() ) {
+			return new \WP_Error(
+				'notifybay_nonce_refresh_forbidden',
+				__( 'A fresh nonce is already present in the page for signed-in visitors.', 'notifybay-waitlist-and-stock-alert-woo' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		return true;
 	}
 
 	/**
@@ -132,6 +168,27 @@ class FrontendController extends ApiController {
 	 */
 	private function new_guest_token() {
 		return wp_generate_password( 64, false );
+	}
+
+	/**
+	 * The expiry windows, in days, the merchant currently offers.
+	 *
+	 * Single source of truth for what counts as an acceptable expiry, shared by
+	 * the subscribe route's validation and matching what both front-end render
+	 * paths put in the dropdown (templates/frontend/waitlist-form.php and
+	 * assets/js/frontend.js).
+	 *
+	 * @since 1.0.3
+	 * @param \NotifyBay\Core\Settings $settings The settings instance.
+	 * @return int[] Positive day counts, in the order configured.
+	 */
+	private function get_expiry_options( $settings ) {
+		/*
+		 * Delegates to Core\Settings, which is where this list now lives so the
+		 * form, the block's JavaScript and this endpoint cannot disagree about
+		 * what the store offers. See Settings::get_expiry_options().
+		 */
+		return $settings->get_expiry_options();
 	}
 
 	/**
@@ -359,17 +416,84 @@ class FrontendController extends ApiController {
 		$settings = Settings::get_instance();
 		$status   = ( $settings->get_settings( 'general_doubleOptIn', false ) ) ? 'pending_verification' : 'active';
 
-		$expires_at  = null;
-		$expiry_days = (int) $request->get_param( 'notifybay_expiry' );
+		$expires_at = null;
 
-		// Fallback to default setting if not provided from frontend
-		if ( $expiry_days <= 0 ) {
-			$settings    = Settings::get_instance();
-			$expiry_days = (int) $settings->get_settings( 'appearance_waitlistExpiryDefault' );
-		}
+		/*
+		 * Expiry only applies when the merchant has switched it on. Previously
+		 * this fell straight through to `appearance_waitlistExpiryDefault` (90)
+		 * without consulting `appearance_waitlistExpiryEnabled`, so every lead
+		 * on every store — including stores that never opted in — was given a
+		 * 90-day expiry and was later flipped to `expired` by
+		 * Engine\CronTasks::cleanup_expired_leads(), silently dropping the
+		 * customer before they could ever be notified.
+		 */
+		if ( $settings->get_settings( 'appearance_waitlistExpiryEnabled', false ) ) {
+			/*
+			 * Presence of the parameter is what distinguishes "the customer was
+			 * offered a choice and made one" from "no control was rendered at
+			 * all". The expiry <select> is only shown to guests, so a logged-in
+			 * one-click subscribe sends nothing and must inherit the configured
+			 * default. An empty string is a real choice — the "No expiry"
+			 * option — and casts to 0, which leaves $expires_at null.
+			 */
+			$offered = $this->get_expiry_options( $settings );
 
-		if ( $expiry_days > 0 ) {
-			$expires_at = gmdate( 'Y-m-d H:i:s', time() + ( $expiry_days * DAY_IN_SECONDS ) );
+			if ( $request->has_param( 'notifybay_expiry' ) ) {
+				$expiry_days = (int) $request->get_param( 'notifybay_expiry' );
+
+				/*
+				 * This is a public endpoint, so the submitted value is only a
+				 * claim. Accept 0 ("No expiry", the empty option) or one of the
+				 * windows the merchant actually offers; anything else falls back
+				 * to the configured default rather than being trusted. Without
+				 * this, an arbitrary integer produced a date beyond MySQL's
+				 * DATETIME range (99999999 days lands in the year 275817), which
+				 * strict mode rejects — failing the shopper's subscribe outright.
+				 */
+				if ( $expiry_days > 0 && ! in_array( $expiry_days, $offered, true ) ) {
+					$expiry_days = (int) $settings->get_settings( 'appearance_waitlistExpiryDefault' );
+				}
+			} else {
+				$expiry_days = (int) $settings->get_settings( 'appearance_waitlistExpiryDefault' );
+
+				/*
+				 * Bound unconditionally here, including when the configured
+				 * default is blank and so reads as 0. Both renderers already do
+				 * this -- templates/frontend/waitlist-form.php and
+				 * assets/js/frontend.js each pin the first offered window when
+				 * the default is not one of them -- and this branch is the one
+				 * they never reach: it is the logged-in one-click subscribe,
+				 * which renders no <select> at all.
+				 *
+				 * Left guarded on `> 0`, the same store gave a guest a 7-day
+				 * expiry and a signed-in shopper none, from one blank setting.
+				 *
+				 * This is deliberately NOT folded into the shared bound below.
+				 * That one must keep its `> 0` guard, because a guest who picks
+				 * "No expiry" posts an explicit 0 and is entitled to mean it.
+				 */
+				if ( ! in_array( $expiry_days, $offered, true ) ) {
+					$expiry_days = $offered ? $offered[0] : 0;
+				}
+			}
+
+			// The configured default is merchant-set and can itself sit outside
+			// the offered list, so bound it the same way before it reaches the DB.
+			if ( $expiry_days > 0 && ! in_array( $expiry_days, $offered, true ) ) {
+				$expiry_days = $offered ? $offered[0] : 0;
+			}
+
+			if ( $expiry_days > 0 ) {
+				/*
+				 * Built in site-local time, like every other datetime column on
+				 * this table (see Models\Lead::save()). A gmdate() value here
+				 * was compared against locally-written columns everywhere it
+				 * was read, so it was wrong by the site's UTC offset.
+				 */
+				$expires_at = current_datetime()
+					->modify( '+' . $expiry_days . ' days' )
+					->format( 'Y-m-d H:i:s' );
+			}
 		}
 
 		// Guarded because this route is reachable by anyone holding a nonce and

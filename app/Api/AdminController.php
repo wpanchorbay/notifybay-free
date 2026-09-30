@@ -246,6 +246,25 @@ class AdminController extends ApiController {
 		}
 		if ( isset( $params['status'] ) ) {
 			$lead->status = sanitize_text_field( $params['status'] );
+
+			/*
+			 * Same rule as the bulk action in bulk_actions(): restoring a lead
+			 * to `active` MUST also clear expires_at. Without it the lead keeps
+			 * the stale, already-past date that expired it, and
+			 * Engine\CronTasks::cleanup_expired_leads() flips it back to
+			 * `expired` on the next daily run -- the edit reports success and
+			 * silently undoes itself within a day.
+			 *
+			 * Only the bulk path was fixed at first, which left the per-row
+			 * edit on the Leads screen still doing it. Cleared rather than
+			 * recomputed, for the reason given at length there: the merchant is
+			 * making a deliberate exception for this lead, and imposing a fresh
+			 * countdown they did not ask for would re-create the same surprise
+			 * on a longer timer.
+			 */
+			if ( 'active' === $lead->status ) {
+				$lead->expires_at = null;
+			}
 		}
 
 		// There was a `target_price` branch here. `target_price` is not a column
@@ -303,6 +322,29 @@ class AdminController extends ApiController {
 			return new \WP_Error( 'invalid_ids', __( 'No IDs provided.', 'notifybay-waitlist-and-stock-alert-woo' ), array( 'status' => 400 ) );
 		}
 
+		/*
+		 * Refuse an action this method does not implement, rather than falling
+		 * past both branches below to the success response at the end. That
+		 * fall-through answered "success: true" having touched nothing, so a
+		 * misspelled action -- or a caller sending `action` instead of
+		 * `bulk_action`, which is easy to do -- reported that a hundred leads
+		 * had been updated when none had. A silent no-op reported as success is
+		 * worse than an error, because nobody goes looking.
+		 */
+		$allowed = array( 'delete', 'active', 'expired', 'unsubscribed' );
+
+		if ( ! in_array( $action, $allowed, true ) ) {
+			return new \WP_Error(
+				'invalid_bulk_action',
+				sprintf(
+					/* translators: %s: comma-separated list of the actions this endpoint accepts. */
+					__( 'Unknown bulk action. Expected one of: %s.', 'notifybay-waitlist-and-stock-alert-woo' ),
+					implode( ', ', $allowed )
+				),
+				array( 'status' => 400 )
+			);
+		}
+
 		global $wpdb;
 		$lead_model      = new Lead();
 		$table           = $lead_model->get_table();
@@ -316,9 +358,28 @@ class AdminController extends ApiController {
 				)
 			);
 		} elseif ( in_array( $action, array( 'active', 'expired', 'unsubscribed' ), true ) ) {
+			/*
+			 * Restoring a lead to `active` MUST also clear expires_at. This wrote
+			 * only status and updated_at, so a lead brought back from `expired`
+			 * kept the stale, already-past expires_at that had expired it in the
+			 * first place -- and Engine\CronTasks::cleanup_expired_leads() flipped
+			 * it straight back to `expired` on the next daily run. The admin
+			 * action reported success and then silently undid itself within a day,
+			 * which is worse than refusing outright.
+			 *
+			 * Clearing rather than recomputing: the merchant is making a
+			 * deliberate exception for these specific leads, so re-imposing a
+			 * fresh countdown they did not ask for would re-create the same
+			 * surprise on a longer timer. It also matches what
+			 * Database\Migrations\FixLeadExpiry does for the historical rows.
+			 */
+			$set_clause = 'active' === $action
+				? 'SET status = %s, expires_at = NULL, updated_at = %s'
+				: 'SET status = %s, updated_at = %s';
+
 			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached bulk write is intentional for this admin action.
 				$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- The IN() list is a runtime-sized %d placeholder set; the arg count always matches.
-					"UPDATE %i SET status = %s, updated_at = %s WHERE id IN ({$ids_placeholder})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $ids_placeholder is a literal list of %d placeholders; the table and every value are bound.
+					"UPDATE %i {$set_clause} WHERE id IN ({$ids_placeholder})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $set_clause is one of two literal strings chosen above and $ids_placeholder is a literal list of %d placeholders; the table and every value are bound.
 					array_merge( array( $table, $action, current_time( 'mysql' ) ), $ids )
 				)
 			);

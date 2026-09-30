@@ -234,7 +234,7 @@ const Settings: React.FC = () => {
     // than inside Advanced because a store owner has no other way to find out
     // the endpoint exists.
     ...(mcp
-      ? [{ id: "mcp", label: __("MCP Connection", "notifybay-waitlist-and-stock-alert-woo") }]
+      ? [{ id: "mcp", label: __("MCP Connection (Beta)", "notifybay-waitlist-and-stock-alert-woo") }]
       : []),
     { id: "advanced", label: __("Advanced", "notifybay-waitlist-and-stock-alert-woo") },
   ];

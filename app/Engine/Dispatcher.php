@@ -80,6 +80,44 @@ class Dispatcher {
 			return; // Product is not in stock anymore, abort
 		}
 
+		/*
+		 * Refuse up front when the back-in-stock email is switched off, rather
+		 * than claiming leads and queueing sends that cannot deliver.
+		 *
+		 * Worker::send() already declines to send in that case, and deliberately
+		 * leaves the lead `processing` so the subscription is not consumed. But
+		 * nothing then breaks the loop: the reaper returns the lead to `active`,
+		 * the next restock re-claims it, the worker suppresses it again, and each
+		 * turn writes another warning to the log. On a store that keeps the
+		 * WooCommerce toggle off on purpose -- a third-party mailer is the usual
+		 * reason -- that runs for every lead, forever.
+		 *
+		 * Claiming nothing means there is nothing to recover, so the cycle cannot
+		 * start. One log line per dispatch replaces one per lead per pass.
+		 *
+		 * Only when the email object exists: get_email() returns null before
+		 * WooCommerce's mailer is up, and the Worker's legacy TemplateRenderer
+		 * path has no toggle at all, so null is not evidence of anything being
+		 * disabled. Same test, same reasoning as
+		 * Mcp\Tools\Leads::resend_notifications().
+		 */
+		$restock_email = \NotifyBay\Emails\EmailManager::get_email( 'notifybay_restock' );
+
+		if ( $restock_email && ! $restock_email->is_enabled() ) {
+			if ( function_exists( 'notifybay_log' ) ) {
+				notifybay_log(
+					sprintf(
+						/* translators: %d: product id. */
+						'Dispatch skipped for product %d: the back-in-stock email is switched off in WooCommerce, so no notification could be delivered. Nobody was removed from the waitlist.',
+						(int) $product_id
+					),
+					'warning'
+				);
+			}
+
+			return;
+		}
+
 		$stock_quantity = $product->get_stock_quantity();
 
 		// Minimum stock threshold check

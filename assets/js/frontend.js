@@ -414,12 +414,39 @@
             else {
                 let expiryField = ''; // Expiry dropdown if enabled
                 if (settings.expiry_enabled) {
+                    // Options and the preselected value both come from settings,
+                    // matching templates/frontend/waitlist-form.php. Preselecting
+                    // matters beyond cosmetics: a returning guest can submit
+                    // straight from the trigger button while this form is still
+                    // hidden, so whatever the browser selected is what gets sent.
+                    // With nothing marked selected that is the empty option, i.e.
+                    // a silent "No expiry".
+                    // Positive integers only, matching the server's
+                    // FrontendController::get_expiry_options(). !isNaN() passed
+                    // "0" and negatives, which the server reads as no expiry --
+                    // so the shopper was offered choices that silently did
+                    // nothing. parseInt also normalises "07" to "7"; without
+                    // that the posted value fails the server's strict in_array.
+                    const options = String(settings.expiry_options || '')
+                        .split(',')
+                        .map((d) => parseInt(d, 10))
+                        .filter((d) => d > 0)
+                        .map(String);
+                    const preferred = String(parseInt(settings.expiry_default, 10) || '');
+                    // Fall back to the first offered option when the configured
+                    // default is not among them, rather than letting the browser
+                    // land on "No expiry".
+                    const selected = options.indexOf(preferred) !== -1 ? preferred : (options[0] || '');
+
                     expiryField = `
                         <select name="notifybay_expiry">
                             <option value="">No expiry</option>
-                            <option value="7">7 days</option>
-                            <option value="14">14 days</option>
-                            <option value="30">30 days</option>
+                            ${options
+                                .map(
+                                    (d) =>
+                                        `<option value="${d}"${d === selected ? ' selected' : ''}>${d} days</option>`
+                                )
+                                .join('')}
                         </select>
                     `;
                 }
@@ -546,7 +573,6 @@
             if (!$root.length) return; // Exit if invalid root
 
             let variationId = 0; // Variation ID (0 if simple)
-            let expiry = 0; // Expiry days
 
             // Get remembered guest email from cookie
             const rememberedEmail = this.getCookie('notifybay_guest_email');
@@ -561,8 +587,14 @@
 
             // Extract variation ID from form or WooCommerce global hidden input
             variationId = $element.find('input[name="variation_id"]').val() || $root.closest('.product').find('.variation_id').val() || 0;
-            // Extract expiry selection
-            expiry = $element.find('select[name="notifybay_expiry"]').val() || 0;
+            // Extract expiry selection. The <select> is only rendered for
+            // guests, and only when the merchant enabled expiry, so its absence
+            // is meaningful: the server treats a missing notifybay_expiry as
+            // "no choice was offered" and applies the configured default, while
+            // an empty string is the customer explicitly picking "No expiry".
+            // Sending a fixed 0 for both cases (as this did) made the two
+            // indistinguishable and the configured default unreachable.
+            const $expiry = $element.find('select[name="notifybay_expiry"]');
 
             // Validate that an email is present
             if (!email) {
@@ -587,16 +619,22 @@
                         xhr.setRequestHeader('X-WP-Nonce', notifybay_vars.nonce);
                     }
                 },
-                data: {
-                    email: email,
-                    product_id: productId,
-                    variation_id: variationId,
-                    type: type,
-                    expiry: expiry,
-                    // Reuse this browser's existing ownership token (if any) so all
-                    // of its leads share one token and hydrate together later.
-                    token: self.getCookie('notifybay_guest_token') || ''
-                },
+                data: $.extend(
+                    {
+                        email: email,
+                        product_id: productId,
+                        variation_id: variationId,
+                        type: type,
+                        // Reuse this browser's existing ownership token (if any) so all
+                        // of its leads share one token and hydrate together later.
+                        token: self.getCookie('notifybay_guest_token') || ''
+                    },
+                    // The key name must match what the REST route reads. It was
+                    // sent as `expiry` while the server read `notifybay_expiry`,
+                    // so the customer's choice never arrived and every lead
+                    // silently took the fallback.
+                    $expiry.length ? { notifybay_expiry: $expiry.val() } : {}
+                ),
                 success: function (response) {
                     // Show success notice
                     self.showNotice(response.message, 'success');

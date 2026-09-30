@@ -23,13 +23,14 @@ return array(
 	/**
 	 * Toggle the main top-level menu.
 	 *
-	 * Set to true to show a dedicated "NotifyBay" menu in the sidebar. This is
-	 * only the fallback used before the live `general_showMainMenu` setting
-	 * has ever been saved (e.g. immediately after activation) -- it must
-	 * match that setting's own default (see config/settings.php) or the menu
-	 * silently fails to appear on a fresh install. The user-facing toggle is
-	 * on the General settings tab; this flag is not meant to be hand-edited
-	 * on a live site.
+	 * Retained for reference only -- nothing reads it any more.
+	 *
+	 * Whether the top-level menu renders is decided solely by the live
+	 * `general_showMainMenu` setting (declared in config/settings.php, exposed on
+	 * the General settings tab). Settings::load_settings() always merges that
+	 * default in, so the setting is never absent and a config-level fallback can
+	 * never be reached. An earlier comment here claimed this value had to be kept
+	 * in sync or the menu would vanish on a fresh install; that was never true.
 	 */
 	'show_main_menu'      => true,
 

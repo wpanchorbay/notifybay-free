@@ -368,6 +368,22 @@ class ProductPage {
 					'waitlist_btn'   => $settings->get_settings( 'appearance_waitlistButtonText', 'Notify Me' ),
 					'waitlist_class' => $settings->get_settings( 'appearance_waitlistButtonClass', '' ),
 					'expiry_enabled' => $settings->get_settings( 'appearance_waitlistExpiryEnabled', false ),
+
+					/*
+					 * The JS-rendered guest form used to hardcode 7/14/30 and
+					 * preselect nothing, so it disagreed with the server-rendered
+					 * template (templates/frontend/waitlist-form.php) on both the
+					 * choices offered and the one selected by default.
+					 *
+					 * Sent as the normalised list, not the raw setting.
+					 * assets/js/frontend.js splits this and drops anything <= 0,
+					 * but it has no fallback of its own -- so a cleared setting
+					 * rendered a form offering no expiry window while the server
+					 * still accepted and assigned one. See
+					 * Core\Settings::get_expiry_options().
+					 */
+					'expiry_options' => implode( ',', $settings->get_expiry_options() ),
+					'expiry_default' => $settings->get_settings( 'appearance_waitlistExpiryDefault', '90' ),
 				),
 			)
 		);

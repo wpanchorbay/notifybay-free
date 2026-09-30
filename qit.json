@@ -1,0 +1,32 @@
+{
+    "sut": {
+        "slug": "notifybay-waitlist-and-stock-alert-woo",
+        "type": "plugin",
+        "source": {
+            "type": "local",
+            "path": "."
+        }
+    },
+    "environments": {
+        "default": {
+            "plugins": [
+                "woocommerce",
+                {
+                    "slug": "notifybaypro",
+                    "from": "local",
+                    "path": "../notifybaypro"
+                }
+            ]
+        }
+    },
+    "test_types": {
+        "e2e": {
+            "default": {
+                "environment": "default",
+                "test_packages": [
+                    "../notifybaypro/tests/e2e"
+                ]
+            }
+        }
+    }
+}

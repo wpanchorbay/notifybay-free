@@ -57,21 +57,6 @@ class Leads {
 	 * @since 1.0.3
 	 * @var string[]
 	 */
-	/**
-	 * Statuses a restock notification may be re-sent for.
-	 *
-	 * `failed` is the retry case: the engine gave up after three attempts.
-	 * `notified` is the resend case: it went out, and somebody wants it sent
-	 * again. Nothing else qualifies -- an `active` lead has not been dispatched
-	 * to yet and belongs to the stock engine, and re-mailing an `unsubscribed`
-	 * or `converted` customer is the kind of thing an assistant should not be
-	 * able to do by passing an id.
-	 *
-	 * @since 1.0.4
-	 * @var string[]
-	 */
-	private const RESENDABLE = array( 'failed', 'notified' );
-
 	private const STATUSES = array(
 		'active',
 		'pending_verification',
@@ -167,7 +152,27 @@ class Leads {
 		global $wpdb;
 
 		$as_table = $wpdb->prefix . 'actionscheduler_actions';
-		$jobs     = array();
+
+		/*
+		 * Seeded out here, not inside the SHOW TABLES guard below. Action
+		 * Scheduler can store its actions in the legacy post table instead of
+		 * this one, in which case the guard fails and the tool used to return
+		 * `jobs: {}` -- destroying the very distinction the manifest promises
+		 * these keys for, that a zero is tellable from a measurement that was
+		 * never taken, on the one path where it is not zero.
+		 *
+		 * The running state is spelled `in-progress`
+		 * (ActionScheduler_Store::STATUS_RUNNING). Seeding `running` instead
+		 * matched no row, so a queue jammed with in-progress actions reported
+		 * running 0 next to an unexpected sixth key merged in from the counts.
+		 */
+		$jobs = array(
+			'pending'     => 0,
+			'in-progress' => 0,
+			'complete'    => 0,
+			'failed'      => 0,
+			'canceled'    => 0,
+		);
 
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $as_table ) ) ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Action Scheduler tables; a direct, uncached read is intentional for this real-time status report.
 			$groups_table = $wpdb->prefix . 'actionscheduler_groups';
@@ -181,22 +186,6 @@ class Leads {
 					$as_table,
 					$groups_table
 				)
-			);
-
-			/*
-			 * Seeded with every Action Scheduler status before the counts are
-			 * merged in. GROUP BY returns no row for a status with no actions,
-			 * so without this the key is simply absent -- and a caller cannot
-			 * tell "none are running" from "running was never measured". That
-			 * distinction matters most when diagnosing a stalled queue, which
-			 * is the one job this tool exists to do.
-			 */
-			$jobs = array(
-				'pending'  => 0,
-				'running'  => 0,
-				'complete' => 0,
-				'failed'   => 0,
-				'canceled' => 0,
 			);
 
 			foreach ( $results as $res ) {
@@ -222,9 +211,7 @@ class Leads {
 		 * while the plugin does nothing. Reported here because it is the first
 		 * thing worth checking when leads are waiting and no mail arrives.
 		 */
-		$restock_email = class_exists( '\NotifyBay\Emails\EmailManager' )
-			? \NotifyBay\Emails\EmailManager::get_email( 'notifybay_restock' )
-			: null;
+		$restock_email = \NotifyBay\Emails\EmailManager::get_email( 'notifybay_restock' );
 
 		return array(
 			'jobs'                  => $jobs,
@@ -305,6 +292,26 @@ class Leads {
 
 			$lead->status = $status;
 			$changed[]    = 'status';
+
+			/*
+			 * Restoring a lead to `active` MUST also clear expires_at -- the
+			 * same rule as Api\AdminController::update_lead() and its
+			 * bulk_actions(). Without it the lead keeps the stale, already-past
+			 * date that expired it, and Engine\CronTasks::cleanup_expired_leads()
+			 * flips it back to `expired` on the next daily run.
+			 *
+			 * This is the third path that writes a lead status, and the third
+			 * to need saying: the bulk action was fixed first, then the per-row
+			 * edit, and this one was missed both times. It is the worst place to
+			 * miss it, because the tool's own description promises that setting
+			 * a lead back to active puts it in front of the restock engine
+			 * again -- and the assistant reports success, then the lead quietly
+			 * expires again within a day with nobody watching the screen.
+			 */
+			if ( 'active' === $lead->status ) {
+				$lead->expires_at = null;
+				$changed[]        = 'expires_at';
+			}
 		}
 
 		if ( isset( $input['user_email'] ) ) {
@@ -410,7 +417,7 @@ class Leads {
 	 * the plugin (or NotifyBay Pro) is not loaded, and has nothing to do with
 	 * any individual customer.
 	 *
-	 * @since 1.0.4
+	 * @since 1.0.3
 	 * @param array $input Validated tool input.
 	 * @return array
 	 */
@@ -430,6 +437,11 @@ class Leads {
 			$row = self::shape( $lead );
 
 			$row['retry_count'] = (int) $lead->retry_count;
+
+			// Not every failure listed here can be acted on -- see
+			// resend_refusal_reason(). Without this field the only way to find
+			// out is to call resend-notifications and be refused.
+			$row['resend_refused_because'] = self::resend_refusal_reason( $lead );
 
 			// The field this list is ordered by. Sorting on a value the caller
 			// cannot see leaves them unable to confirm the order is what the
@@ -479,7 +491,7 @@ class Leads {
 	 * silently finds nothing for half the actions. The trailing comma anchors
 	 * the id so lead 12 does not match lead 123.
 	 *
-	 * @since 1.0.4
+	 * @since 1.0.3
 	 * @param int $lead_id Lead id.
 	 * @return string|null Null when no attempt was ever logged.
 	 */
@@ -519,7 +531,7 @@ class Leads {
 	/**
 	 * Failed background jobs in the notifybay_alerts group, grouped by hook.
 	 *
-	 * @since 1.0.4
+	 * @since 1.0.3
 	 * @return array
 	 */
 	private static function failed_jobs(): array {
@@ -570,7 +582,7 @@ class Leads {
 	/**
 	 * Waitlist size per product, with a per-status breakdown.
 	 *
-	 * @since 1.0.4
+	 * @since 1.0.3
 	 * @param array $input Validated tool input.
 	 * @return array
 	 */
@@ -653,9 +665,62 @@ class Leads {
 	}
 
 	/**
+	 * Why this lead cannot be re-sent a back-in-stock notification, if it cannot.
+	 *
+	 * Shared deliberately with notification_failures(), which lists `failed`
+	 * leads and so lists these too. Reporting a lead as a failure to fix and
+	 * then refusing to act on it is the same defect as reporting a send as
+	 * queued when the email is switched off: the caller is told something is
+	 * actionable when it is not. One function decides it for both, so the list
+	 * and the tool cannot drift apart.
+	 *
+	 * Reads only columns Lead::find() and Model::paginate() already select
+	 * (both are `SELECT *`), so calling it per row adds no queries.
+	 *
+	 * Status is not checked here. resend_notifications() tests that first and
+	 * reports it separately as wrong_status, and every lead
+	 * notification_failures() lists is `failed` by definition.
+	 *
+	 * @since 1.0.3
+	 * @param Lead $lead The lead.
+	 * @return string|null Machine-readable reason, or null when it can be sent.
+	 */
+	private static function resend_refusal_reason( Lead $lead ) {
+		/*
+		 * This tool only ever enqueues `waitlist_restock`. A wishlist lead
+		 * belongs to NotifyBay Pro's price-drop flow, so queuing it here mails
+		 * a "back in stock" notice for an item that was never out of stock.
+		 * Free validates every subscribe against `notifybay_allowed_lead_types`,
+		 * which defaults to `waitlist`, so on a Free-only store this refuses
+		 * nothing.
+		 */
+		if ( 'waitlist' !== (string) $lead->type ) {
+			return 'not_a_waitlist_lead';
+		}
+
+		/*
+		 * Only the notification dispatchers stamp `last_batch_id`, never the
+		 * verification send, and Engine\Worker::handle_failure() sets `failed`
+		 * without touching it. So `failed` with an empty batch id means the
+		 * *verification* email is what failed -- that customer never confirmed
+		 * the subscription at all. Mailing them a restock notice is the first
+		 * harm. The second is that claiming the lead would stamp a token over
+		 * the empty value, and Pro's Api\LeadsController::resend() reads
+		 * exactly that emptiness to decide whether to re-send the
+		 * verification; nothing clears the column afterwards, so the lead
+		 * could never again be recovered from Pro's admin UI.
+		 */
+		if ( 'failed' === (string) $lead->status && empty( $lead->last_batch_id ) ) {
+			return 'verification_never_confirmed';
+		}
+
+		return null;
+	}
+
+	/**
 	 * Re-send the back-in-stock notification for specific leads.
 	 *
-	 * @since 1.0.4
+	 * @since 1.0.3
 	 * @param array $input Validated tool input.
 	 * @return array|WP_Error
 	 */
@@ -680,11 +745,35 @@ class Leads {
 			);
 		}
 
-		$queued       = array();
-		$not_found    = array();
-		$wrong_status = array();
-		$out_of_stock = array();
-		$failed       = array();
+		/*
+		 * The WooCommerce "Enable this email" toggle is the final say at send
+		 * time: Engine\Worker returns without sending when it is off, leaving
+		 * the lead parked. Queueing anyway reported every id as `queued` --
+		 * true in the narrow sense that a job was scheduled, and useless to the
+		 * person reading it, since no mail could ever leave. Refuse instead,
+		 * and name the screen that fixes it.
+		 *
+		 * Only when the email object actually exists: get_email() returns null
+		 * before WooCommerce's mailer is up, and the Worker's legacy
+		 * TemplateRenderer path has no toggle to consult, so a null here is not
+		 * evidence of anything being disabled.
+		 */
+		$restock_email = \NotifyBay\Emails\EmailManager::get_email( 'notifybay_restock' );
+
+		if ( $restock_email && ! $restock_email->is_enabled() ) {
+			return new WP_Error(
+				'notifybay_email_disabled',
+				__( 'The back-in-stock email is switched off in WooCommerce, so nothing would be sent. Enable it under WooCommerce > Settings > Emails, then try again.', 'notifybay-waitlist-and-stock-alert-woo' ),
+				array( 'status' => 409 )
+			);
+		}
+
+		$queued         = array();
+		$not_found      = array();
+		$wrong_status   = array();
+		$not_resendable = array();
+		$out_of_stock   = array();
+		$failed         = array();
 
 		foreach ( $ids as $id ) {
 			$lead = Lead::find( $id );
@@ -694,10 +783,37 @@ class Leads {
 				continue;
 			}
 
-			if ( ! in_array( (string) $lead->status, self::RESENDABLE, true ) ) {
+			/*
+			 * Eligibility is the key set of Lead::RESEND_CLAIM_TOKENS, and that
+			 * is not a coincidence to be tidied away later: parking a lead in
+			 * `processing` is only safe if the stale-lead reaper can be told
+			 * where to put it back, so a status with no claim token is a status
+			 * this tool must not claim. In practice that is `failed` (the
+			 * engine gave up after four attempts) and `notified` (it went out
+			 * and somebody wants it sent again). An `active` lead has not been
+			 * dispatched to yet and belongs to the stock engine, and re-mailing
+			 * an `unsubscribed` or `converted` customer is the kind of thing an
+			 * assistant should not be able to do by passing an id.
+			 *
+			 * Status alone is not sufficient, though -- see the guard directly
+			 * below.
+			 */
+			$prior_status = (string) $lead->status;
+
+			if ( ! isset( Lead::RESEND_CLAIM_TOKENS[ $prior_status ] ) ) {
 				$wrong_status[] = array(
 					'id'     => $id,
-					'status' => (string) $lead->status,
+					'status' => $prior_status,
+				);
+				continue;
+			}
+
+			$reason = self::resend_refusal_reason( $lead );
+
+			if ( null !== $reason ) {
+				$not_resendable[] = array(
+					'id'     => $id,
+					'reason' => $reason,
 				);
 				continue;
 			}
@@ -724,17 +840,37 @@ class Leads {
 
 			/*
 			 * retry_count is reset because handle_failure() increments and
-			 * gives up at three. A failed lead is already at the ceiling, so
+			 * gives up after the fourth failure. A failed lead is already at
+			 * the ceiling, so
 			 * without this a resend gets one attempt and no backoff before
 			 * failing again -- which looks like the resend itself not working.
 			 *
 			 * The status must become `processing`: Worker::handle() returns
 			 * early for any non-verification email whose lead is not in that
 			 * state, so queuing without it silently sends nothing.
+			 *
+			 * `processing` is a claim, though, and Action Scheduler is not
+			 * guaranteed to honour it -- on a WP-Cron-only store the queue
+			 * routinely takes longer than the fifteen minutes after which
+			 * CronTasks::recover_stale_processing_leads() reclaims the lead.
+			 * The claim token records where the lead came from so that reaper
+			 * can put it back there instead of onto the live waitlist, which is
+			 * what used to happen and what earned an already-notified customer
+			 * a second copy at the next restock.
+			 *
+			 * This is not pure upside, and Engine\Worker's comment about the
+			 * reaper returning a lead to `active` so the subscription survives
+			 * does not hold for leads claimed here. A reclaimed `resend:failed`
+			 * now stays `failed` instead of rejoining the live waitlist, so a
+			 * customer who is genuinely owed an email no longer gets one by
+			 * accident at the next restock. That path was the double-send bug
+			 * wearing a friendly face; the lead stays visible to
+			 * notification_failures() and to Pro's resend screen, and a human
+			 * decides.
 			 */
-			$lead->retry_count = 0;
-			$lead->status      = 'processing';
-			$lead->updated_at  = current_time( 'mysql' );
+			$lead->retry_count   = 0;
+			$lead->status        = 'processing';
+			$lead->last_batch_id = Lead::RESEND_CLAIM_TOKENS[ $prior_status ];
 
 			if ( ! $lead->save() ) {
 				/*
@@ -756,12 +892,13 @@ class Leads {
 		}
 
 		return array(
-			'queued'       => $queued,
-			'not_found'    => $not_found,
-			'wrong_status' => $wrong_status,
-			'out_of_stock' => $out_of_stock,
-			'failed'       => $failed,
-			'affected'     => $queued,
+			'queued'         => $queued,
+			'not_found'      => $not_found,
+			'wrong_status'   => $wrong_status,
+			'not_resendable' => $not_resendable,
+			'out_of_stock'   => $out_of_stock,
+			'failed'         => $failed,
+			'affected'       => $queued,
 		);
 	}
 

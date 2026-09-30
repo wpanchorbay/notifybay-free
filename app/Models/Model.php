@@ -107,6 +107,33 @@ abstract class Model {
 	}
 
 	/**
+	 * Magic isset for attributes.
+	 *
+	 * Required, not optional. isset() and empty() on an inaccessible property
+	 * call __isset(), NOT __get() -- so without this every isset( $model->col )
+	 * was false and every empty( $model->col ) was true, no matter what __get()
+	 * would have returned. Models\Lead::is_expired() was guarded by exactly such
+	 * an empty() and therefore returned false for every lead that was not
+	 * already flagged expired.
+	 *
+	 * @param string $key Attribute name.
+	 * @return bool
+	 */
+	public function __isset( $key ) {
+		return isset( $this->attributes[ $key ] );
+	}
+
+	/**
+	 * Magic unset for attributes, so unset( $model->col ) is not silently a no-op.
+	 *
+	 * @param string $key Attribute name.
+	 * @return void
+	 */
+	public function __unset( $key ) {
+		unset( $this->attributes[ $key ] );
+	}
+
+	/**
 	 * Get all attributes.
 	 *
 	 * @return array

@@ -26,6 +26,8 @@ return array(
 	\NotifyBay\Engine\Dispatcher::class,
 	\NotifyBay\Engine\Worker::class,
 	\NotifyBay\Emails\EmailManager::class,
+	\NotifyBay\Mcp\DesktopBundle::class,
+	\NotifyBay\Mcp\GrantAccess::class,
 	\NotifyBay\Engine\CronTasks::class,
 	\NotifyBay\Engine\ActionSchedulerFallback::class,
 	\NotifyBay\Core\WooCommerceHooks::class,

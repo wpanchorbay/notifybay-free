@@ -222,9 +222,24 @@ class Worker {
 			 * the waitlist back because 'notified' is terminal.
 			 *
 			 * The lead is now left exactly as it is -- still 'processing' -- so
-			 * recover_stale_processing_leads() returns it to 'active' and it is
-			 * picked up again once the merchant re-enables the email. Looping
-			 * through the reaper is the reaper doing its job, not a fault.
+			 * recover_stale_processing_leads() returns it to 'active' and the
+			 * subscription survives instead of being silently consumed.
+			 *
+			 * Be precise about what that does and does not buy, because an
+			 * earlier version of this comment overstated it. Nothing re-sends on
+			 * its own when the merchant re-enables the email: CronTasks only
+			 * schedules the recovery, verification and expiry jobs, never a
+			 * recurring dispatcher. The lead waits in 'active' for the next
+			 * stock-change event on its product.
+			 *
+			 * Two consequences worth knowing:
+			 * - While the email stays disabled the lead cycles
+			 *   processing -> active on every reaper pass, logging the warning
+			 *   below each time.
+			 * - 'active' is also what Engine\Dispatcher selects on, so a later
+			 *   restock can re-enqueue this lead and, if the email is enabled by
+			 *   then, send it a back-in-stock notice for a restock it may already
+			 *   have been queued for once.
 			 */
 			if ( ! $wc_email->is_enabled() ) {
 				if ( function_exists( 'notifybay_log' ) ) {
@@ -308,7 +323,21 @@ class Worker {
 		$lead->retry_count = (int) $lead->retry_count + 1;
 		$lead->updated_at  = current_time( 'mysql' );
 
-		if ( $lead->retry_count >= 3 ) {
+		/*
+		 * `>` rather than `>=`: the third backoff below was unreachable. Giving
+		 * up the moment the counter hit 3 returned before the delay was ever
+		 * looked up, so the 2-hour entry had never once been used and the store
+		 * got two retries where the code promised three.
+		 *
+		 * Making it real depends on Engine\CronTasks::
+		 * recover_stale_processing_leads() no longer reclaiming a lead that has
+		 * a send still queued. Before that, a retry two hours out was certain
+		 * to be reclaimed first, the job would find a status other than
+		 * `processing`, and it would return without sending or logging
+		 * anything -- so lengthening the backoff would have made delivery
+		 * worse, not better.
+		 */
+		if ( $lead->retry_count > 3 ) {
 			$lead->status = 'failed';
 			$lead->save();
 			return;
@@ -317,7 +346,7 @@ class Worker {
 		$lead->status = 'processing';
 		$lead->save();
 
-		// Exponential backoff: 5 min, 30 min, 2 hours (120 min)
+		// Exponential backoff after each failure: 5 min, 30 min, 2 hours.
 		$delays = array(
 			1 => 300,
 			2 => 1800,

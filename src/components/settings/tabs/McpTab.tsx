@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { __ } from "@wordpress/i18n";
 import apiFetch from "../../../utils/apiFetch";
 import { ClassicSettingsTable } from "../../classics";
@@ -8,6 +8,7 @@ import { CopyToClipboard } from "../../common/CopyToClipboard";
 import { useToast } from "../../../store/toast/use-toast";
 import { McpLocalize, McpStatus } from "../../../utils/types";
 import { buildMcpSnippets } from "./mcpSnippets";
+import { postTo } from "./postTo";
 import { McpAppPasswords } from "./McpAppPasswords";
 import { McpClientConfig } from "./McpClientConfig";
 import { McpConnectionModal } from "./McpConnectionModal";
@@ -77,6 +78,23 @@ const LEVEL_DESCRIPTIONS: Record<string, string> = {
  * @param root0
  * @param root0.mcp
  */
+/**
+ * The one-time Application Password, held for the lifetime of the PAGE rather
+ * than of the component.
+ *
+ * The docblock on the state below promises it "lives until the page is
+ * reloaded", and component state could not keep that promise: Settings.tsx
+ * renders this tab as {activeTab === "mcp" && <McpTab/>}, so switching to any
+ * other tab unmounts McpTab and discarded the secret. WordPress reveals an
+ * application password exactly once, so a user who clicked away to check a
+ * setting and came back found placeholders, with no recourse but to revoke the
+ * credential and generate another.
+ *
+ * A module binding lives exactly as long as the page does, which is the
+ * lifetime that was described all along. It is never persisted anywhere.
+ */
+let pageLiveSecret: string | null = null;
+
 export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
   const [status, setStatus] = useState<McpStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -93,7 +111,19 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
    * fast can still read the snippets off the tab -- and it is why nothing here
    * claims the secret is destroyed at the moment the dialog closes.
    */
-  const [liveSecret, setLiveSecret] = useState<string | null>(null);
+  const [liveSecret, setLiveSecretState] = useState<string | null>(
+    pageLiveSecret,
+  );
+
+  /*
+   * Mirrors into the module binding above so the value survives this
+   * component being unmounted. Everything else about it is unchanged --
+   * callers still just call setLiveSecret(secret).
+   */
+  const setLiveSecret = useCallback((secret: string | null) => {
+    pageLiveSecret = secret;
+    setLiveSecretState(secret);
+  }, []);
   const [showConnection, setShowConnection] = useState(false);
   const { addToast } = useToast();
 
@@ -229,22 +259,35 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
     );
   }
 
-  const snippets = buildMcpSnippets({
-    endpoint: status.endpoint,
-    username: mcp.current_user_login,
-    offerTlsBypass: mcp.offer_tls_bypass,
-    password: liveSecret,
-  });
+  /*
+   * Null, not a placeholder set. buildMcpSnippets() now requires a real
+   * credential, because every snippet it used to produce without one was
+   * unusable -- and unusable is worse than absent, since it reads as the
+   * answer. McpClientConfig renders no snippet at all for null.
+   */
+  const snippets = liveSecret
+    ? buildMcpSnippets({
+        endpoint: status.endpoint,
+        username: mcp.current_user_login,
+        offerTlsBypass: mcp.offer_tls_bypass,
+        password: liveSecret,
+      })
+    : null;
 
   /*
    * A snippet is only as good as the endpoint behind it. While MCP is off the
-   * client will be refused, and nothing else on this screen says so at the
-   * point where someone is copying a command they are about to run.
+   * client cannot reach it at all, and nothing else on this screen says so at
+   * the point where someone is copying a command they are about to run.
+   *
+   * "Not found", not "refused": Bootstrap returns before register_rest_route()
+   * when the endpoint is disabled, so no route exists. A client reports a 404,
+   * and someone told to expect a permissions error goes hunting through user
+   * roles for a problem that is a switch on this page.
    */
   const offNotice = !isEnabled ? (
     <p className="notifybay-m-0 notifybay-max-w-3xl notifybay-rounded-md notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50 notifybay-p-2 notifybay-text-sm">
       {__(
-        "MCP is currently switched off, so a client using this will be refused until you turn on Enable MCP above.",
+        "MCP is currently switched off. Until you turn on Enable MCP above, a client will report the address as not found rather than as a permissions problem.",
         "notifybay-waitlist-and-stock-alert-woo",
       )}
     </p>
@@ -252,6 +295,53 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
 
   return (
     <div className="notifybay-flex notifybay-flex-col notifybay-gap-6">
+      <p className="notifybay-m-0 notifybay-max-w-3xl notifybay-rounded-md notifybay-border notifybay-border-sky-300 notifybay-bg-sky-50 notifybay-p-2 notifybay-text-sm">
+        <strong>{__("Beta:", "notifybay-waitlist-and-stock-alert-woo")}</strong>{" "}
+        {__(
+          "the MCP connection is a beta feature. It may change in future releases, and assistant tools can make mistakes — review what an assistant changes, and give it the lowest access level that does the job.",
+          "notifybay-waitlist-and-stock-alert-woo",
+        )}
+      </p>
+      {/*
+        The endpoint requires `wpab_mcp_access`, but this screen is gated on
+        `manage_options` -- two different capabilities. A site updated in place
+        rather than activated never received the first one, so everything below
+        reports a healthy, enabled endpoint while every actual MCP request is
+        refused with a 403. Without this notice there is nothing anywhere that
+        says why.
+      */}
+      {status.has_access_capability === false && (
+        <div className="notifybay-rounded-lg notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50 notifybay-p-4 notifybay-text-sm notifybay-text-amber-900">
+          <strong className="notifybay-block notifybay-mb-1">
+            {__(
+              "Your account cannot use this endpoint yet.",
+              "notifybay-waitlist-and-stock-alert-woo",
+            )}
+          </strong>
+          {__(
+            "The settings below are correct, but your user is missing the permission the MCP endpoint checks, so every request from an AI assistant will be refused.",
+            "notifybay-waitlist-and-stock-alert-woo",
+          )}
+          {/*
+            This used to print `wp cap add administrator wpab_mcp_access` and
+            leave it there. For a store owner without shell access that is not a
+            fix, it is a referral to somebody else -- so the button does it.
+          */}
+          <p className="notifybay-mt-3 notifybay-mb-0">
+            <button
+              type="button"
+              className="button button-secondary"
+              onClick={() => postTo(mcp.grant_cap_url)}
+            >
+              {__(
+                "Grant access to administrators",
+                "notifybay-waitlist-and-stock-alert-woo",
+              )}
+            </button>
+          </p>
+        </div>
+      )}
+
       <ClassicSettingsTable
         title={__(
           "AI assistant access (MCP)",
@@ -460,7 +550,7 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
                     {liveSecret && (
                       <p className="notifybay-m-0 notifybay-max-w-2xl notifybay-rounded-md notifybay-border notifybay-border-amber-300 notifybay-bg-amber-50 notifybay-p-2 notifybay-text-sm">
                         {__(
-                          "The password you just created is still filled into the connection snippets below. Reloading this page clears it for good — WordPress keeps only a hash and cannot show it again.",
+                          "The password you just created is still filled into the download and the connection details below. Reloading this page clears it for good — WordPress keeps only a hash and cannot show it again.",
                           "notifybay-waitlist-and-stock-alert-woo",
                         )}
                         {" "}
@@ -523,13 +613,15 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
               "notifybay-waitlist-and-stock-alert-woo",
             ),
             tooltip: __(
-              "Pick your client and copy the snippet. It contains a real password only while a freshly generated one is still on screen.",
+              "Download the file for Claude Desktop and double-click it. Setup for other clients appears here while a freshly generated password is still on screen.",
               "notifybay-waitlist-and-stock-alert-woo",
             ),
             render: () => (
               <McpClientConfig
                 snippets={snippets}
                 username={mcp.current_user_login}
+                bundleUrl={mcp.desktop_bundle_url}
+                password={liveSecret}
                 notice={offNotice}
               />
             ),
@@ -541,6 +633,7 @@ export const McpTab: React.FC<McpTabProps> = ({ mcp }) => {
         isOpen={showConnection && null !== liveSecret}
         password={liveSecret || ""}
         snippets={snippets}
+        bundleUrl={mcp.desktop_bundle_url}
         username={mcp.current_user_login}
         mcpEnabled={isEnabled}
         onClose={() => setShowConnection(false)}

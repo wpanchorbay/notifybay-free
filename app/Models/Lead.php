@@ -42,6 +42,83 @@ class Lead extends Model {
 	protected $sortable_columns = array( 'created_at', 'updated_at', 'notified_at' );
 
 	/**
+	 * Claim tokens written to `last_batch_id` by Mcp\Tools\Leads::
+	 * resend_notifications(), keyed by the status the lead was taken from.
+	 *
+	 * The key set is also that tool's eligibility test, and that is not a
+	 * coincidence to be tidied away: parking a lead in `processing` is only
+	 * safe if Engine\CronTasks::recover_stale_processing_leads() can be told
+	 * where to put it back, so a status with no claim token is a status the
+	 * tool must not claim.
+	 *
+	 * INVARIANT: every value here must appear as a key of
+	 * CLAIM_RESTORE_TOKENS. A token the reaper cannot resolve falls through to
+	 * `active`, which for a `notified` or `failed` lead is the demotion this
+	 * whole mechanism exists to prevent.
+	 *
+	 * @since 1.0.3
+	 * @var array<string,string>
+	 */
+	public const RESEND_CLAIM_TOKENS = array(
+		'notified' => 'resend:notified',
+		'failed'   => 'resend:failed',
+	);
+
+	/**
+	 * Every claim token this plugin family understands, mapped to the status
+	 * an abandoned claim carrying it must be restored to.
+	 *
+	 * Engine\Dispatcher needs no token: its UPDATE carries
+	 * `AND status = 'active'`, so `active` is provably where its claims came
+	 * from, and Engine\CronTasks::recover_stale_processing_leads() falls back
+	 * to that for any unrecognised value -- a real uuid4 batch id, NULL, or
+	 * something unexpected. A claimer needs an entry here only when it takes
+	 * leads from somewhere else:
+	 *
+	 *   - resend_notifications() claims `notified` and `failed` leads. Without
+	 *     a token, a resend whose job never drained handed a finished lead
+	 *     back to the live waitlist and the next restock mailed that customer
+	 *     a second copy.
+	 *   - NotifyBay Pro's Engine\ProDispatcher hurry-alert claims `notified`
+	 *     waitlist leads on a daily schedule, with no status guard, and Pro
+	 *     ships no reaper of its own. Same demotion, reached far more often
+	 *     than the resend path. Its wishlist branch claims from `active` and
+	 *     so is deliberately left on a plain uuid4 -- a token whose restore
+	 *     target is already the fallback would only make this map bigger than
+	 *     the problem.
+	 *
+	 * Two claimers restoring to the same status (`resend:notified` and
+	 * `hurry:notified` both to `notified`) is why this is keyed by token
+	 * rather than by status; RESEND_CLAIM_TOKENS keeps the status-keyed view
+	 * its own tool needs.
+	 *
+	 * A uuid4 batch id cannot collide with any of these: uuid4 contains no
+	 * colon. The tokens are also deliberately non-empty, because Pro's
+	 * Api\LeadsController::resend() reads an *empty* `last_batch_id` on a
+	 * `failed` lead as "this lead's last email was a verification, not a
+	 * notification", and resets it to `pending_verification` on that basis.
+	 * Stamping a token over an empty value would destroy that discriminator
+	 * permanently -- nothing clears this column except the next dispatch -- so
+	 * resend_notifications() refuses a `failed` lead that has no batch id
+	 * rather than claiming it. On the leads it does claim the batch id was
+	 * already non-empty and the claim really is a notification attempt, so the
+	 * token is the truthful value there; that is why the reaper restores the
+	 * status but leaves the token in place rather than clearing it.
+	 *
+	 * Old and new versions of the two plugins mix safely in both directions.
+	 * A token this map does not know falls through to `active`, which is
+	 * exactly how the reaper behaved before any of them existed.
+	 *
+	 * @since 1.0.3
+	 * @var array<string,string>
+	 */
+	public const CLAIM_RESTORE_TOKENS = array(
+		'resend:notified' => 'notified',
+		'resend:failed'   => 'failed',
+		'hurry:notified'  => 'notified',
+	);
+
+	/**
 	 * Perform an Insert OR Update if duplicate key exists.
 	 * This is essential for Smart Transition and preventing duplicate active leads.
 	 *
@@ -270,6 +347,38 @@ class Lead extends Model {
 	}
 
 	/**
+	 * Whether anyone is currently waiting to be notified about a product.
+	 *
+	 * Deliberately mirrors the selection predicate in Engine\Dispatcher so the
+	 * two can never disagree about who counts as waiting: an unexpired, active
+	 * waitlist lead. Callers use this to avoid queueing dispatch work for
+	 * products nobody has subscribed to — on a large catalogue, a bulk stock
+	 * write would otherwise schedule one job per product.
+	 *
+	 * Backed by idx_product_variation_status.
+	 *
+	 * @since 1.0.3
+	 * @param int $product_id   Product ID.
+	 * @param int $variation_id Variation ID (0 for simple products).
+	 * @return bool
+	 */
+	public static function has_active_waitlist( $product_id, $variation_id = 0 ) {
+		global $wpdb;
+		$instance = new static();
+		$table    = $instance->get_table();
+
+		return (bool) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom {$wpdb->prefix}notifybay_leads table; a direct, uncached read is intentional for this real-time data-access layer.
+			$wpdb->prepare(
+				"SELECT 1 FROM %i WHERE product_id = %d AND variation_id = %d AND type = 'waitlist' AND status = 'active' AND (expires_at IS NULL OR expires_at = '0000-00-00 00:00:00' OR expires_at > %s) LIMIT 1",
+				$table,
+				(int) $product_id,
+				(int) $variation_id,
+				current_time( 'mysql' )
+			)
+		);
+	}
+
+	/**
 	 * Get all active/pending subscriptions for a user for a specific product (including variations).
 	 *
 	 * @param string $email       User email.
@@ -421,6 +530,19 @@ class Lead extends Model {
 	/**
 	 * Check if the lead is expired.
 	 *
+	 * Compared in the site's local clock, because that is the clock the column
+	 * is written in (Api\FrontendController::subscribe()). This previously used
+	 * strtotime()/time(), i.e. UTC -- accidentally correct only while the column
+	 * was written with gmdate(), and wrong by gmt_offset once it no longer was.
+	 * On a store behind UTC that reported a lead expired hours early and then
+	 * *persisted* the mistake through save(). Comparing the two 'Y-m-d H:i:s'
+	 * strings directly is both correct and exactly what the SQL readers do.
+	 *
+	 * The zero-date exclusion keeps this in step with the column's other
+	 * readers -- Engine\Dispatcher, Engine\CronTasks::cleanup_expired_leads()
+	 * and self::has_active_waitlist() all treat '0000-00-00 00:00:00' as
+	 * "no expiry".
+	 *
 	 * @return bool
 	 */
 	public function is_expired() {
@@ -428,14 +550,23 @@ class Lead extends Model {
 			return true;
 		}
 
-		if ( ! empty( $this->expires_at ) ) {
-			$expiry_time = strtotime( $this->expires_at );
-			if ( $expiry_time && $expiry_time < time() ) {
-				$this->status     = 'expired';
-				$this->updated_at = current_time( 'mysql' );
-				$this->save();
-				return true;
-			}
+		// Read through __get() into a local before testing. empty() on a magic
+		// property dispatches to __isset(), so testing $this->expires_at
+		// directly depended on Model::__isset() existing -- which it did not
+		// until this cycle, making this whole method dead.
+		$expires_at = $this->expires_at;
+
+		if ( null === $expires_at || '' === $expires_at || '0000-00-00 00:00:00' === $expires_at ) {
+			return false;
+		}
+
+		$now_mysql = current_time( 'mysql' );
+
+		if ( $expires_at <= $now_mysql ) {
+			$this->status     = 'expired';
+			$this->updated_at = $now_mysql;
+			$this->save();
+			return true;
 		}
 
 		return false;

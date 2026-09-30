@@ -45,7 +45,12 @@ return array(
 		'appearance_waitlistButtonText'     => array( 'type' => 'string' ),
 		'appearance_waitlistButtonClass'    => array( 'type' => 'string' ),
 		'appearance_waitlistExpiryEnabled'  => array( 'type' => 'boolean' ),
-		'appearance_waitlistExpiryOptions'  => array( 'type' => 'string' ),
+		// `day_list` normalises to positive integers. Without it the admin UI
+		// happily saved "0,-5,abc", leaving every renderer to defend against it.
+		'appearance_waitlistExpiryOptions'  => array(
+			'type'   => 'string',
+			'format' => 'day_list',
+		),
 		'appearance_waitlistExpiryDefault'  => array( 'type' => 'string' ),
 		'appearance_waitlistSuccessMessage' => array(
 			'type'   => 'string',

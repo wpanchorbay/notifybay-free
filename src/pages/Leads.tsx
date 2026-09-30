@@ -125,12 +125,29 @@ const Leads: FC = () => {
         ids: selectedIds,
         bulk_action: bulkAction,
       },
-    }).then(() => {
-      fetchLeads(currentPage, searchTerm);
-      setSelectedIds([]);
-      setBulkAction("");
-      addToast(__("Bulk action applied successfully.", "notifybay-waitlist-and-stock-alert-woo"), "success");
-    });
+    })
+      .then(() => {
+        fetchLeads(currentPage, searchTerm);
+        setSelectedIds([]);
+        setBulkAction("");
+        addToast(__("Bulk action applied successfully.", "notifybay-waitlist-and-stock-alert-woo"), "success");
+      })
+      /*
+       * The endpoint rejects an unrecognised bulk action with a 400 rather than
+       * quietly doing nothing, which was the point of adding that validation.
+       * Without this catch the rejection went unhandled: no toast, the
+       * selection stayed, the dropdown stayed -- pressing Apply appeared to do
+       * nothing at all, which is a worse report than the silent success it
+       * replaced.
+       */
+      .catch((error) => {
+        addToast(
+          error instanceof Error && error.message
+            ? error.message
+            : __("The bulk action could not be applied.", "notifybay-waitlist-and-stock-alert-woo"),
+          "error",
+        );
+      });
   };
 
   const handleExport = () => {

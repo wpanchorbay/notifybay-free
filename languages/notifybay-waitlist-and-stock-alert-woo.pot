@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-23T09:13:51+00:00\n"
+"POT-Creation-Date: 2026-09-30T04:38:08+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: notifybay-waitlist-and-stock-alert-woo\n"
@@ -39,6 +39,20 @@ msgstr ""
 msgid "https://wpanchorbay.com"
 msgstr ""
 
+#: app/Admin/Admin.php:212
+#: config/admin.php:120
+#: dist/svn/trunk/app/Admin/Admin.php:212
+#: dist/svn/trunk/config/admin.php:120
+#: build/admin.js:13
+#: dist/svn/trunk/build/admin.js:13
+msgid "Settings"
+msgstr ""
+
+#: app/Admin/Admin.php:218
+#: build/settings.js:15
+msgid "MCP Connection (Beta)"
+msgstr ""
+
 #: app/Admin/WCSettingsTab.php:27
 #: dist/svn/trunk/app/Admin/WCSettingsTab.php:27
 msgid "Leads Settings"
@@ -57,29 +71,36 @@ msgid "NotifyBay Settings"
 msgstr ""
 
 #: app/Api/AdminController.php:240
-#: app/Api/AdminController.php:282
+#: app/Api/AdminController.php:301
 #: dist/svn/trunk/app/Api/AdminController.php:240
-#: dist/svn/trunk/app/Api/AdminController.php:282
+#: dist/svn/trunk/app/Api/AdminController.php:301
 msgid "Lead not found."
 msgstr ""
 
-#: app/Api/AdminController.php:268
-#: dist/svn/trunk/app/Api/AdminController.php:268
+#: app/Api/AdminController.php:287
+#: dist/svn/trunk/app/Api/AdminController.php:287
 msgid "Could not update lead."
 msgstr ""
 
-#: app/Api/AdminController.php:289
-#: dist/svn/trunk/app/Api/AdminController.php:289
+#: app/Api/AdminController.php:308
+#: dist/svn/trunk/app/Api/AdminController.php:308
 msgid "Could not delete lead."
 msgstr ""
 
-#: app/Api/AdminController.php:303
-#: dist/svn/trunk/app/Api/AdminController.php:303
+#: app/Api/AdminController.php:322
+#: dist/svn/trunk/app/Api/AdminController.php:322
 msgid "No IDs provided."
 msgstr ""
 
-#: app/Api/AdminController.php:335
-#: dist/svn/trunk/app/Api/AdminController.php:335
+#. translators: %s: comma-separated list of the actions this endpoint accepts.
+#: app/Api/AdminController.php:341
+#: dist/svn/trunk/app/Api/AdminController.php:341
+#, php-format
+msgid "Unknown bulk action. Expected one of: %s."
+msgstr ""
+
+#: app/Api/AdminController.php:396
+#: dist/svn/trunk/app/Api/AdminController.php:396
 msgid "Forbidden"
 msgstr ""
 
@@ -104,7 +125,6 @@ msgstr ""
 #: app/Api/ApiController.php:190
 #: dist/svn/trunk/app/Api/ApiController.php:133
 #: dist/svn/trunk/app/Api/ApiController.php:190
-#: dist/svn/trunk/app/Api/McpAccountController.php:198
 msgid "The security token is invalid."
 msgstr ""
 
@@ -118,65 +138,77 @@ msgstr ""
 msgid "Invalid data provided."
 msgstr ""
 
-#: app/Api/FrontendController.php:163
-#: dist/svn/trunk/app/Api/FrontendController.php:163
+#: app/Api/FrontendController.php:139
+#: dist/svn/trunk/app/Api/FrontendController.php:139
+msgid "A fresh nonce is already present in the page for signed-in visitors."
+msgstr ""
+
+#: app/Api/FrontendController.php:220
+#: dist/svn/trunk/app/Api/FrontendController.php:220
 msgid "Invalid product IDs."
 msgstr ""
 
-#: app/Api/FrontendController.php:210
-#: dist/svn/trunk/app/Api/FrontendController.php:210
+#: app/Api/FrontendController.php:267
+#: dist/svn/trunk/app/Api/FrontendController.php:267
 msgid "Invalid product ID."
 msgstr ""
 
-#: app/Api/FrontendController.php:215
-#: dist/svn/trunk/app/Api/FrontendController.php:215
+#: app/Api/FrontendController.php:272
+#: app/Api/FrontendController.php:510
+#: dist/svn/trunk/app/Api/FrontendController.php:272
+#: dist/svn/trunk/app/Api/FrontendController.php:510
 msgid "Product not found."
 msgstr ""
 
-#: app/Api/FrontendController.php:337
-#: dist/svn/trunk/app/Api/FrontendController.php:337
+#: app/Api/FrontendController.php:404
+#: dist/svn/trunk/app/Api/FrontendController.php:404
 msgid "Too many requests. Please try again later."
 msgstr ""
 
+#: app/Api/FrontendController.php:529
+#: dist/svn/trunk/app/Api/FrontendController.php:529
+msgid "That variation does not belong to this product."
+msgstr ""
+
 #. translators: %s: lead type
-#: app/Api/FrontendController.php:395
-#: dist/svn/trunk/app/Api/FrontendController.php:395
+#: app/Api/FrontendController.php:564
+#: dist/svn/trunk/app/Api/FrontendController.php:564
 #, php-format
 msgid "[NotifyBay] New %s signup"
 msgstr ""
 
-#: app/Api/FrontendController.php:409
-#: dist/svn/trunk/app/Api/FrontendController.php:409
+#: app/Api/FrontendController.php:578
+#: dist/svn/trunk/app/Api/FrontendController.php:578
 msgid "Please check your email to verify your subscription."
 msgstr ""
 
-#: app/Api/FrontendController.php:414
-#: dist/svn/trunk/app/Api/FrontendController.php:414
+#: app/Api/FrontendController.php:583
+#: dist/svn/trunk/app/Api/FrontendController.php:583
 msgid "Successfully subscribed! You will be notified as soon as possible."
 msgstr ""
 
-#: app/Api/FrontendController.php:455
-#: dist/svn/trunk/app/Api/FrontendController.php:455
+#: app/Api/FrontendController.php:624
+#: dist/svn/trunk/app/Api/FrontendController.php:624
 msgid "Could not process subscription. Please try again."
 msgstr ""
 
-#: app/Api/FrontendController.php:469
-#: dist/svn/trunk/app/Api/FrontendController.php:469
+#: app/Api/FrontendController.php:638
+#: dist/svn/trunk/app/Api/FrontendController.php:638
 msgid "Invalid lead ID."
 msgstr ""
 
-#: app/Api/FrontendController.php:474
-#: dist/svn/trunk/app/Api/FrontendController.php:474
+#: app/Api/FrontendController.php:643
+#: dist/svn/trunk/app/Api/FrontendController.php:643
 msgid "You must be logged in to manage subscriptions."
 msgstr ""
 
-#: app/Api/FrontendController.php:497
-#: dist/svn/trunk/app/Api/FrontendController.php:497
+#: app/Api/FrontendController.php:666
+#: dist/svn/trunk/app/Api/FrontendController.php:666
 msgid "Unsubscribed successfully."
 msgstr ""
 
-#: app/Api/FrontendController.php:514
-#: dist/svn/trunk/app/Api/FrontendController.php:514
+#: app/Api/FrontendController.php:683
+#: dist/svn/trunk/app/Api/FrontendController.php:683
 msgid "Subscription not found or already removed."
 msgstr ""
 
@@ -357,7 +389,7 @@ msgstr ""
 #: dist/svn/trunk/templates/frontend/waitlist.php:47
 #: templates/frontend/waitlist.php:28
 #: templates/frontend/waitlist.php:47
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Product"
 msgstr ""
@@ -406,7 +438,7 @@ msgstr ""
 
 #: app/Frontend/Endpoints.php:159
 #: dist/svn/trunk/app/Frontend/Endpoints.php:159
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Unsubscribed"
 msgstr ""
@@ -422,7 +454,7 @@ msgstr ""
 
 #: app/Frontend/Endpoints.php:197
 #: dist/svn/trunk/app/Frontend/Endpoints.php:197
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Email"
 msgstr ""
@@ -438,7 +470,7 @@ msgstr ""
 #: dist/svn/trunk/templates/frontend/waitlist.php:52
 #: templates/frontend/waitlist.php:29
 #: templates/frontend/waitlist.php:52
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Status"
 msgstr ""
@@ -448,322 +480,345 @@ msgstr ""
 msgid "Created"
 msgstr ""
 
+#: app/Mcp/DesktopBundle.php:120
+#: dist/svn/trunk/app/Mcp/DesktopBundle.php:120
+msgid "You are not allowed to download the Claude Desktop bundle."
+msgstr ""
+
+#: app/Mcp/DesktopBundle.php:152
+#: dist/svn/trunk/app/Mcp/DesktopBundle.php:152
+msgid "This server cannot build zip files (the PHP zip extension is missing), so the Claude Desktop bundle cannot be created here. Use the JSON snippet on the connection screen instead."
+msgstr ""
+
+#: app/Mcp/DesktopBundle.php:186
+#: dist/svn/trunk/app/Mcp/DesktopBundle.php:186
+msgid "Could not create a temporary file for the bundle."
+msgstr ""
+
+#: app/Mcp/DesktopBundle.php:193
+#: dist/svn/trunk/app/Mcp/DesktopBundle.php:193
+msgid "Could not open the bundle archive for writing."
+msgstr ""
+
+#: app/Mcp/DesktopBundle.php:240
+#: dist/svn/trunk/app/Mcp/DesktopBundle.php:240
+msgid "Work with your WooCommerce waitlist from Claude: read leads, diagnose failed notifications, and re-send back-in-stock emails."
+msgstr ""
+
+#: app/Mcp/DesktopBundle.php:257
+#: dist/svn/trunk/app/Mcp/DesktopBundle.php:257
+msgid "WordPress username"
+msgstr ""
+
+#: app/Mcp/DesktopBundle.php:258
+#: dist/svn/trunk/app/Mcp/DesktopBundle.php:258
+msgid "The account Claude connects as. Its role still limits what it can reach."
+msgstr ""
+
+#: app/Mcp/DesktopBundle.php:283
+#: dist/svn/trunk/app/Mcp/DesktopBundle.php:283
+msgid "Application password"
+msgstr ""
+
+#: app/Mcp/DesktopBundle.php:284
+#: dist/svn/trunk/app/Mcp/DesktopBundle.php:284
+msgid "Generate one on the MCP Connection screen in WordPress and paste it here. It is stored in your operating system keychain, not in this file."
+msgstr ""
+
+#: app/Mcp/DesktopBundle.php:293
+#: dist/svn/trunk/app/Mcp/DesktopBundle.php:293
+msgid "Already filled in from your WordPress site. It is stored in your operating system keychain."
+msgstr ""
+
+#: app/Mcp/GrantAccess.php:112
+#: dist/svn/trunk/app/Mcp/GrantAccess.php:112
+msgid "You are not allowed to change roles on this site."
+msgstr ""
+
 #. translators: %d: lead id.
-#: app/Mcp/Tools/Leads.php:243
-#: dist/svn/trunk/app/Mcp/Tools/Leads.php:197
+#: app/Mcp/Tools/Leads.php:271
+#: dist/svn/trunk/app/Mcp/Tools/Leads.php:271
 #, php-format
 msgid "No waitlist lead with id %d."
 msgstr ""
 
-#: app/Mcp/Tools/Leads.php:260
-#: dist/svn/trunk/app/Mcp/Tools/Leads.php:214
+#: app/Mcp/Tools/Leads.php:288
+#: dist/svn/trunk/app/Mcp/Tools/Leads.php:288
 msgid "That is not a recognised lead status."
 msgstr ""
 
-#: app/Mcp/Tools/Leads.php:275
-#: dist/svn/trunk/app/Mcp/Tools/Leads.php:229
+#: app/Mcp/Tools/Leads.php:323
+#: dist/svn/trunk/app/Mcp/Tools/Leads.php:323
 msgid "That is not a valid email address."
 msgstr ""
 
-#: app/Mcp/Tools/Leads.php:287
-#: dist/svn/trunk/app/Mcp/Tools/Leads.php:241
+#: app/Mcp/Tools/Leads.php:335
+#: dist/svn/trunk/app/Mcp/Tools/Leads.php:335
 msgid "Supply at least one of status or user_email."
 msgstr ""
 
-#: app/Mcp/Tools/Leads.php:295
-#: dist/svn/trunk/app/Mcp/Tools/Leads.php:249
+#: app/Mcp/Tools/Leads.php:343
+#: dist/svn/trunk/app/Mcp/Tools/Leads.php:343
 msgid "The lead could not be saved."
 msgstr ""
 
-#: app/Mcp/Tools/Leads.php:328
-#: app/Mcp/Tools/Leads.php:600
-#: dist/svn/trunk/app/Mcp/Tools/Leads.php:282
+#: app/Mcp/Tools/Leads.php:376
+#: app/Mcp/Tools/Leads.php:735
+#: dist/svn/trunk/app/Mcp/Tools/Leads.php:376
+#: dist/svn/trunk/app/Mcp/Tools/Leads.php:735
 msgid "No lead ids were supplied."
 msgstr ""
 
-#: app/Mcp/Tools/Leads.php:608
+#: app/Mcp/Tools/Leads.php:743
+#: dist/svn/trunk/app/Mcp/Tools/Leads.php:743
 msgid "Action Scheduler is not available, so nothing can be queued."
 msgstr ""
 
-#: config/admin.php:41
-#: config/admin.php:42
-#: config/admin.php:120
-#: config/admin.php:121
-#: config/admin.php:122
+#: app/Mcp/Tools/Leads.php:766
+#: dist/svn/trunk/app/Mcp/Tools/Leads.php:766
+msgid "The back-in-stock email is switched off in WooCommerce, so nothing would be sent. Enable it under WooCommerce > Settings > Emails, then try again."
+msgstr ""
+
+#: config/admin.php:57
+#: config/admin.php:58
+#: config/admin.php:153
+#: config/admin.php:154
+#: config/admin.php:155
 #: config/mcp.php:42
-#: dist/svn/trunk/config/admin.php:41
-#: dist/svn/trunk/config/admin.php:42
-#: dist/svn/trunk/config/admin.php:120
-#: dist/svn/trunk/config/admin.php:121
-#: dist/svn/trunk/config/admin.php:122
-#: dist/svn/trunk/config/mcp.php:32
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:91
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:139
-#: notifybay-waitlist-and-stock-alert-woo.php:91
-#: notifybay-waitlist-and-stock-alert-woo.php:139
-#: build/admin.js:1
+#: dist/svn/trunk/config/admin.php:57
+#: dist/svn/trunk/config/admin.php:58
+#: dist/svn/trunk/config/admin.php:153
+#: dist/svn/trunk/config/admin.php:154
+#: dist/svn/trunk/config/admin.php:155
+#: dist/svn/trunk/config/mcp.php:42
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:95
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:143
+#: notifybay-waitlist-and-stock-alert-woo.php:95
+#: notifybay-waitlist-and-stock-alert-woo.php:143
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "NotifyBay"
 msgstr ""
 
-#: config/admin.php:60
-#: config/admin.php:61
-#: dist/svn/trunk/config/admin.php:60
-#: dist/svn/trunk/config/admin.php:61
-#: build/admin.js:1
+#: config/admin.php:80
+#: config/admin.php:81
+#: config/admin.php:93
+#: config/admin.php:94
+#: dist/svn/trunk/config/admin.php:80
+#: dist/svn/trunk/config/admin.php:81
+#: dist/svn/trunk/config/admin.php:93
+#: dist/svn/trunk/config/admin.php:94
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Leads"
 msgstr ""
 
-#: config/admin.php:81
-#: dist/svn/trunk/config/admin.php:81
+#: config/admin.php:114
+#: dist/svn/trunk/config/admin.php:114
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: config/admin.php:87
-#: dist/svn/trunk/config/admin.php:87
-#: build/admin.js:1
-#: dist/svn/trunk/build/admin.js:13
-msgid "Settings"
-msgstr ""
-
-#: config/admin.php:101
-#: dist/svn/trunk/config/admin.php:101
+#: config/admin.php:134
+#: dist/svn/trunk/config/admin.php:134
 msgid "Docs"
 msgstr ""
 
-#: config/admin.php:105
-#: dist/svn/trunk/config/admin.php:105
+#: config/admin.php:138
+#: dist/svn/trunk/config/admin.php:138
 msgid "Support"
 msgstr ""
 
-#: config/admin.php:109
-#: dist/svn/trunk/config/admin.php:109
+#: config/admin.php:142
+#: dist/svn/trunk/config/admin.php:142
 msgid "Rate ★★★★★"
 msgstr ""
 
 #: config/mcp.php:51
-#: dist/svn/trunk/config/mcp.php:41
+#: dist/svn/trunk/config/mcp.php:51
 msgid "NotifyBay Waitlist"
 msgstr ""
 
 #: config/mcp.php:67
-#: dist/svn/trunk/config/mcp.php:57
+#: dist/svn/trunk/config/mcp.php:67
 msgid "List Waitlist Leads"
 msgstr ""
 
-#: config/mcp.php:124
-#: dist/svn/trunk/config/mcp.php:106
+#: config/mcp.php:131
+#: dist/svn/trunk/config/mcp.php:131
 msgid "NotifyBay System Status"
 msgstr ""
 
-#: config/mcp.php:135
+#: config/mcp.php:147
+#: dist/svn/trunk/config/mcp.php:147
 msgid "Diagnose Notification Failures"
 msgstr ""
 
-#: config/mcp.php:160
+#: config/mcp.php:179
+#: dist/svn/trunk/config/mcp.php:179
 msgid "Waitlist Size By Product"
 msgstr ""
 
-#: config/mcp.php:180
-#: dist/svn/trunk/config/mcp.php:118
+#: config/mcp.php:217
+#: dist/svn/trunk/config/mcp.php:217
 msgid "Update Waitlist Lead"
 msgstr ""
 
-#: config/mcp.php:208
+#: config/mcp.php:253
+#: dist/svn/trunk/config/mcp.php:253
 msgid "Resend Back-in-Stock Notifications"
 msgstr ""
 
-#: config/mcp.php:242
-#: dist/svn/trunk/config/mcp.php:143
+#: config/mcp.php:295
+#: dist/svn/trunk/config/mcp.php:295
 msgid "Delete Waitlist Leads"
 msgstr ""
 
-#: dist/svn/trunk/app/Api/McpAccountController.php:188
-msgid "Sorry, you are not allowed to manage MCP accounts."
+#: dist/svn/trunk/app/Admin/Admin.php:218
+#: dist/svn/trunk/build/settings.js:15
+msgid "MCP Connection"
 msgstr ""
 
-#: dist/svn/trunk/app/Api/McpAccountController.php:288
-msgid "WordPress is refusing Application Passwords on this site, which usually means it is served over plain http. An MCP client has no other way to sign in, so there is no point creating an account yet."
-msgstr ""
-
-#: dist/svn/trunk/app/Api/McpAccountController.php:298
-msgid "Please supply a username."
-msgstr ""
-
-#: dist/svn/trunk/app/Api/McpAccountController.php:306
-msgid "That username is already taken. Pick another, or revoke and reuse the existing account."
-msgstr ""
-
-#: dist/svn/trunk/app/Api/McpAccountController.php:332
-msgid "That email address is not usable. Supply a different one."
-msgstr ""
-
-#: dist/svn/trunk/app/Api/McpAccountController.php:366
-msgid "The account was created but could not be read back."
-msgstr ""
-
-#: dist/svn/trunk/app/Api/McpAccountController.php:391
-msgid "Account created. Copy the password now — it cannot be shown again."
-msgstr ""
-
-#: dist/svn/trunk/app/Api/McpAccountController.php:429
-msgid "New password issued. The previous one stopped working immediately."
-msgstr ""
-
-#: dist/svn/trunk/app/Api/McpAccountController.php:462
-msgid "Access revoked. The account still exists but can no longer reach the endpoint."
-msgstr ""
-
-#: dist/svn/trunk/app/Api/McpAccountController.php:485
-msgid "That account does not exist."
-msgstr ""
-
-#: dist/svn/trunk/app/Api/McpAccountController.php:493
-msgid "This screen will not issue MCP credentials for an administrator. An administrator can change the access level itself, which defeats the point of setting one. Create a dedicated account instead."
-msgstr ""
-
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:92
-#: notifybay-waitlist-and-stock-alert-woo.php:92
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:96
+#: notifybay-waitlist-and-stock-alert-woo.php:96
 msgid "requires WooCommerce to be installed and active."
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:142
-#: notifybay-waitlist-and-stock-alert-woo.php:142
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:146
+#: notifybay-waitlist-and-stock-alert-woo.php:146
 msgid "Quick question before you go"
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:143
-#: notifybay-waitlist-and-stock-alert-woo.php:143
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:147
+#: notifybay-waitlist-and-stock-alert-woo.php:147
 msgid "If you have a moment, let us know why you're deactivating so we can improve NotifyBay."
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:144
-#: notifybay-waitlist-and-stock-alert-woo.php:144
-#: build/admin.js:1
-#: build/settings.js:3
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:148
+#: notifybay-waitlist-and-stock-alert-woo.php:148
+#: build/admin.js:13
+#: build/settings.js:15
 #: dist/svn/trunk/build/admin.js:13
 #: dist/svn/trunk/build/settings.js:15
 msgid "Cancel"
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:145
-#: notifybay-waitlist-and-stock-alert-woo.php:145
-msgid "Skip & Deactivate"
-msgstr ""
-
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:146
-#: notifybay-waitlist-and-stock-alert-woo.php:146
-msgid "Submit & Deactivate"
-msgstr ""
-
 #: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:149
 #: notifybay-waitlist-and-stock-alert-woo.php:149
-msgid "What information is sent?"
+msgid "Skip & Deactivate"
 msgstr ""
 
 #: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:150
 #: notifybay-waitlist-and-stock-alert-woo.php:150
+msgid "Submit & Deactivate"
+msgstr ""
+
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:153
+#: notifybay-waitlist-and-stock-alert-woo.php:153
+msgid "What information is sent?"
+msgstr ""
+
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:154
+#: notifybay-waitlist-and-stock-alert-woo.php:154
 msgid "Pressing \"Submit & Deactivate\" sends the reason you select and any note you type, along with your site address, the email address of your account, and your WordPress version, to wpanchorbay.com. Pressing \"Skip & Deactivate\" sends nothing."
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:155
-#: notifybay-waitlist-and-stock-alert-woo.php:155
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:159
+#: notifybay-waitlist-and-stock-alert-woo.php:159
 msgid "I couldn't get it working"
-msgstr ""
-
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:157
-#: notifybay-waitlist-and-stock-alert-woo.php:157
-msgid "What were you trying to configure?"
 msgstr ""
 
 #: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:161
 #: notifybay-waitlist-and-stock-alert-woo.php:161
-msgid "It's missing a feature I need"
+msgid "What were you trying to configure?"
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:163
-#: notifybay-waitlist-and-stock-alert-woo.php:163
-msgid "What feature?"
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:165
+#: notifybay-waitlist-and-stock-alert-woo.php:165
+msgid "It's missing a feature I need"
 msgstr ""
 
 #: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:167
 #: notifybay-waitlist-and-stock-alert-woo.php:167
-msgid "It conflicted with my theme or another plugin"
+msgid "What feature?"
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:169
-#: notifybay-waitlist-and-stock-alert-woo.php:169
-msgid "Which theme/plugin?"
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:171
+#: notifybay-waitlist-and-stock-alert-woo.php:171
+msgid "It conflicted with my theme or another plugin"
 msgstr ""
 
 #: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:173
 #: notifybay-waitlist-and-stock-alert-woo.php:173
-msgid "It slowed down my site"
+msgid "Which theme/plugin?"
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:175
-#: notifybay-waitlist-and-stock-alert-woo.php:175
-msgid "Please describe what felt slow"
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:177
+#: notifybay-waitlist-and-stock-alert-woo.php:177
+msgid "It slowed down my site"
 msgstr ""
 
 #: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:179
 #: notifybay-waitlist-and-stock-alert-woo.php:179
-msgid "Restock emails weren't reaching my customers"
+msgid "Please describe what felt slow"
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:181
-#: notifybay-waitlist-and-stock-alert-woo.php:181
-msgid "What did you see happen?"
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:183
+#: notifybay-waitlist-and-stock-alert-woo.php:183
+msgid "Restock emails weren't reaching my customers"
 msgstr ""
 
 #: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:185
 #: notifybay-waitlist-and-stock-alert-woo.php:185
-msgid "I found a better alternative"
+msgid "What did you see happen?"
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:187
-#: notifybay-waitlist-and-stock-alert-woo.php:187
-msgid "Which plugin?"
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:189
+#: notifybay-waitlist-and-stock-alert-woo.php:189
+msgid "I found a better alternative"
 msgstr ""
 
 #: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:191
 #: notifybay-waitlist-and-stock-alert-woo.php:191
-msgid "It's too complicated to set up"
+msgid "Which plugin?"
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:193
-#: notifybay-waitlist-and-stock-alert-woo.php:193
-msgid "What part was confusing?"
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:195
+#: notifybay-waitlist-and-stock-alert-woo.php:195
+msgid "It's too complicated to set up"
 msgstr ""
 
 #: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:197
 #: notifybay-waitlist-and-stock-alert-woo.php:197
+msgid "What part was confusing?"
+msgstr ""
+
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:201
+#: notifybay-waitlist-and-stock-alert-woo.php:201
 msgid "I no longer need waitlists on my store"
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:202
-#: notifybay-waitlist-and-stock-alert-woo.php:202
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:206
+#: notifybay-waitlist-and-stock-alert-woo.php:206
 msgid "It's temporary — I'm troubleshooting/debugging"
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:207
-#: notifybay-waitlist-and-stock-alert-woo.php:207
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:211
+#: notifybay-waitlist-and-stock-alert-woo.php:211
 msgid "Other"
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:209
-#: notifybay-waitlist-and-stock-alert-woo.php:209
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:213
+#: notifybay-waitlist-and-stock-alert-woo.php:213
 msgid "Please share the reason"
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:218
-#: notifybay-waitlist-and-stock-alert-woo.php:218
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:222
+#: notifybay-waitlist-and-stock-alert-woo.php:222
 msgid "Enjoying NotifyBay?"
 msgstr ""
 
-#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:219
-#: notifybay-waitlist-and-stock-alert-woo.php:219
+#: dist/svn/trunk/notifybay-waitlist-and-stock-alert-woo.php:223
+#: notifybay-waitlist-and-stock-alert-woo.php:223
 msgid "You've been using NotifyBay for a few days now. If it's been helpful, would you mind leaving a quick review? It really helps!"
 msgstr ""
 
@@ -779,15 +834,15 @@ msgstr ""
 
 #: dist/svn/trunk/templates/admin/meta-box-overrides.php:49
 #: templates/admin/meta-box-overrides.php:49
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Pro"
 msgstr ""
 
 #: dist/svn/trunk/templates/admin/meta-box-overrides.php:54
 #: templates/admin/meta-box-overrides.php:54
-#: build/admin.js:1
-#: build/settings.js:3
+#: build/admin.js:13
+#: build/settings.js:15
 #: dist/svn/trunk/build/admin.js:13
 #: dist/svn/trunk/build/settings.js:15
 msgid "Unlock with Pro"
@@ -795,7 +850,7 @@ msgstr ""
 
 #: dist/svn/trunk/templates/admin/meta-box-overrides.php:62
 #: templates/admin/meta-box-overrides.php:62
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Backorder Behavior"
 msgstr ""
@@ -920,13 +975,13 @@ msgstr ""
 msgid "Your email address"
 msgstr ""
 
-#: dist/svn/trunk/templates/frontend/waitlist-form.php:53
-#: templates/frontend/waitlist-form.php:53
+#: dist/svn/trunk/templates/frontend/waitlist-form.php:76
+#: templates/frontend/waitlist-form.php:76
 msgid "No expiry"
 msgstr ""
 
-#: dist/svn/trunk/templates/frontend/waitlist-form.php:62
-#: templates/frontend/waitlist-form.php:62
+#: dist/svn/trunk/templates/frontend/waitlist-form.php:81
+#: templates/frontend/waitlist-form.php:81
 msgid "days"
 msgstr ""
 
@@ -960,1473 +1015,1433 @@ msgstr ""
 msgid "Remove"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Revenue Analytics is a Pro feature"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "See potential vs. recovered revenue, historical demand trends, and your most-wanted products with NotifyBay Pro."
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Active Waitlist"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Price Watchers"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Converted Sales"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Potential Recovery"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "New Leads Trend"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Top Requested Restocks"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Top Price-Drop Wishes"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Logs"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Dashboard"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Unlock with Pro ✦"
 msgstr ""
 
-#: build/admin.js:1
-#: build/settings.js:3
+#: build/admin.js:13
+#: build/settings.js:15
 #: dist/svn/trunk/build/admin.js:13
 #: dist/svn/trunk/build/settings.js:15
 msgid "Upgrade to unlock"
 msgstr ""
 
-#: build/admin.js:1
-#: build/settings.js:3
+#: build/admin.js:13
+#: build/settings.js:15
 #: dist/svn/trunk/build/admin.js:13
 #: dist/svn/trunk/build/settings.js:15
 msgid "Buy Pro"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Lead updated successfully."
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Type"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Date"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Lead Management"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Search Leads:"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Search..."
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Search"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
+#: dist/svn/trunk/build/admin.js:13
+msgid "Could not export leads."
+msgstr ""
+
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Export CSV ⬇"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Select bulk action"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Bulk Actions"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Mark Active"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Mark Expired"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Delete"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Resend failed (Pro)"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Bulk action applied successfully."
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Are you sure you want to delete the selected leads?"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
+#: dist/svn/trunk/build/admin.js:13
+msgid "The bulk action could not be applied."
+msgstr ""
+
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Apply"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "items"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "of"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Quick Edit"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Email Address"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
-#: dist/svn/trunk/build/settings.js:15
 msgid "Active"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Pending Verification"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Notified"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Converted"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Expired"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Failed"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Saving…"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Update"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Edit"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Are you sure you want to delete this lead?"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Lead deleted successfully."
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Resend"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Show more details"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Welcome to NotifyBay"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Let's get your back-in-stock alerts set up in a few quick steps."
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Sender identity"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "From name"
 msgstr ""
 
-#: build/admin.js:1
-#: build/settings.js:1
+#: build/admin.js:13
+#: build/settings.js:13
 #: dist/svn/trunk/build/admin.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "e.g. My Store Team"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "From email"
 msgstr ""
 
-#: build/admin.js:1
-#: build/settings.js:1
+#: build/admin.js:13
+#: build/settings.js:13
 #: dist/svn/trunk/build/admin.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "e.g. sales@mystore.com"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Choose features"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Double opt-in"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Require email confirmation"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Button text"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Waitlist button label"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "This button shows on out-of-stock products so shoppers can join the waitlist."
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Add it to your store"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "NotifyBay adds its button to product pages automatically. To place it elsewhere, use the NotifyBay Waitlist block or the shortcode:"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "NotifyBay adds its button to product pages automatically. To place it elsewhere, use the shortcode:"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Activate your license"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Activate your NotifyBay Pro license to receive automatic updates and unlock all Pro features."
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Open license settings"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "You're all set!"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "NotifyBay is ready. Email content is managed under WooCommerce → Settings → Emails."
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "NotifyBay Setup Wizard"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Setup progress"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Current"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Complete"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Upcoming"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Back"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Skip setup"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Finish Setup"
 msgstr ""
 
-#: build/admin.js:1
+#: build/admin.js:13
 #: dist/svn/trunk/build/admin.js:13
 msgid "Next"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "General Logic"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Configure the core behavior of your revenue recovery system, including opt-in and verification rules."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Double Opt-In"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Requires guest users to verify their email address before their subscription becomes active."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Require email verification for all leads"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Highly recommended for GDPR and CAN-SPAM compliance."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Choose whether the 'Notify Me' form should appear for products that allow backorders."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Waitlist only if backorders disabled"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Show waitlist regardless of backorders"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Never show waitlist for backorderable items"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Select the behavior that matches your store's inventory policy."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
+#: dist/svn/trunk/build/settings.js:13
+msgid "Main Menu"
+msgstr ""
+
+#: build/settings.js:13
+#: dist/svn/trunk/build/settings.js:13
+msgid "Adds a top-level NotifyBay menu to the WordPress admin sidebar, alongside the existing Products → Leads and WooCommerce → Settings entries."
+msgstr ""
+
+#: build/settings.js:13
+#: dist/svn/trunk/build/settings.js:13
+msgid "Show NotifyBay in the main admin menu"
+msgstr ""
+
+#: build/settings.js:13
+#: dist/svn/trunk/build/settings.js:13
+msgid "Turning this off only hides the sidebar shortcut — Products → Leads and WooCommerce → Settings → NotifyBay still work."
+msgstr ""
+
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Waitlist Display"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Customize how the 'Notify Me' button and social proof elements appear on your product pages."
 msgstr ""
 
-#: build/settings.js:1
-#: build/settings.js:3
+#: build/settings.js:13
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:13
 #: dist/svn/trunk/build/settings.js:15
 msgid "Button Text"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "The text shown on the 'Notify Me' button."
 msgstr ""
 
-#: build/settings.js:1
-#: build/settings.js:3
+#: build/settings.js:13
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:13
 #: dist/svn/trunk/build/settings.js:15
 msgid "Button CSS Class"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Additional CSS classes for the Waitlist button."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "e.g. my-custom-btn"
 msgstr ""
 
-#: build/settings.js:1
-#: build/settings.js:3
+#: build/settings.js:13
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:13
 #: dist/svn/trunk/build/settings.js:15
 msgid "Success Message"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "The message shown after a user successfully joins the waitlist."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Waitlist Expiry Logic"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Define the rules for cleaning up old or abandoned waitlist subscriptions."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Auto-Expire Leads"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Automatically remove users from the waitlist after a certain number of days if no restock occurs."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Expire old subscriptions"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Default Expiry (Days)"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Days"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Frontend Options"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Comma-separated list of day options shown to customers."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Stock Control"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Fine-tune when restock alerts should be triggered based on physical inventory levels."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Minimum Restock Threshold"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Prevents the system from firing mass alerts if only 1 or 2 items are returned or restocked."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Admin Notifications"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Stay informed about your customers' intent by receiving alerts for new signups."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Owner Alerts"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Sends a notification to the store administrator whenever a new shopper joins a waitlist."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Notify store owner of new signups"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Email Identity"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Configure the global 'From' name and email address for all notifications sent by this plugin."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "From Name"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "The name that will appear in the customer's inbox."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "From Email"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "The email address used to send notifications."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Email content & templates"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Subject lines, headings, body content, enable/disable, and test sends for each email are now managed as native WooCommerce emails."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Open WooCommerce → Emails"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Loading system status..."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Background Engine Status"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Action Scheduler Queue"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Current email job queue"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Lead Health"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Diagnostic database check"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Failed Leads"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "In Processing"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Environment Information"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Versions"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Server environment details"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Setup"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Setup Wizard"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Re-run the first-time setup wizard to reconfigure the essentials."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Run Setup Wizard"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "System & Maintenance"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Debug Mode"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Logs technical data during execution to help developers troubleshoot background jobs and API calls."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Enable developer logging"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Only recommended for troubleshooting. Logs are written to the WooCommerce Status > Logs."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Deep Uninstall"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Determines if all plugin data should be permanently deleted from the database when the plugin is deleted."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "Delete all tables and settings on plugin deletion"
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
 #: dist/svn/trunk/build/settings.js:13
 msgid "DANGEROUS: If checked, all leads and settings will be permanently erased and cannot be recovered."
 msgstr ""
 
-#: build/settings.js:1
+#: build/settings.js:13
+#: dist/svn/trunk/build/settings.js:13
+msgid "Could not load your connection credentials."
+msgstr ""
+
+#: build/settings.js:13
+#: dist/svn/trunk/build/settings.js:13
+msgid "Could not generate the password."
+msgstr ""
+
+#: build/settings.js:13
+#: dist/svn/trunk/build/settings.js:13
+msgid "Name it first, so you can tell it apart from other credentials later."
+msgstr ""
+
+#: build/settings.js:13
+#: dist/svn/trunk/build/settings.js:13
 msgid "Could not rename it."
 msgstr ""
 
 #. translators: %s: date the credential was last used.
-#: build/settings.js:2
+#: build/settings.js:14
 #: dist/svn/trunk/build/settings.js:14
 #, js-format
 msgid "last used %s"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:14
 #: dist/svn/trunk/build/settings.js:14
 msgid "never used"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:14
+#: dist/svn/trunk/build/settings.js:14
 msgid "Name"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:14
+#: dist/svn/trunk/build/settings.js:14
 msgid "e.g. Claude on my laptop"
 msgstr ""
 
-#: build/settings.js:2
-msgid "Could not generate the password."
-msgstr ""
-
-#: build/settings.js:2
-msgid "Name it first, so you can tell it apart from other credentials later."
-msgstr ""
-
-#: build/settings.js:2
+#: build/settings.js:14
+#: dist/svn/trunk/build/settings.js:14
 msgid "Generate password"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:14
+#: dist/svn/trunk/build/settings.js:14
 msgid "Rename"
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:14
+#: dist/svn/trunk/build/settings.js:14
 msgid "Revoked. Any client still using it will get a 401 on its next request."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:14
+#: dist/svn/trunk/build/settings.js:14
 msgid "Could not revoke it."
 msgstr ""
 
-#: build/settings.js:2
+#: build/settings.js:14
 #: dist/svn/trunk/build/settings.js:14
-#: dist/svn/trunk/build/settings.js:15
 msgid "Revoke"
 msgstr ""
 
+#: build/settings.js:14
+#: dist/svn/trunk/build/settings.js:14
+msgid "Download for Claude Desktop"
+msgstr ""
+
+#: build/settings.js:14
+#: dist/svn/trunk/build/settings.js:14
+msgid "Double-click the downloaded file, then press Install. Nothing to copy and nothing to fill in — your password is already in it. Claude Desktop moves it into your operating system keychain."
+msgstr ""
+
+#: build/settings.js:14
+#: dist/svn/trunk/build/settings.js:14
+msgid "Double-click the downloaded file to install it, then paste an application password when Claude Desktop asks. Generate one above and the download fills it in for you."
+msgstr ""
+
+#: build/settings.js:14
+#: dist/svn/trunk/build/settings.js:14
+msgid "Setup details for other clients — Claude Code, Cursor, Codex — appear here the moment you generate a password, with the credential already filled in. WordPress can only show a password once, so they are not shown for an existing one. Generating another does not stop the ones already in use."
+msgstr ""
+
 #. translators: %s: the WordPress username the snippet authenticates as.
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 #, js-format
 msgid "· connects as %s"
 msgstr ""
 
-#: build/settings.js:3
-msgid "MCP is currently switched off, so this connection will be refused until you turn on Enable MCP. The credential itself is fine — save it now and enable the endpoint when you are ready."
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
+msgid "MCP is currently switched off, so a client will report the address as not found until you turn on Enable MCP. The credential itself is fine — save it now and enable the endpoint when you are ready."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "Your connection details"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "You have not copied anything yet. Press Done again to close."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Done"
 msgstr ""
 
-#: build/settings.js:3
-msgid "The credential is already active — there is nothing left to save. This is the only time it can be read: WordPress stores just a hash of it. It stays on this screen and on the AI Access tab until you reload the page, and is gone for good after that."
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
+msgid "The credential is already active — there is nothing left to save. This is the only time it can be read: WordPress stores just a hash of it. It stays on this screen and on the MCP Connection tab until you reload the page, and is gone for good after that."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "Password"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Read only"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Read and modify"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Full access"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "The assistant can list leads, see which products have the longest waitlists, read system status and diagnose failed notifications. It cannot change anything."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "Adds editing a lead's status or email address. The assistant still cannot delete anything or email your customers."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "Adds deleting leads permanently, and re-sending back-in-stock emails to real customers. Neither can be undone. Only grant this if you trust the assistant and the account it connects with."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Failed to load MCP settings."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Off"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "Live · read only"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "Live · can edit"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "Live · can delete"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "Live"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "That access level was rejected. Nothing was changed."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "MCP settings saved."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Failed to save MCP settings."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Loading MCP settings…"
 msgstr ""
 
-#: build/settings.js:3
-#: dist/svn/trunk/build/settings.js:15
-msgid "Claude Code"
-msgstr ""
-
-#: build/settings.js:3
-msgid "Ready to paste. Run it in a terminal where Claude Code is installed — your new password is already encoded into the header."
-msgstr ""
-
-#: build/settings.js:3
-msgid "Generate a password above and this becomes ready to paste. Otherwise, replace the placeholder with base64 of \"username:application-password\"."
-msgstr ""
-
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Claude Desktop"
 msgstr ""
 
-#: build/settings.js:3
-msgid "Add this to your Claude Desktop config (Settings → Developer → Edit Config), then restart Claude Desktop. Your new password is already filled in."
-msgstr ""
-
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
-msgid "Add this to your Claude Desktop config (Settings → Developer → Edit Config), fill in the application password, then restart Claude Desktop."
+msgid "Only needed if you would rather not use the download above. Paste this into your Claude Desktop config yourself, at Settings → Developer → Edit Config — Claude Desktop cannot add it for you. It needs Node.js installed. Then fully quit and reopen it."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "NODE_TLS_REJECT_UNAUTHORIZED=0 turns off certificate checking for the proxy. It is included because this looks like a development site with a self-signed certificate. Never keep it on a live store — trust the certificate authority instead."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
+msgid "Claude Code"
+msgstr ""
+
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
+msgid "Ready to paste. Run it in a terminal where Claude Code is installed — your new password is already encoded into the header."
+msgstr ""
+
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Cursor"
 msgstr ""
 
-#: build/settings.js:3
-msgid "Add this to Cursor's mcp.json. It is complete as shown — no proxy, nothing to substitute."
-msgstr ""
-
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
-msgid "Add this to Cursor's mcp.json, replacing the placeholder with base64 of \"username:application-password\". No proxy is needed."
+msgid "Add this to Cursor's mcp.json — ~/.cursor/mcp.json for every project, or .cursor/mcp.json inside one project. It is complete as shown: no proxy, nothing to substitute."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Codex"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
-msgid "In Codex, add a custom MCP server with Streamable HTTP transport and the Authorization header above."
+msgid "Add this to ~/.codex/config.toml, then restart Codex. It is complete as shown: no proxy, nothing to substitute. Do not use `codex mcp add` for this — it cannot attach the Authorization header, so the server would be added without a credential."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Anything else"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Any MCP client that speaks Streamable HTTP can connect with this URL and a Basic auth header."
 msgstr ""
 
-#: build/settings.js:3
-msgid "MCP is currently switched off, so a client using this will be refused until you turn on Enable MCP above."
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
+msgid "MCP is currently switched off. Until you turn on Enable MCP above, a client will report the address as not found rather than as a permissions problem."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+msgid "Beta:"
+msgstr ""
+
+#: build/settings.js:15
+msgid "the MCP connection is a beta feature. It may change in future releases, and assistant tools can make mistakes — review what an assistant changes, and give it the lowest access level that does the job."
+msgstr ""
+
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
+msgid "Your account cannot use this endpoint yet."
+msgstr ""
+
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
+msgid "The settings below are correct, but your user is missing the permission the MCP endpoint checks, so every request from an AI assistant will be refused."
+msgstr ""
+
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
+msgid "Grant access to administrators"
+msgstr ""
+
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "AI assistant access (MCP)"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Lets an AI assistant work with your waitlist through the Model Context Protocol. It is off until you turn it on, and whoever connects still signs in as a WordPress user with their own permissions."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Enable MCP"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Turns the endpoint on. While off, it refuses every request."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Access level"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "How much the assistant is allowed to do. Tools above this level are not offered to it at all."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "READ ONLY"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "CAN EDIT"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "CAN DELETE"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Tools available"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "How many NotifyBay tools this endpoint publishes in total, before the access level filters them."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Connecting a client"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Your assistant signs in as an ordinary WordPress user with an Application Password. Its own role still limits what it can reach, on top of the access level above."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Endpoint URL"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "Connect as"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "The username half of the credential. An Application Password belongs to an account, so the assistant inherits whatever that account may do."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Application Password"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "A per-application credential. It cannot be used to sign in to the dashboard, and revoking it does not change the account's own password."
 msgstr ""
 
-#: build/settings.js:3
-msgid "The password you just created is still filled into the connection snippets below. Reloading this page clears it for good — WordPress keeps only a hash and cannot show it again."
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
+msgid "The password you just created is still filled into the download and the connection details below. Reloading this page clears it for good — WordPress keeps only a hash and cannot show it again."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "Show the connection details again"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "Revoking stops that credential immediately. Note that an assistant connecting as an account that can edit users could issue itself another one — so revoke is a reliable off switch only for an account without that permission."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
 msgid "Manage all of this account's passwords"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "WordPress is refusing Application Passwords on this site, which usually means it is served over plain http. No MCP client can authenticate until the site uses https."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Client configuration"
 msgstr ""
 
-#: build/settings.js:3
-msgid "Pick your client and copy the snippet. It contains a real password only while a freshly generated one is still on screen."
+#: build/settings.js:15
+#: dist/svn/trunk/build/settings.js:15
+msgid "Download the file for Claude Desktop and double-click it. Setup for other clients appears here while a freshly generated password is still on screen."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Allow the assistant to delete?"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Full access lets the assistant permanently delete leads. Deleted leads cannot be recovered. Only grant this if you trust the assistant and the account it connects with."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Grant full access"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Wishlist"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Enable wishlist functionality (price-drop notifications) across the store."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Enable Wishlist"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Enable Wishlist features"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Social Proof (FOMO)"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Show how many other people are waiting for this product."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Enable FOMO Banner"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Show waiting count on product page"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Use {count} as a placeholder."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Only show if count is equal or higher than this."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Wishlist Display"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Optional extra CSS class(es) added to the wishlist button."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Shown after a product is added to the wishlist."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Archive Visibility"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Show on shop archives"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Fair-Play Restock"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Prevents customer frustration by only notifying a number of people equal to the actual units restocked."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Fair-Play"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Only notify leads equal to available stock"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Notification multiplier per unit restocked."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Reservation window, in hours."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Sales Attribution"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Conversion Window (Days)"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Urgency Alerts"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Hurry Logic"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Enable follow-up urgency alerts"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Trigger alert when stock falls below this level."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Minimum hours after restock before the hurry alert fires."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Failed to load system status."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Failed to load settings."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Settings saved successfully."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Failed to save settings."
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Overview"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "General"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Display"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Engine Logic"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Email Templates"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "System Status"
 msgstr ""
 
-#: build/settings.js:3
-#: dist/svn/trunk/build/settings.js:15
-msgid "AI Access"
-msgstr ""
-
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Advanced"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Unsaved Changes"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "You have unsaved changes. Would you like to save them before switching tabs?"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Save"
 msgstr ""
 
-#: build/settings.js:3
+#: build/settings.js:15
 #: dist/svn/trunk/build/settings.js:15
 msgid "Discard"
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:13
-msgid "Could not load the list of connected accounts."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:13
-msgid "Could not create the account."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:13
-msgid "Choose a username first."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:13
-msgid "no password issued here"
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "Connected accounts"
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "An assistant connects as an ordinary WordPress account. Give it its own, with permission to use the assistant tools and nothing else — not an administrator account, which could change its own access level."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "Can connect now"
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "Loading…"
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "Administrator — an assistant connecting as this account could raise its own access level. Use a dedicated account instead."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "Could not issue a new password."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "New password"
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "granted by role"
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "No account can reach the endpoint yet."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "Create an account"
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "Creates a subscriber that may use the assistant tools and nothing else. It cannot sign in to the dashboard."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "e.g. notifybay-assistant"
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "Create account"
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "It gets the Subscriber role plus permission to use the assistant tools. It is never given permission to manage the site, and cannot delete leads even at Full access."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:14
-msgid "Application Passwords are unavailable on this site, so a new account would have no way to sign in. Serve the site over https first."
-msgstr ""
-
-#. translators: %s: the account's username.
-#: dist/svn/trunk/build/settings.js:15
-#, js-format
-msgid "Password for %s — copy it now."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:15
-msgid "This is the only time it can be shown. If you lose it, use “New password” to issue another — which immediately stops the old one working."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:15
-msgid "Revoke this account's access?"
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:15
-msgid "Its password stops working immediately and the assistant will be disconnected. The WordPress account itself is kept, so nothing attributed to it is lost."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:15
-msgid "Access revoked. The account still exists but can no longer connect."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:15
-msgid "Could not revoke access."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:15
-msgid "The assistant can list leads and read system status. It cannot change anything."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:15
-msgid "Adds editing a lead. The assistant still cannot delete anything."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:15
-msgid "Adds deleting leads permanently. Only grant this if you trust the assistant and the account it connects with."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:15
-msgid "Run this in a terminal where Claude Code is installed, replacing the placeholder with base64 of \"username:application-password\"."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:15
-msgid "A revocable, per-application credential. It cannot be used to sign in to the dashboard, and revoking it does not change the account's own password."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:15
-msgid "Create one on your profile"
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:15
-msgid "or create a dedicated account below, which is the safer option."
-msgstr ""
-
-#: dist/svn/trunk/build/settings.js:15
-msgid "Pick your client, paste the snippet, then substitute the credential. Nothing here contains a real password."
 msgstr ""

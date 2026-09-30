@@ -25,6 +25,22 @@ const parseIntOr = (raw: string, fallback: number): number => {
   return Number.isNaN(n) ? fallback : n;
 };
 
+/*
+ * An empty box has to stay empty while it is being typed in. These inputs are
+ * controlled on a number, so returning the previous value for "" refilled the
+ * field the instant it was cleared: select-all + Delete put the old number
+ * straight back, and getting from 5 to 12 meant typing in front of the 5 and
+ * saving 512. Empty is held as "" until something valid is typed, and only
+ * then does it become a number again -- so the field never carries a value the
+ * server would reject, which is what parseIntOr was guarding against.
+ */
+const parseIntOrEmpty = (raw: string, fallback: number): number | "" => {
+  if ("" === raw.trim()) {
+    return "";
+  }
+  return parseIntOr(raw, fallback);
+};
+
 export const EngineTab: React.FC<EngineTabProps> = ({
   settings,
   setSettings,
@@ -81,6 +97,12 @@ export const EngineTab: React.FC<EngineTabProps> = ({
                         }
                         options={settings.appearance_waitlistExpiryOptions
                           .split(",")
+                          // "".split(",") is [""], which rendered a single
+                          // blank " Days" choice that saved an empty string --
+                          // and an empty options list makes the server fall
+                          // back to its packaged windows, so the blank entry
+                          // promised something it could not deliver.
+                          .filter((opt) => "" !== opt.trim())
                           .map((opt) => ({
                             value: opt.trim(),
                             label: `${opt.trim()} ${__("Days", "notifybay-waitlist-and-stock-alert-woo")}`,
@@ -141,9 +163,19 @@ export const EngineTab: React.FC<EngineTabProps> = ({
                 onChange={(e) =>
                   setSettings({
                     ...settings,
-                    engine_minStockThreshold: parseIntOr(e.target.value, settings.engine_minStockThreshold),
+                    engine_minStockThreshold: parseIntOrEmpty(
+                      e.target.value,
+                      Number(settings.engine_minStockThreshold),
+                    ) as number,
                   })
                 }
+                onBlur={(e) => {
+                  // Leaving an emptied box commits a real number again, so the
+                  // field is never saved as "".
+                  if ("" === e.target.value.trim()) {
+                    setSettings({ ...settings, engine_minStockThreshold: 0 });
+                  }
+                }}
               />
             ),
           },

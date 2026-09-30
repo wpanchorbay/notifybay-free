@@ -117,10 +117,11 @@ class Admin {
 		$menu_config = $config['menu'] ?? array();
 		// Live setting, not just the static config default -- lets a store
 		// owner turn the top-level menu off from the General settings tab.
-		// The config value is only the fallback for the instant before any
-		// settings row has ever been saved (e.g. right after activation).
-		$show_main   = Settings::get_instance()->get_settings( 'general_showMainMenu', $config['show_main_menu'] ?? true );
-		$top_slug    = $menu_config['top_level']['menu_slug'] ?? null;
+		// Settings::load_settings() merges config/settings.php's defaults, so this
+		// key is always present and the second argument is never reached — it is
+		// spelled out only to document the intended value.
+		$show_main = Settings::get_instance()->get_settings( 'general_showMainMenu', true );
+		$top_slug  = $menu_config['top_level']['menu_slug'] ?? null;
 
 		// 1. Add top-level menu
 		if ( $show_main && ! empty( $menu_config['top_level'] ) ) {
@@ -138,7 +139,48 @@ class Admin {
 
 		// 2. Add sub-menus
 		if ( ! empty( $menu_config['sub_menus'] ) ) {
-			foreach ( $menu_config['sub_menus'] as $sub ) {
+			$sub_menus = $menu_config['sub_menus'];
+
+			/*
+			 * Register the entry parented to our own top-level LAST.
+			 *
+			 * `notifybay-products` is deliberately registered more than once --
+			 * by add_menu_page() above, as the relabelled first child of that
+			 * menu, and again under WooCommerce's Products menu, which is the
+			 * original surface and has to keep working. But a slug can only have
+			 * one parent: add_submenu_page() assigns $_parent_pages[$menu_slug]
+			 * unconditionally, so whichever call runs last decides which menu
+			 * WordPress opens and highlights for that page.
+			 *
+			 * In config order the Products entry ran last, so visiting
+			 * admin.php?page=notifybay-products -- what get_admin_page_url()
+			 * returns, and where the post-activation redirect lands -- opened the
+			 * Products menu and left the new NotifyBay menu looking inert on its
+			 * own page. Ordering it this way points the highlight at NotifyBay
+			 * when that menu exists, and changes nothing when it does not: the
+			 * entry is skipped entirely then, leaving Products as the only
+			 * claimant.
+			 *
+			 * Partitioned rather than sorted: usort() is not stable before PHP
+			 * 8.0 and this plugin supports 7.4, so a comparator returning 0 for
+			 * every remaining pair could quietly reshuffle the visible order of
+			 * the other menu items on exactly the versions still supported.
+			 */
+			$own_last = array();
+			$others   = array();
+
+			foreach ( $sub_menus as $sub_menu ) {
+				if ( $sub_menu['parent_slug'] === $top_slug ) {
+					$own_last[] = $sub_menu;
+					continue;
+				}
+
+				$others[] = $sub_menu;
+			}
+
+			$sub_menus = array_merge( $others, $own_last );
+
+			foreach ( $sub_menus as $sub ) {
 				// The entry whose parent_slug is the top-level's own slug only
 				// makes sense once that top-level page actually exists.
 				if ( $sub['parent_slug'] === $top_slug && ! $show_main ) {
@@ -165,13 +207,15 @@ class Admin {
 		if ( $show_main && $top_slug ) {
 			global $submenu;
 			if ( isset( $submenu[ $top_slug ] ) ) {
+				// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- appending an entry to $submenu is the documented way to link into another plugin's registered page; nothing existing is overwritten.
 				$submenu[ $top_slug ][] = array(
 					__( 'Settings', 'notifybay-waitlist-and-stock-alert-woo' ),
 					'manage_woocommerce', // wc-settings' own required capability.
 					'admin.php?page=wc-settings&tab=' . \NOTIFYBAY_PLUGIN_NAME,
 				);
+				// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- see above.
 				$submenu[ $top_slug ][] = array(
-					__( 'MCP Connection', 'notifybay-waitlist-and-stock-alert-woo' ),
+					__( 'MCP Connection (Beta)', 'notifybay-waitlist-and-stock-alert-woo' ),
 					// manage_options, not manage_notifybay: the "mcp" tab only
 					// renders for a manage_options user (see get_mcp_localize()
 					// below) -- a lower-capability user following this link
@@ -224,21 +268,39 @@ class Admin {
 	public function get_admin_page_url() {
 		$config      = $this->get_config();
 		$menu_config = $config['menu'] ?? array();
-		$show_main   = $config['show_main_menu'] ?? true;
+		$top_slug    = $menu_config['top_level']['menu_slug'] ?? null;
 
-		if ( $show_main && ! empty( $menu_config['top_level']['menu_slug'] ) ) {
-			return admin_url( 'admin.php?page=' . $menu_config['top_level']['menu_slug'] );
+		// Read the same live setting add_admin_menu() registers against. Reading
+		// the static config here instead meant that turning the toggle off left
+		// this returning admin.php?page=<top slug> for a page that was never
+		// registered — a permissions error from the activation redirect and from
+		// the admin_url handed to the React app.
+		$show_main = Settings::get_instance()->get_settings( 'general_showMainMenu', true );
+
+		if ( $show_main && ! empty( $top_slug ) ) {
+			return admin_url( 'admin.php?page=' . $top_slug );
 		}
 
-		if ( ! empty( $menu_config['sub_menus'][0]['menu_slug'] ) ) {
-			$slug   = $menu_config['sub_menus'][0]['menu_slug'];
-			$parent = $menu_config['sub_menus'][0]['parent_slug'] ?? 'admin.php';
+		/*
+		 * Fall back to a sub-menu that exists in BOTH toggle states, which means
+		 * skipping any entry parented to the top-level menu — add_admin_menu()
+		 * skips those too when the toggle is off, and their parent_slug is not a
+		 * real admin file, so building a URL from one yields a dead screen.
+		 */
+		foreach ( $menu_config['sub_menus'] ?? array() as $sub ) {
+			if ( empty( $sub['menu_slug'] ) || empty( $sub['parent_slug'] ) ) {
+				continue;
+			}
+
+			if ( $sub['parent_slug'] === $top_slug ) {
+				continue;
+			}
 
 			// A parent such as `edit.php?post_type=product` already carries a
 			// query string, so `page` must be appended with `&`, not `?`.
-			$separator = ( false === strpos( $parent, '?' ) ) ? '?' : '&';
+			$separator = ( false === strpos( $sub['parent_slug'], '?' ) ) ? '?' : '&';
 
-			return admin_url( $parent . $separator . 'page=' . $slug );
+			return admin_url( $sub['parent_slug'] . $separator . 'page=' . $sub['menu_slug'] );
 		}
 
 		return admin_url( 'admin.php?page=' . \NOTIFYBAY_PLUGIN_NAME );
@@ -438,6 +500,21 @@ class Admin {
 			 * user, so there is no target to tamper with.
 			 */
 			'app_passwords_rest_url'  => get_rest_url( null, 'wp/v2/users/me/application-passwords' ),
+
+			/*
+			 * A one-click alternative to hand-editing claude_desktop_config.json.
+			 * Claude Desktop cannot add a server to its own config from inside a
+			 * conversation, which is what people try first, so the screen offers
+			 * the file instead. See Mcp\DesktopBundle.
+			 */
+			'desktop_bundle_url'      => \NotifyBay\Mcp\DesktopBundle::download_url(),
+
+			/*
+			 * Repairs the capability split the status route reports through
+			 * has_access_capability. Replaces a `wp cap add` line that was
+			 * printed as instructions. See Mcp\GrantAccess.
+			 */
+			'grant_cap_url'           => \NotifyBay\Mcp\GrantAccess::grant_url(),
 			'current_user_login'      => $user && $user->exists() ? $user->user_login : '',
 
 			/*
@@ -449,13 +526,17 @@ class Admin {
 			'is_local_dev'            => self::is_local_dev(),
 
 			/*
-			 * Whether to offer the npx proxy's NODE_TLS_REJECT_UNAUTHORIZED=0
-			 * escape hatch, which disables certificate verification and is
-			 * therefore offered as narrowly as possible: only on a development
-			 * host that is actually served over https, where a self-signed
-			 * certificate is the plausible reason the proxy cannot connect. On
-			 * plain http there is no TLS to verify, so including it there would
-			 * teach the habit without ever being the fix.
+			 * Whether to offer the NODE_TLS_REJECT_UNAUTHORIZED=0 escape hatch,
+			 * which disables certificate verification and is therefore offered
+			 * as narrowly as possible: only on a development host that is
+			 * actually served over https, where a self-signed certificate is the
+			 * plausible reason a client cannot connect. On plain http there is no
+			 * TLS to verify, so including it there would teach the habit without
+			 * ever being the fix.
+			 *
+			 * It is read by Node either way -- by the bundled bridge and by the
+			 * npx proxy the hand-written snippet still uses -- so this governs
+			 * both.
 			 */
 			'offer_tls_bypass'        => self::is_local_dev()
 				&& 'https' === strtolower( (string) wp_parse_url( home_url(), PHP_URL_SCHEME ) ),
@@ -465,16 +546,24 @@ class Admin {
 	/**
 	 * Whether this looks like a development host.
 	 *
-	 * Used only to decide whether the connection snippet should carry
-	 * `NODE_TLS_REJECT_UNAUTHORIZED=0`, which the npx proxy needs to talk to a
+	 * Used only to decide whether the connection details should carry
+	 * `NODE_TLS_REJECT_UNAUTHORIZED=0`, which Node needs to talk to a
 	 * self-signed certificate. It must never be used to relax a security
 	 * decision.
 	 *
+	 * Public because Mcp\DesktopBundle needs the same answer. It previously
+	 * carried its own copy, on the reasoning that a duplicated condition was
+	 * safer than a shared one -- and the two promptly disagreed: that copy
+	 * treated WP_ENVIRONMENT_TYPE=local as sufficient, so a staging site on a
+	 * real https hostname with that variable set got a bundle carrying
+	 * NODE_TLS_REJECT_UNAUTHORIZED=0 while this screen showed no warning at
+	 * all. One answer, or the screen and the file it hands out will keep
+	 * drifting apart.
+	 *
 	 * @since 1.0.3
-	 * @access private
 	 * @return bool
 	 */
-	private static function is_local_dev() {
+	public static function is_local_dev() {
 		$host = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
 
 		$is_local = in_array( $host, array( 'localhost', '127.0.0.1', '::1' ), true );

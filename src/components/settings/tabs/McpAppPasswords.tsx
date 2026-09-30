@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { __, sprintf } from "@wordpress/i18n";
 import apiFetch from "../../../utils/apiFetch";
 import { ClassicInput, ClassicButton } from "../../classics";
@@ -43,11 +43,38 @@ interface McpAppPasswordsProps {
  * @param root0.endpoint
  * @param root0.onSecretChange
  */
+/*
+ * Which credential the on-screen secret belongs to.
+ *
+ * A module binding, not a ref, because it has to live exactly as long as the
+ * secret it guards -- and that secret is itself a module binding in McpTab
+ * (pageLiveSecret), deliberately, so it survives this component unmounting.
+ * Settings.tsx renders the tab as {activeTab === "mcp" && <McpTab/>}, so
+ * switching settings tabs and back unmounts and remounts everything here.
+ *
+ * A ref was wrong for precisely that reason: it reset on the remount while the
+ * secret did not, so after a tab switch revoking the live credential no longer
+ * recognised it as live. The snippets went on showing a dead password and the
+ * Claude Desktop download went on baking it into the bundle -- an install that
+ * 401s on first use, which is the failure this check exists to prevent.
+ */
+let pageLiveUuid: string | null = null;
+
+function setLiveUuid(uuid: string | null) {
+  pageLiveUuid = uuid;
+}
+
+function getLiveUuid() {
+  return pageLiveUuid;
+}
+
 export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
   endpoint,
   onSecretChange,
 }) => {
   const [items, setItems] = useState<McpAppPassword[] | null>(null);
+
+
   const [isBusy, setIsBusy] = useState(false);
   const { addToast } = useToast();
 
@@ -69,9 +96,25 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
       const response = (await apiFetch({ url: endpoint })) as McpAppPassword[];
       setItems(response || []);
     } catch (error) {
+      /*
+       * An empty list and a failed request looked identical here -- this was
+       * the only failure path in this component that raised nothing. A 403 or
+       * a network error rendered as "no credentials", so the user generated a
+       * second one and could neither see nor revoke the first from this
+       * screen.
+       */
+      addToast(
+        error instanceof Error && error.message
+          ? error.message
+          : __(
+              "Could not load your connection credentials.",
+              "notifybay-waitlist-and-stock-alert-woo",
+            ),
+        "error",
+      );
       setItems([]);
     }
-  }, [endpoint]);
+  }, [endpoint, addToast]);
 
   useEffect(() => {
     load();
@@ -110,6 +153,7 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
        * where one breaks it. WordPress strips whitespace before comparing, so
        * both forms authenticate.
        */
+      setLiveUuid(response.uuid);
       onSecretChange(response.password.replace(/\s/g, ""));
       setName("");
       await load();
@@ -134,11 +178,28 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
     });
   };
 
+  /*
+   * `editing` is state, so it is not cleared until after the await below --
+   * which leaves the guard open for the whole round-trip. Enter fires
+   * commitRename, and the blur that follows (from clicking away, or from the
+   * input being disabled) fires it again with `editing` still set, sending a
+   * second identical PUT whose `finally` then races the first on isBusy.
+   * A ref settles synchronously, so it closes the window that state cannot.
+   * Clearing `editing` early instead would throw away the user's text if the
+   * request fails.
+   */
+  const renameInFlight = useRef(false);
+
   const commitRename = async () => {
     if (!editing || !editing.name.trim()) {
       setEditing(null);
       return;
     }
+
+    if (renameInFlight.current) {
+      return;
+    }
+    renameInFlight.current = true;
 
     setIsBusy(true);
     try {
@@ -151,6 +212,7 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
         __("Could not rename it.", "notifybay-waitlist-and-stock-alert-woo"),
       );
     } finally {
+      renameInFlight.current = false;
       setIsBusy(false);
     }
   };
@@ -159,6 +221,20 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
     setIsBusy(true);
     try {
       await apiFetch({ url: `${endpoint}/${item.uuid}`, method: "DELETE" });
+
+      /*
+       * Revoking the credential that is still filled into the screen has to
+       * clear it, or everything below goes on offering a password that now
+       * 401s: the snippets still show it, and the Claude Desktop download still
+       * bakes it into the bundle. The secret outlives this component -- McpTab
+       * holds it in a module binding so it survives a tab switch -- so nothing
+       * else will drop it before the page reloads.
+       */
+      if (getLiveUuid() === item.uuid) {
+        setLiveUuid(null);
+        onSecretChange(null);
+      }
+
       addToast(
         __(
           "Revoked. Any client still using it will get a 401 on its next request.",
@@ -199,6 +275,17 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
           id="mcp_app_password_name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => {
+            // Same WooCommerce <form id="mainform"> trap as the rename field
+            // below: without this, Enter here reloads the settings page instead
+            // of generating the password the user was clearly asking for.
+            if ("Enter" === e.key) {
+              e.preventDefault();
+              if (!isBusy) {
+                generate();
+              }
+            }
+          }}
           placeholder={__(
             "e.g. Claude on my laptop",
             "notifybay-waitlist-and-stock-alert-woo",
@@ -226,6 +313,14 @@ export const McpAppPasswords: React.FC<McpAppPasswordsProps> = ({
                       onBlur={commitRename}
                       onKeyDown={(e) => {
                         if ("Enter" === e.key) {
+                          // This panel renders inside WooCommerce's
+                          // <form id="mainform">, so a bare Enter submits the
+                          // whole settings form and reloads the page. WC ships
+                          // its save button disabled to prevent exactly that,
+                          // but its own MutationObserver on #mainform re-enables
+                          // the button when React mounts, so the guard is gone
+                          // by the time anyone types here.
+                          e.preventDefault();
                           commitRename();
                         }
                         if ("Escape" === e.key) {

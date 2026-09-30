@@ -135,7 +135,26 @@ class WooCommerceHooks {
 		// notify anyone waiting on an unmanaged product.
 		$has_quantity = ( null === $stock_quantity ) || ( $stock_quantity > 0 );
 
-		if ( ! $product->is_in_stock() || ! $has_quantity ) {
+		/*
+		 * `onbackorder` is not a restock. is_in_stock() is
+		 * `'outofstock' !== get_stock_status()`, so a backorder-able product
+		 * passes it, and once $has_quantity stopped reading an unmanaged
+		 * product's NULL quantity as zero, a merchant flipping an unmanaged
+		 * product to "On backorder" mailed the entire waitlist to say it was
+		 * back. It is not back -- that is what backorder means -- and the email
+		 * states it plainly.
+		 *
+		 * Tested on top of is_in_stock() rather than in place of it, so the
+		 * `woocommerce_product_is_in_stock` filter still governs the normal
+		 * path and only this one status is carved out. The managed case was
+		 * already covered by the quantity test; this closes the unmanaged one.
+		 *
+		 * Independent of general_backorderWaitlist, which decides whether a
+		 * backorder-able product is offered a waitlist at all
+		 * (Frontend\ProductPage::should_show_waitlist) -- not whether reaching
+		 * backorder counts as being restocked. It never does.
+		 */
+		if ( ! $product->is_in_stock() || 'onbackorder' === $product->get_stock_status() || ! $has_quantity ) {
 			return;
 		}
 
@@ -151,6 +170,26 @@ class WooCommerceHooks {
 		}
 
 		$enqueued[ $key ] = true;
+
+		/*
+		 * Only queue a dispatch for a product somebody is actually waiting on.
+		 * Every in-stock product reaching this point used to get an Action
+		 * Scheduler job regardless, and since an unmanaged product now satisfies
+		 * $has_quantity, that is most of a catalogue: a bulk stock write or a CSV
+		 * import enqueued one job per product, each of which woke a worker only to
+		 * find no leads and exit. The de-dup above is keyed per product, so it does
+		 * not help across thousands of distinct ones.
+		 *
+		 * Mirrors Engine\Dispatcher's own selection predicate, and is covered by
+		 * idx_product_variation_status.
+		 */
+		if ( ! Lead::has_active_waitlist( $parent_id, $variation_id ) ) {
+			// The cache flush is deliberately left outside the guard: the product's
+			// stock genuinely changed, so its transients are stale whether or not
+			// NotifyBay has anyone to email about it.
+			wc_delete_product_transients( $parent_id );
+			return;
+		}
 
 		if ( function_exists( 'as_enqueue_async_action' ) ) {
 			as_enqueue_async_action( 'notifybay_run_dispatcher', array( $parent_id, $variation_id ), 'notifybay_alerts' );

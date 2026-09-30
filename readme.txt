@@ -88,27 +88,45 @@ The compiled JavaScript in the `build/` directory is generated from human-readab
 
 The same source is also published publicly at:
 
-https://github.com/wpanchorbay/notifybay-free/tree/1.0.1
+https://github.com/wpanchorbay/notifybay-free/tree/1.0.3
 
 To rebuild the compiled assets from source: run `npm install`, then `npm run build`.
 
 == Changelog ==
 
 = 1.0.3 =
-* New: NotifyBay can be connected to an AI assistant over MCP (Model Context Protocol). It is off until you turn it on, under WooCommerce → Settings → Leads Settings → AI Access, where you also choose how much the assistant is allowed to do and copy the connection details.
-* New: seven assistant tools — list leads, waitlist size by product, system status, diagnose failed notifications, update a lead, resend a back-in-stock email, and delete leads. Deleting and resending are offered only at the "Full access" level, and only to an account that can manage NotifyBay.
-* New: generate, rename and revoke the Application Password the assistant connects with directly on the AI Access screen, without visiting your profile. Name it so you can tell it apart later, press Generate, and WordPress creates the password itself. The screen also shows the endpoint address and the account to connect as.
+* New (Beta): NotifyBay can be connected to an AI assistant over MCP (Model Context Protocol). This is a beta feature and may change in future releases. It is off until you turn it on, under WooCommerce → Settings → Leads Settings → MCP Connection, where you also choose how much the assistant is allowed to do and copy the connection details.
+* New (Beta): seven assistant tools — list leads, waitlist size by product, system status, diagnose failed notifications, update a lead, resend a back-in-stock email, and delete leads. Deleting and resending are offered only at the "Full access" level, and only to an account that can manage NotifyBay.
+* New: generate, rename and revoke the Application Password the assistant connects with directly on the MCP Connection screen, without visiting your profile. Name it so you can tell it apart later, press Generate, and WordPress creates the password itself. The screen also shows the endpoint address and the account to connect as.
 * New: connection details for Claude Code, Claude Desktop, Cursor, Codex, and any other client that speaks MCP over HTTP. The moment a password is generated they open in a dialog with everything filled in — the password and a ready-to-paste snippet for each client, with nothing left to substitute and no need to encode anything yourself.
-* New: the connection details say so when MCP is switched off, instead of handing you a snippet that would be refused.
+* New: connecting Claude Desktop is now Download, double-click, Install. The downloaded file already contains your site address and your password, so there is nothing to copy and nothing to type. Delete the file once it is installed — it is a working credential until you do, and Revoke on the same screen cancels it at any time.
+* New: the downloaded file no longer needs Node.js to be installed or the npm registry to be reachable on first connection. It now carries everything it needs, so the first connection works on a machine that has neither.
+* New: the Download button is shown straight away instead of appearing only after picking "Claude Desktop" from a list that opened on a terminal command.
+* New: when your account is missing the permission the assistant endpoint checks, the screen now has a button that grants it. It used to print a command for you to run on your server.
+* Fix: the connection snippets were always on screen, even before a password existed — showing placeholders like "<base64(admin:application-password)>" that could not be used and gave no way to work out the real value. They now appear only once there is a real password to put in them, and say what to do when there is not.
+* Fix: the connection details said a client would be "refused" while MCP is switched off. A client actually reports the address as not found, which sent people looking through user permissions for a problem that is a switch on that screen.
+* Fix: with the WooCommerce back-in-stock email switched off, every restock still claimed the waitlist and queued sends that could not deliver, then returned those leads to the waitlist and did it again at the next restock — writing a warning to the log each time, for every lead, indefinitely. A restock now stops before claiming anyone and says why once.
+* Fix: clearing the list of expiry windows left the sign-up form offering no expiry at all while the server still assigned one, so a logged-in shopper — whose one-click sign-up never shows the dropdown — could be given a 90-day expiry on a store that offered none, and be dropped when it passed. The form, the block and the server now read one list.
 * Fix: copying anything on the settings screens — an endpoint address, a username, a snippet — silently saved the whole settings form and reported "Settings saved successfully". Copy buttons now only copy.
 * Fix: removed a non-functional "Target Price" field and column from the Leads screen. The field wrote to a database column that does not exist, which made the whole save fail — discarding the email and status changes made alongside it — and reported only "Could not update lead."
 * Fix: a failed database write is now logged with the reason, instead of failing with no explanation anywhere.
-
-= 1.0.2 =
+* Fix: the AI assistant connection was refused with a permissions error on any site that updated to this release rather than activating it fresh, while the MCP Connection screen still reported the endpoint as ready. The permission is now granted automatically on update, and the screen says plainly when an account is missing it.
+* Fix: deactivating NotifyBay over the REST API — used by some hosts, migration tools and site managers — failed with a critical error and left the plugin active. Deactivating from the Plugins screen was unaffected.
+* Fix: waitlist sign-ups were given a 90-day expiry even on stores that never switched expiry on, and were then quietly dropped when it passed. The setting is now respected, the shopper's own choice reaches the server for the first time, and a one-time repair clears expiry dates that should never have been set.
+* Fix: expiry dates were recorded in UTC while every check that reads them runs on store local time, so on stores not set to UTC leads expired early or late. The same correction applies to stale-job recovery and double opt-in cleanup.
+* Fix: restoring an expired lead to active from the Leads screen appeared to work, then silently reverted within a day.
+* Fix: the expiry dropdown could offer choices — "0 days", or a negative number if one was configured — that the server ignored, silently giving the shopper no expiry. Invalid entries are now dropped when the setting is saved.
+* Fix: pressing Enter in the MCP Connection screen's name fields reloaded the settings page instead of doing what was asked.
+* Fix: a back-in-stock check was queued for every product returning to stock, including products nobody is waiting for.
+* Fix: hiding the top-level NotifyBay menu left the plugin's own links pointing at a page that no longer existed.
 * Fix: removed two per-product override fields ("Smart Transition", "Max Waitlist Size") that saved a value but never actually did anything.
+* New: an option to show or hide the top-level NotifyBay admin menu, and a new sidebar icon that follows your admin colour scheme.
 * Fix: Setup Wizard no longer tells users to use a Gutenberg block for manual placement unless NotifyBay Pro is active.
 * Fix: clearing a numeric setting (e.g. Minimum Restock Threshold) silently reverted to the old value while the UI still showed a "Saved" success message.
 * Fix: guest waitlist status checks failed silently on an expired security token; waitlist actions now refresh the token and retry automatically instead of failing with no recovery path.
+* Fix: asking the assistant to re-send a back-in-stock email could put an already-notified customer back on the waitlist, so the next restock emailed them a second time. This happened whenever the background queue was slow, which is normal on stores without a real cron.
+* Fix: asking the assistant to re-send a back-in-stock email while that email is switched off in WooCommerce reported the job as queued, when nothing could ever be sent. It now refuses and says why.
+* Fix: a failed notification was meant to be retried three times with a growing delay. The third retry could never run, and the second was usually cancelled by a cleanup job before it fired. All three now happen.
 
 = 1.0.1 =
 * Fix: the `templates/` directory (required to render the Leads Settings admin screen, product-column lead counts, and per-product override meta box) was missing from the packaged release, leaving those screens blank. Packaging now includes it correctly.
@@ -119,10 +137,7 @@ To rebuild the compiled assets from source: run `npm install`, then `npm run bui
 == Upgrade Notice ==
 
 = 1.0.3 =
-Adds an optional AI assistant connection (MCP), off by default and configured under WooCommerce → Settings → Leads Settings → AI Access. Also fixes copy buttons on the settings screens silently saving the form, and removes a non-functional "Target Price" field on the Leads screen whose presence could make an otherwise valid lead edit fail.
-
-= 1.0.2 =
-Removes two non-functional per-product settings fields, fixes wizard copy referencing a Free-tier block that no longer exists, fixes a settings field that silently reverted on save, and improves recovery from expired security tokens.
+Adds an optional AI assistant connection (MCP, beta), off by default and configured under WooCommerce → Settings → Leads Settings → MCP Connection. Repairs waitlist expiry: leads were given an expiry date even on stores that never enabled it, and were dropped when it passed — this release honours the setting, records dates in the store's own timezone, and runs a one-time repair of existing ones. If you updated and the assistant connection was refused with a permissions error, that permission is now granted automatically. Also removes two non-functional per-product settings fields and a non-functional "Target Price" field on the Leads screen, and fixes copy buttons that silently saved the settings form. Also fixes duplicate back-in-stock emails — a customer who had already been notified could be returned to the waitlist and emailed again at the next restock — and restores the full retry schedule for notifications that fail to send.
 
 = 1.0.1 =
 Fixes a blank Leads Settings screen under WooCommerce → Settings caused by missing template files in the 1.0.0 package.

@@ -16,4 +16,8 @@ defined( 'ABSPATH' ) || exit;
 
 return array(
 	\NotifyBay\Database\Migrations\CreateNotifybayLeadsTable::class,
+	// Order matters: DbManager::create_tables() runs this array in sequence and
+	// Activator calls it on a fresh install, so a data migration must come after
+	// the schema migration that creates the table it rewrites.
+	\NotifyBay\Database\Migrations\FixLeadExpiry::class,
 );
