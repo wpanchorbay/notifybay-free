@@ -82,16 +82,6 @@ No data is sent at any other time. This plugin does not phone home during normal
 
 Service provider: WPAnchorBay — Terms of Service: https://wpanchorbay.com/terms/ — Privacy Policy: https://wpanchorbay.com/privacy-policy/
 
-== Source Code ==
-
-The compiled JavaScript in the `build/` directory is generated from human-readable source using [@wordpress/scripts](https://www.npmjs.com/package/@wordpress/scripts) (webpack). The full, unminified source (the `src/` directory) and the build tooling (`package.json`, `webpack.config.js`, `tsconfig.json`, `postcss.config.js`, `tailwind.config.js`) are **included in this package**, alongside the compiled `build/` output.
-
-The same source is also published publicly at:
-
-https://github.com/wpanchorbay/notifybay-free/tree/1.0.3
-
-To rebuild the compiled assets from source: run `npm install`, then `npm run build`.
-
 == Changelog ==
 
 = 1.0.3 =
