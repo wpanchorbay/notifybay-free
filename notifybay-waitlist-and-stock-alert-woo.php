@@ -66,6 +66,12 @@ if ( class_exists( '\WPAB\Mcp\Kit' ) ) {
 
 require_once NOTIFYBAY_PATH . 'app/functions.php';
 
+// WPAnchorBay campaign banner (shared across WPAnchorBay plugins). Admin only, but at file
+// scope on purpose so its wp_ajax_ dismiss handler also registers on admin-ajax.php requests.
+if ( is_admin() ) {
+	require_once __DIR__ . '/includes/wpab-banner/wpab-banner-loader.php';
+}
+
 /**
  * Declare compatibility with WooCommerce High-Performance Order Storage (HPOS).
  *

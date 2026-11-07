@@ -69,6 +69,7 @@ copy_plugin_files() {
     rm -rf "$DEST/vendor/plugin-update-checker"
     cp -r config "$DEST/"
     cp -r templates "$DEST/"
+    cp -r includes "$DEST/"
 
     # Copy files
     cp index.php "$DEST/"

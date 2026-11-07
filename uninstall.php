@@ -56,3 +56,8 @@ if ( $notifybay_deep_uninstall ) {
 		}
 	}
 }
+
+// Shared WPAnchorBay banner cleanup: removes the "banner closed" user meta only when the last
+// WPAnchorBay plugin is uninstalled.
+require_once __DIR__ . '/includes/wpab-banner/wpab-banner-uninstall.php';
+wpab_banner_uninstall( WP_UNINSTALL_PLUGIN, (bool) $notifybay_deep_uninstall );
