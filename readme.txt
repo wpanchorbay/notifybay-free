@@ -2,9 +2,9 @@
 Contributors: sankarsan, wpanchorbay, forhadkhan, arifac, shuvendushekhar
 Tags: woocommerce, waitlist, back-in-stock, stock-alert, inventory
 Requires at least: 6.8
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -84,6 +84,9 @@ Service provider: WPAnchorBay — Terms of Service: https://wpanchorbay.com/term
 
 == Changelog ==
 
+= 1.0.4 =
+* New: a dismissible Black Friday deals notice from WPAnchorBay for administrators, on the Plugins screen, NotifyBay's own admin pages and its WooCommerce settings tab, through 5 December 2026. Closing it hides it for good.
+
 = 1.0.3 =
 * New (Beta): NotifyBay can be connected to an AI assistant over MCP (Model Context Protocol). This is a beta feature and may change in future releases. It is off until you turn it on, under WooCommerce → Settings → Leads Settings → MCP Connection, where you also choose how much the assistant is allowed to do and copy the connection details.
 * New (Beta): seven assistant tools — list leads, waitlist size by product, system status, diagnose failed notifications, update a lead, resend a back-in-stock email, and delete leads. Deleting and resending are offered only at the "Full access" level, and only to an account that can manage NotifyBay.
@@ -125,6 +128,9 @@ Service provider: WPAnchorBay — Terms of Service: https://wpanchorbay.com/term
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.0.4 =
+Adds a dismissible Black Friday notice for administrators on the Plugins and NotifyBay screens, through 5 December 2026. No changes to waitlists or emails.
 
 = 1.0.3 =
 Adds an optional AI assistant connection (MCP, beta), off by default and configured under WooCommerce → Settings → Leads Settings → MCP Connection. Repairs waitlist expiry: leads were given an expiry date even on stores that never enabled it, and were dropped when it passed — this release honours the setting, records dates in the store's own timezone, and runs a one-time repair of existing ones. If you updated and the assistant connection was refused with a permissions error, that permission is now granted automatically. Also removes two non-functional per-product settings fields and a non-functional "Target Price" field on the Leads screen, and fixes copy buttons that silently saved the settings form. Also fixes duplicate back-in-stock emails — a customer who had already been notified could be returned to the waitlist and emailed again at the next restock — and restores the full retry schedule for notifications that fail to send.

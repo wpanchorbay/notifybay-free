@@ -6,7 +6,7 @@
  * Requires at least: 6.8
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
- * Version:           1.0.3
+ * Version:           1.0.4
  * Author:            WPAnchorBay
  * Author URI:        https://wpanchorbay.com
  * License:           GPLv2 or later
@@ -25,7 +25,7 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'NOTIFYBAY_PATH', plugin_dir_path( __FILE__ ) );
 define( 'NOTIFYBAY_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NOTIFYBAY_URL', plugin_dir_url( __FILE__ ) );
-define( 'NOTIFYBAY_VERSION', '1.0.3' );
+define( 'NOTIFYBAY_VERSION', '1.0.4' );
 // Database schema version -- a counter, unrelated to NOTIFYBAY_VERSION above.
 // Bump whenever the custom table structure changes, or whenever a data migration
 // needs to run, so config/migrations.php is re-applied on plugin UPDATE

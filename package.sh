@@ -70,6 +70,9 @@ copy_plugin_files() {
     cp -r config "$DEST/"
     cp -r templates "$DEST/"
     cp -r includes "$DEST/"
+    # The banner README is internal integration docs for WPAnchorBay developers; keep it in
+    # the repo but out of every shipped package.
+    rm -f "$DEST/includes/wpab-banner/README.md"
 
     # Copy files
     cp index.php "$DEST/"
